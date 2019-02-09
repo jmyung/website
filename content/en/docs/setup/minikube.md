@@ -42,7 +42,7 @@ the following drivers:
 * kvm ([driver installation](https://git.k8s.io/minikube/docs/drivers.md#kvm-driver))
 * hyperkit ([driver installation](https://git.k8s.io/minikube/docs/drivers.md#hyperkit-driver))
 * xhyve ([driver installation](https://git.k8s.io/minikube/docs/drivers.md#xhyve-driver)) (deprecated)
-
+* hyperv ([driver installation](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#hyperv-driver))
 Note that the IP below is dynamic and can change. It can be retrieved with `minikube ip`.
 
 ```shell
@@ -403,7 +403,6 @@ For more information about Minikube, see the [proposal](https://git.k8s.io/commu
 * **Building Minikube**: For instructions on how to build/test Minikube from source, see the [build guide](https://git.k8s.io/minikube/docs/contributors/build_guide.md).
 * **Adding a New Dependency**: For instructions on how to add a new dependency to Minikube see the [adding dependencies guide](https://git.k8s.io/minikube/docs/contributors/adding_a_dependency.md).
 * **Adding a New Addon**: For instruction on how to add a new addon for Minikube see the [adding an addon guide](https://git.k8s.io/minikube/docs/contributors/adding_an_addon.md).
-* **Updating Kubernetes**: For instructions on how to update Kubernetes see the [updating Kubernetes guide](https://git.k8s.io/minikube/docs/contributors/updating_kubernetes.md).
 
 ## Community
 

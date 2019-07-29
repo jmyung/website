@@ -26,23 +26,23 @@ weight: 10
 
 ## 동기
 
-Kubernetes {{< glossary_tooltip term_id="pod" text="Pods" >}} are mortal.
-They are born and when they die, they are not resurrected.
-If you use a {{< glossary_tooltip term_id="deployment" >}} to run your app,
-it can create and destroy Pods dynamically.
+쿠버네티스 {{< glossary_tooltip term_id="pod" text="파드" >}}는 수명이 있다.
+파드는 생성되고, 소멸된 후 부활하지 않는다.
+만약 앱을 실행하기 위해 {{< glossary_tooltip term_id="deployment" text="디플로이먼트" >}}를 사용한다면,
+동적으로 파드를 생성하고 제거할 수 있다.
 
-Each Pod gets its own IP address, however in a Deployment, the set of Pods
-running in one moment in time could be different from
-the set of Pods running that application a moment later.
+각 파드는 고유한 IP 주소를 갖지만, 디플로이먼트에서는
+한 시점에 실행되는 파드 집합이
+잠시후 실행되는 해당 파드 집합과 다를 수 있다.
 
-This leads to a problem: if some set of Pods (call them “backends”) provides
-functionality to other Pods (call them “frontends”) inside your cluster,
-how do the frontends find out and keep track of which IP address to connect
-to, so that the frontend can use the backend part of the workload?
+이는 다음과 같은 문제를 야기한다. (“백엔드”라 불리는) 일부 파드 집합이
+클러스터의 (“프론트엔드”라 불리는) 다른 파드 에 기능을 제공하는 경우,
+프론트엔드가 워크로드의 백엔드를 사용하기 위해,
+프론트엔드가 어떻게 연결할 IP 주소를 찾아서 추적할 수 있는가?
 
-Enter _Services_.
+_서비스_ 로 들어가보자.
 
-## Service resources {#service-resource}
+## 서비스 리소스 {#service-resource}
 
 In Kubernetes, a Service is an abstraction which defines a logical set of Pods
 and a policy by which to access them (sometimes this pattern is called

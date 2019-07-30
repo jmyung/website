@@ -44,22 +44,22 @@ _서비스_ 로 들어가보자.
 
 ## 서비스 리소스 {#service-resource}
 
-In Kubernetes, a Service is an abstraction which defines a logical set of Pods
-and a policy by which to access them (sometimes this pattern is called
-a micro-service). The set of Pods targeted by a Service is usually determined
-by a {{< glossary_tooltip text="selector" term_id="selector" >}}
-(see [below](#services-without-selectors) for why you might want a Service
-_without_ a selector).
+쿠버네티스에서 서비스는 파드의 논리적 집합과 그것들을 액세스할 수 있는
+정책을 정의하는 추상화이다. (때로는 이 패턴을
+마이크로-서비스라고 한다.) 서비스가 대상으로 하는 파드 집합은 일반적으로
+{{< glossary_tooltip text="셀렉터" term_id="selector" >}}가 결정한다.
+(셀렉터가 _없는_ 서비스가 필요한 이유는 [아래](#services-without-selectors)를
+참조한다).
 
-For example, consider a stateless image-processing backend which is running with
-3 replicas.  Those replicas are fungible&mdash;frontends do not care which backend
-they use.  While the actual Pods that compose the backend set may change, the
-frontend clients should not need to be aware of that, nor should they need to keep
-track of the set of backends themselves.
+예를 들어, 3개의 레플리카로 실행되는 스테이트리스 이미지-처리 백엔드를
+생각해보자. 이러한 레플리카는 대체 가능하고&mdash;프론트 엔드는 그것들이 사용하는 백엔드를
+신경 쓰지 않는다. 백엔드 세트를 구성하는 실제 파드는 변경될 수 있지만,
+프론트엔드 클라이언트는 이를 인식할 필요가 없으며, 백엔드 세트 자체를 추적해야 할 필요도
+없다.
 
-The Service abstraction enables this decoupling.
+서비스 추상화는 이러한 디커플링을 가능하게 한다.
 
-### Cloud-native service discovery
+### 클라우드-네이티브 서비스 검색
 
 If you're able to use Kubernetes APIs for service discovery in your application,
 you can query the {{< glossary_tooltip text="API server" term_id="kube-apiserver" >}}

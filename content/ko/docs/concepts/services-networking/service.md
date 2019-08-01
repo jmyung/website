@@ -61,21 +61,21 @@ _서비스_ 로 들어가보자.
 
 ### 클라우드-네이티브 서비스 검색
 
-If you're able to use Kubernetes APIs for service discovery in your application,
-you can query the {{< glossary_tooltip text="API server" term_id="kube-apiserver" >}}
-for Endpoints, that get updated whenever the set of Pods in a Service changes.
+애플리케이션에서 서비스 검색을 위해 쿠버네티스 API를 사용할 수 있는 경우,
+서비스 내 파드 세트가 변경 될 때마다 업데이트되는 엔드포인트를 {{< glossary_tooltip text="API 서버" term_id="kube-apiserver" >}}에
+질의할 수 ​​있다.
 
-For non-native applications, Kubernetes offers ways to place a network port or load
-balancer in between your application and the backend Pods.
+네이티브 애플리케이션이 아닌 (non-native applications) 경우, 쿠버네티스는 애플리케이션과 백엔드 파드 사이에 네트워크 포트 또는 로드
+밸런서를 배치 할 수 있는 방법을 제공한다.
 
-## Defining a Service
+## 서비스 정의
 
-A Service in Kubernetes is a REST object, similar to a Pod.  Like all of the
-REST objects, you can `POST` a Service definition to the API server to create
-a new instance.
+쿠버네티스의 서비스는 파드와 비슷한 REST 객체이다. 모든 REST 객체와
+마찬가지로, 서비스 정의를 API 서버에 `POST`하여
+새 인스턴스를 생성할 수 있다.
 
-For example, suppose you have a set of Pods that each listen on TCP port 9376
-and carry a label `app=MyApp`:
+예를 들어, 각각 TCP 포트 9376에서 수신하고
+`app=MyApp` 레이블을 가지고 있는 파드 세트가 있다고 가정해 보자.
 
 ```yaml
 apiVersion: v1

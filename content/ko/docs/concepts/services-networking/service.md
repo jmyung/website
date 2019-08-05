@@ -48,7 +48,7 @@ _서비스_ 로 들어가보자.
 정책을 정의하는 추상화이다. (때로는 이 패턴을
 마이크로-서비스라고 한다.) 서비스가 대상으로 하는 파드 집합은 일반적으로
 {{< glossary_tooltip text="셀렉터" term_id="selector" >}}가 결정한다.
-(셀렉터가 _없는_ 서비스가 필요한 이유는 [아래](#services-without-selectors)를
+(셀렉터가 _없는_ 서비스가 필요한 이유는 [아래](#셀렉터가-없는-서비스)를
 참조한다).
 
 예를 들어, 3개의 레플리카로 실행되는 스테이트리스 이미지-처리 백엔드를
@@ -91,39 +91,39 @@ spec:
     targetPort: 9376
 ```
 
-This specification creates a new Service object named “my-service”, which
-targets TCP port 9376 on any Pod with the `app=MyApp` label.
+이 명세는 “my-service”라는 새로운 서비스 오브젝트를 생성하고,
+`app=MyApp` 레이블을 가진 파드의 TCP 9376 포트를 대상으로 한다.
 
-Kubernetes assigns this Service an IP address (sometimes called the "cluster IP"),
-which is used by the Service proxies
-(see [Virtual IPs and service proxies](#virtual-ips-and-service-proxies) below).
+쿠버네티스는 이 서비스에 서비스 프록시가 사용하는 IP 주소 ("cluster IP"라고도 함)
+를 할당한다.
+(이하 [가상 IP와 서비스 프록시](#가상-IP와-서비스-프록시) 참고)
 
-The controller for the Service selector continuously scans for Pods that
-match its selector, and then POSTs any updates to an Endpoint object
-also named “my-service”.
+서비스 셀렉터의 컨트롤러는 셀렉터와 일치하는 파드를 지속적으로 검색하고,
+“my-service”라는 엔드포인트 오브젝트에 대한
+모든 업데이트를 POST한다.
 
 {{< note >}}
-A Service can map _any_ incoming `port` to a `targetPort`. By default and
-for convenience, the `targetPort` is set to the same value as the `port`
-field.
+서비스는 _모든_ 수신 `port`를 `targetPort`에 매핑할 수 있다. 기본적으로 그리고
+편의상, `targetPort`는 `port`
+필드와 같은 값으로 설정된다.
 {{< /note >}}
 
-Port definitions in Pods have names, and you can reference these names in the
-`targetPort` attribute of a Service. This works even if there is a mixture
-of Pods in the Service using a single configured name, with the same network
-protocol available via different port numbers.
-This offers a lot of flexibility for deploying and evolving your Services.
-For example, you can change the port numbers that Pods expose in the next
-version of your backend software, without breaking clients.
+파드의 포트 정의에는 이름이 있고, 서비스의 `targetPort` 속성에서 이 이름을
+참조할 수 있다. 이것은 다른 포트 번호를 통한 가용한 동일 네트워크 프로토콜이 있고,
+단일 구성 이름을 사용하는 서비스 내에
+혼합된 파드가 존재해도 가능하다.
+이를 통해 서비스를 배포하고 진전시키는데 많은 유연성을 제공한다.
+예를 들어, 클라이언트를 망가뜨리지 않고, 백엔드 소프트웨어의 다음
+버전에서 파드가 노출시키는 포트 번호를 변경할 수 있다.
 
-The default protocol for Services is TCP; you can also use any other
-[supported protocol](#protocol-support).
+서비스의 기본 프로토콜은 TCP이다. 다른
+[지원 프로토콜](#지원-프로토콜)을 사용할 수도 있다.
 
-As many Services need to expose more than one port, Kubernetes supports multiple
-port definitions on a Service object.
-Each port definition can have the same `protocol`, or a different one.
+많은 서비스가 하나 이상의 포트를 노출해야 하기 때문에, 쿠버네티스는 서비스 오브젝트에서 다중
+포트 정의를 지원한다.
+각 포트는 동일한 `프로토콜` 또는 다른 프로토콜로 정의될 수 있다.
 
-### Services without selectors
+### 셀렉터가 없는 서비스
 
 Services most commonly abstract access to Kubernetes Pods, but they can also
 abstract other kinds of backends.
@@ -184,7 +184,7 @@ An ExternalName Service is a special case of Service that does not have
 selectors and uses DNS names instead. For more information, see the
 [ExternalName](#externalname) section later in this document.
 
-## Virtual IPs and service proxies
+## 가상 IP와 서비스 프록시
 
 Every node in a Kubernetes cluster runs a `kube-proxy`. `kube-proxy` is
 responsible for implementing a form of virtual IP for `Services` of type other
@@ -1050,7 +1050,7 @@ IPVS is designed for load balancing and based on in-kernel hash tables. So you c
 Service is a top-level resource in the Kubernetes REST API. You can find more details
 about the API object at: [Service API object](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#service-v1-core).
 
-## Supported protocols {#protocol-support}
+## 지원 프로토콜 {#지원-프로토콜}
 
 ### TCP
 

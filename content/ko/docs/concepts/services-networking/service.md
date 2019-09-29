@@ -136,8 +136,8 @@ spec:
   * 워크로드를 쿠버네티스로 마이그레이션하고 있다. 접근 방식을 평가하는 동안,
     쿠버네티스에서는 일정 비율의 백엔드만 실행한다.
 
-In any of these scenarios you can define a Service _without_ a Pod selector.
-For example:
+이러한 시나리오에서 파드 셀렉터가 _없는_ 서비스를 정의 할 수 있다.
+다음은 예이다.
 
 ```yaml
 apiVersion: v1
@@ -151,9 +151,9 @@ spec:
       targetPort: 9376
 ```
 
-Because this Service has no selector, the corresponding Endpoint object is *not*
-created automatically. You can manually map the Service to the network address and port
-where it's running, by adding an Endpoint object manually:
+이 서비스에는 셀렉터가 없으므로, 해당되는 엔드포인트 객체가
+자동으로 생성되지 *않는다*. 엔드포인트 객체를 수동으로 추가하여, 서비스를
+실행중인 네트워크 주소 및 포트에 수동으로 매핑할 수 있다.
 
 ```yaml
 apiVersion: v1
@@ -168,12 +168,12 @@ subsets:
 ```
 
 {{< note >}}
-The endpoint IPs _must not_ be: loopback (127.0.0.0/8 for IPv4, ::1/128 for IPv6), or
-link-local (169.254.0.0/16 and 224.0.0.0/24 for IPv4, fe80::/64 for IPv6).
+엔드포인트 IP는 루프백 (IPv4의 경우 127.0.0.0/8, IPv6의 경우 ::1/128) 또는
+링크-로컬 (IPv4의 경우 169.254.0.0/16 및 224.0.0.0/24, IPv6의 경우 fe80::/64)이 _아니어야_ 한다.
 
-Endpoint IP addresses cannot be the cluster IPs of other Kubernetes Services,
-because {{< glossary_tooltip term_id="kube-proxy" >}} doesn't support virtual IPs
-as a destination.
+엔드포인트 IP 주소는 다른 쿠버네티스 서비스의 클러스터 IP일 수 없는데,
+{{< glossary_tooltip term_id="kube-proxy" >}}는 가상 IP를
+목적지로서 지원하지 않기 때문이다.
 {{< /note >}}
 
 Accessing a Service without a selector works the same as if it had a selector.

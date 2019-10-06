@@ -176,32 +176,32 @@ subsets:
 목적지로서 지원하지 않기 때문이다.
 {{< /note >}}
 
-Accessing a Service without a selector works the same as if it had a selector.
-In the example above, traffic is routed to the single endpoint defined in
-the YAML: `192.0.2.42:9376` (TCP).
+셀렉터가 없는 서비스의 액세스는 셀렉터가 있는 것과 같이 동일하게 작동한다.
+위의 예에서, 트래픽은 YAML에 정의된 단일 엔드포인트인
+`192.0.2.42:9376` (TCP)으로 라우팅된다.
 
-An ExternalName Service is a special case of Service that does not have
-selectors and uses DNS names instead. For more information, see the
-[ExternalName](#externalname) section later in this document.
+ExternalName 서비스는 셀렉터가 없고
+DNS 명을 대신 사용하는 특수한 케이스의 서비스이다. 자세한 내용은, 이 문서의 뒷부분의
+[ExternalName](#externalname) 섹션을 참고한다.
 
-### Endpoint Slices
+### 엔드포인트 슬라이스
 {{< feature-state for_k8s_version="v1.16" state="alpha" >}}
 
-Endpoint Slices are an API resource that can provide a more scalable alternative
-to Endpoints. Although conceptually quite similar to Endpoints, Endpoint Slices
-allow for distributing network endpoints across multiple resources. By default,
-an Endpoint Slice is considered "full" once it reaches 100 endpoints, at which
-point additional Endpoint Slices will be created to store any additional
-endpoints.
+엔드포인트 슬라이스는 엔드포인트에 보다 확장 가능한 (scalable) 대안을 제공할 수 있는
+API 리소스이다. 개념적으로 엔드포인트와 매우 유사하지만, 엔드포인트 슬라이스를
+사용하면 여러 리소스에 네트워크 엔드포인트를 분산시킬 수 있다. 기본적으로,
+엔드포인트 슬라이스는 100개의 엔드포인트에 도달하면 "full(전체)"로 간주되며, 추가 엔드포인트를
+저장하기 위해 추가 엔드포인트 슬라이스가
+생성된다.
 
-Endpoint Slices provide additional attributes and functionality which is
-described in detail in [Endpoint Slices](/docs/concepts/services-networking/endpoint-slices/).
+엔드포인트 슬라이스는 [엔드포인트 슬라이스](/docs/concepts/services-networking/endpoint-slices/)에
+자세히 설명된 추가 속성 및 기능을 제공한다.
 
-## Virtual IPs and service proxies
+## 가상 IP 및 서비스 프록시
 
-Every node in a Kubernetes cluster runs a `kube-proxy`. `kube-proxy` is
-responsible for implementing a form of virtual IP for `Services` of type other
-than [`ExternalName`](#externalname).
+쿠버네티스 클러스터의 모든 노드는 `kube-proxy`를 실행한다. `kube-proxy`는
+[`ExternalName`](#externalname)이 아닌 `서비스`에 대해
+가상 IP 형식을 생성한다.
 
 ### Why not use round-robin DNS?
 

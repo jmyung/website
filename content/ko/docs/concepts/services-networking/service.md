@@ -125,19 +125,19 @@ spec:
 
 ### 셀렉터가 없는 서비스
 
-Services most commonly abstract access to Kubernetes Pods, but they can also
-abstract other kinds of backends.
-For example:
+서비스는 일반적으로 쿠버네티스 파드에 대한 접근을 추상화하지만,
+다른 종류의 백엔드를 추상화할 수도 있다.
+예를 들면
 
-  * You want to have an external database cluster in production, but in your
-    test environment you use your own databases.
-  * You want to point your Service to a Service in a different
-    {{< glossary_tooltip term_id="namespace" >}} or on another cluster.
-  * You are migrating a workload to Kubernetes. Whilst evaluating the approach,
-    you run only a proportion of your backends in Kubernetes.
+  * 프로덕션 환경에서는 외부 데이터베이스 클러스터를 사용하려고 하지만,
+    테스트 환경에서는 자체 데이터베이스를 사용한다.
+  * 한 서비스에서 다른
+    {{< glossary_tooltip term_id="namespace" text="네임스페이스">}} 또는 다른 클러스터의 서비스를 지정하려고 한다.
+  * 워크로드를 쿠버네티스로 마이그레이션하고 있다. 해당 방식을 평가하는 동안,
+    쿠버네티스에서는 일정 비율의 백엔드만 실행한다.
 
-In any of these scenarios you can define a Service _without_ a Pod selector.
-For example:
+이러한 시나리오 중에서 파드 셀렉터 _없이_ 서비스를 정의 할 수 있다.
+예를 들면
 
 ```yaml
 apiVersion: v1
@@ -151,9 +151,9 @@ spec:
     targetPort: 9376
 ```
 
-Because this Service has no selector, the corresponding Endpoint object is *not*
-created automatically. You can manually map the Service to the network address and port
-where it's running, by adding an Endpoint object manually:
+이 서비스에는 셀렉터가 없으므로, 해당 엔드포인트 개체가 자동으로
+생성되지 *않는다*. 엔드포인트 객체를 수동으로 추가하여, 서비스를 실행중인 네트워크 주소 및 포트에
+서비스를 수동으로 매핑할 수 있다.
 
 ```yaml
 apiVersion: v1
@@ -168,54 +168,54 @@ subsets:
 ```
 
 {{< note >}}
-The endpoint IPs _must not_ be: loopback (127.0.0.0/8 for IPv4, ::1/128 for IPv6), or
-link-local (169.254.0.0/16 and 224.0.0.0/24 for IPv4, fe80::/64 for IPv6).
+엔드포인트 IP는 루프백 (IPv4의 경우 127.0.0.0/8, IPv6의 경우 ::1/128), 또는
+링크-로컬 (IPv4의 경우 169.254.0.0/16와 224.0.0.0/24, IPv6의 경우 fe80::/64)이 _되어서는 안된다_.
 
-Endpoint IP addresses cannot be the cluster IPs of other Kubernetes Services,
-because {{< glossary_tooltip term_id="kube-proxy" >}} doesn't support virtual IPs
-as a destination.
+엔드포인트 IP 주소는 다른 쿠버네티스 서비스의 클러스터 IP일 수 없는데,
+{{< glossary_tooltip term_id="kube-proxy" >}}는 가상 IP를
+대상으로 지원하지 않기 때문이다.
 {{< /note >}}
 
-Accessing a Service without a selector works the same as if it had a selector.
-In the example above, traffic is routed to the single endpoint defined in
-the YAML: `192.0.2.42:9376` (TCP).
+셀렉터가 없는 서비스에 접근하면 셀렉터가 있는 것처럼 동일하게 작동한다.
+위의 예에서, 트래픽은 YAML에 정의된 단일 엔드 포인트로
+라우팅된다. `192.0.2.42:9376` (TCP)
 
-An ExternalName Service is a special case of Service that does not have
-selectors and uses DNS names instead. For more information, see the
-[ExternalName](#externalname) section later in this document.
+ExternalName 서비스는 셀렉터가 없고
+DNS명을 대신 사용하는 특수한 상황의 서비스이다. 자세한 내용은
+이 문서 뒷부분의 [ExternalName](#externalname) 섹션을 참조한다.
 
 ## 가상 IP와 서비스 프록시
 
-Every node in a Kubernetes cluster runs a `kube-proxy`. `kube-proxy` is
-responsible for implementing a form of virtual IP for `Services` of type other
-than [`ExternalName`](#externalname).
+쿠버네티스 클러스터의 모든 노드는 `kube-proxy`를 실행한다. `kube-proxy`는
+[`ExternalName`](#externalname) 이외의 유형의 `서비스`에 대한
+가상 IP 형식을 구현한다.
 
-### Why not use round-robin DNS?
+### 라운드-로빈 DNS를 사용하지 않는 이유
 
-A question that pops up every now and then is why Kubernetes relies on
-proxying to forward inbound traffic to backends. What about other
-approaches? For example, would it be possible to configure DNS records that
-have multiple A values (or AAAA for IPv6), and rely on round-robin name
-resolution?
+항상 발생하는 질문은 왜 쿠버네티스가 인바운드 트래픽을 백엔드로 전달하기 위해 프록시에
+의존하는가 하는 점이다. 다른 접근법이
+있는가? 예를 들어, 여러 A 값 (또는 IPv6의 경우 AAAA)을 가진
+DNS 레코드를 구성하고, 라운드-로빈 이름 확인 방식을
+취할 수 있는가?
 
-There are a few reasons for using proxying for Services:
+서비스에 프록시를 사용하는 데는 몇 가지 이유가 있다.
 
- * There is a long history of DNS implementations not respecting record TTLs,
-   and caching the results of name lookups after they should have expired.
- * Some apps do DNS lookups only once and cache the results indefinitely.
- * Even if apps and libraries did proper re-resolution, the low or zero TTLs
-   on the DNS records could impose a high load on DNS that then becomes
-   difficult to manage.
+ * 레코드 TTL을 고려하지 않고, 만료된 이름 검색 결과를
+   캐싱하는 DNS 구현에 대한 오래된 역사가 있다.
+ * 일부 앱은 DNS 검색을 한 번만 수행하고 결과를 무기한으로 캐시한다.
+ * 앱과 라이브러리가 적절히 재-확인을 했다고 하더라도, DNS 레코드의 TTL이
+   낮거나 0이면 DNS에 부하가 높아 관리하기가
+   어려워 질 수 있다.
 
-### Version compatibility
+### 버전 호환성
 
-Since Kubernetes v1.0 you have been able to use the
-[userspace proxy mode](#proxy-mode-userspace).
-Kubernetes v1.1 added iptables mode proxying, and in Kubernetes v1.2 the
-iptables mode for kube-proxy became the default.
-Kubernetes v1.8 added ipvs proxy mode.
+쿠버네티스 v1.0 부터
+[userspace 프록시 모드](#proxy-mode-userspace)를 사용할 수 있었다.
+쿠버네티스 v1.1은 iptables 모드 프록시를 추가했고, 쿠버네티스 v1.2에서는
+kube-proxy의 iptables 모드가 기본값이 되었다.
+쿠버네티스 v1.8은 ipvs 프록시 모드를 추가했다.
 
-### User space proxy mode {#proxy-mode-userspace}
+### User space 프록시 모드 {#proxy-mode-userspace}
 
 In this mode, kube-proxy watches the Kubernetes master for the addition and
 removal of Service and Endpoint objects. For each Service it opens a

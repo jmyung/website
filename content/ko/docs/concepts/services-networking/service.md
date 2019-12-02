@@ -217,28 +217,32 @@ kube-proxy의 iptables 모드가 기본값이 되었다.
 
 ### User space 프록시 모드 {#proxy-mode-userspace}
 
-In this mode, kube-proxy watches the Kubernetes master for the addition and
-removal of Service and Endpoint objects. For each Service it opens a
-port (randomly chosen) on the local node.  Any connections to this "proxy port"
-is proxied to one of the Service's backend Pods (as reported via
-Endpoints). kube-proxy takes the `SessionAffinity` setting of the Service into
-account when deciding which backend Pod to use.
+이 모드에서는, kube-proxy는 쿠버네티스 마스터의 서비스, 엔드포인트 객체의
+추가와 제거를 감시한다. 각 서비스는 로컬 노드에서
+포트(임의로 선택됨)를 연다. 이 "프록시 포트"에 대한 모든
+연결은 (엔드포인트를 통해 보고된대로) 서비스의 백엔드 파드 중 하나로
+프록시된다. kube-proxy는 사용할 백엔드 파드를 결정할 때 서비스의
+`SessionAffinity` 설정을 고려한다.
 
-Lastly, the user-space proxy installs iptables rules which capture traffic to
-the Service's `clusterIP` (which is virtual) and `port`. The rules
-redirect that traffic to the proxy port which proxies the backend Pod.
+마지막으로, user-space 프록시는 서비스의
+`clusterIP` (가상)와 `port` 에 대한
+트래픽을 캡처하는 iptables 규칙을 설치한다.
 
-By default, kube-proxy in userspace mode chooses a backend via a round-robin algorithm.
+기본적으로, userspace 모드의 kube-proxy는 라운드-로빈 알고리즘으로 백엔드를 선택한다.
 
-![Services overview diagram for userspace proxy](/images/docs/services-userspace-overview.svg)
+![userspace 프록시에 대한 서비스 개요 다이어그램](/images/docs/services-userspace-overview.svg)
 
-### `iptables` proxy mode {#proxy-mode-iptables}
+### `iptables` 프록시 모드 {#proxy-mode-iptables}
 
-In this mode, kube-proxy watches the Kubernetes control plane for the addition and
-removal of Service and Endpoint objects. For each Service, it installs
-iptables rules, which capture traffic to the Service's `clusterIP` and `port`,
-and redirect that traffic to one of the Service's
-backend sets.  For each Endpoint object, it installs iptables rules which
+이 모드에서는, kube-proxy는 쿠버네티스 컨트롤 플레인의 서비스, 엔드포인트 객체의
+추가와 제거를 감시한다.
+
+각 서비스에 대해, 서비스의 `clusterIP` 및 `port`에 대한 트래픽을 캡처하고 해당 트래픽을 서비스의 백엔드 세트 중 하나로 리다이렉트하는 iptables 규칙을 설치합니다.
+
+For each Service, it installs iptables rules, which capture traffic to the Service's `clusterIP` and `port`, and redirect that traffic to one of the Service's backend sets.
+
+
+For each Endpoint object, it installs iptables rules which
 select a backend Pod.
 
 By default, kube-proxy in iptables mode chooses a backend at random.

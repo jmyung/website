@@ -215,7 +215,7 @@ DNS 레코드를 구성하고, 라운드-로빈 이름 확인 방식을
 kube-proxy의 iptables 모드가 기본값이 되었다.
 쿠버네티스 v1.8은 ipvs 프록시 모드를 추가했다.
 
-### User space 프록시 모드 {#proxy-mode-userspace}
+### 유저 스페이스 (User space) 프록시 모드 {#proxy-mode-userspace}
 
 이 모드에서는, kube-proxy는 쿠버네티스 마스터의 서비스, 엔드포인트 객체의
 추가와 제거를 감시한다. 각 서비스는 로컬 노드에서
@@ -224,37 +224,39 @@ kube-proxy의 iptables 모드가 기본값이 되었다.
 프록시된다. kube-proxy는 사용할 백엔드 파드를 결정할 때 서비스의
 `SessionAffinity` 설정을 고려한다.
 
-마지막으로, user-space 프록시는 서비스의
+마지막으로, 유저-스페이스 (user-space) 프록시는 서비스의
 `clusterIP` (가상)와 `port` 에 대한
 트래픽을 캡처하는 iptables 규칙을 설치한다.
 
-기본적으로, userspace 모드의 kube-proxy는 라운드-로빈 알고리즘으로 백엔드를 선택한다.
+기본적으로, 유저스페이스 (userspace) 모드의 kube-proxy는 라운드-로빈 알고리즘으로 백엔드를 선택한다.
 
 ![userspace 프록시에 대한 서비스 개요 다이어그램](/images/docs/services-userspace-overview.svg)
 
 ### `iptables` 프록시 모드 {#proxy-mode-iptables}
 
 이 모드에서는, kube-proxy는 쿠버네티스 컨트롤 플레인의 서비스, 엔드포인트 객체의
-추가와 제거를 감시한다.
+추가와 제거를 감시한다. 각 서비스에 대해, 서비스의
+`clusterIP` 및 `port`에 대한 트래픽을 캡처하고 해당 트래픽을 서비스의
+백엔드 세트 중 하나로 리다이렉트하는
+iptables 규칙을 설치한다. 각 엔드포인트 오브젝트에 대해,
+백엔드 파드를 선택하는 iptables 규칙을 설치한다.
 
-각 서비스에 대해, 서비스의 `clusterIP` 및 `port`에 대한 트래픽을 캡처하고 해당 트래픽을 서비스의 백엔드 세트 중 하나로 리다이렉트하는 iptables 규칙을 설치합니다.
+기본적으로, iptables 모드의 kube-proxy는 임의의 백엔드를 선택한다.
 
-For each Service, it installs iptables rules, which capture traffic to the Service's `clusterIP` and `port`, and redirect that traffic to one of the Service's backend sets.
+트래픽을 처리하기 위해 iptables를 사용하면 시스템 오버헤드가 줄어드는데, 유저스페이스 (userspace)와
+커널 스페이스 사이를 전환 할 필요없이 리눅스 넷필터(netfilter)가 트래픽을 처리하기
+때문이다. 이 접근 방식은 더 신뢰성이 있다.
 
 
-For each Endpoint object, it installs iptables rules which
-select a backend Pod.
+kube-proxy가 iptables 모드에서 실행 중이고 선택된 첫 번째 파드가 응답하지
+않으면, 연결이 실패한다. 이는 userspace 모드와 다르다: 해당 시나리오에서는, kube-proxy는 첫 번째
+파드에 대한 연결이 실패했음을 감지하고 다른 백엔드 파드로 자동으로 재시도한다.
 
-By default, kube-proxy in iptables mode chooses a backend at random.
+파드 레디니스 프로브를 사용하여 백엔드 파드가 제대로 작동하는지 확인할 수 있으므로, iptables 모드의 kube-proxy는 정상으로 테스트 된 백엔드 만 볼 수 있습니다.
 
-Using iptables to handle traffic has a lower system overhead, because traffic
-is handled by Linux netfilter without the need to switch between userspace and the
-kernel space. This approach is also likely to be more reliable.
+You can use Pod readiness probes to verify that backend Pods are working OK, so that kube-proxy in iptables mode only sees backends that test out as healthy. Doing this means you avoid having traffic sent via kube-proxy to a Pod that's known to have failed.
 
-If kube-proxy is running in iptables mode and the first Pod that's selected
-does not respond, the connection fails. This is different from userspace
-mode: in that scenario, kube-proxy would detect that the connection to the first
-Pod had failed and would automatically retry with a different backend Pod.
+
 
 You can use Pod [readiness probes](/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
 to verify that backend Pods are working OK, so that kube-proxy in iptables mode

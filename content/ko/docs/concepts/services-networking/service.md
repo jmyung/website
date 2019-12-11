@@ -275,61 +275,54 @@ IPVS 규칙을 쿠버네티스 서비스와 엔드포인트와 주기적으로 �
 보장한다.
 서비스에 액세스하면, IPVS는 트래픽을 백엔드 파드 중 하나로 보낸다.
 
+IPVS 프록시 모드는 iptables 모드와 유사한 netfilter 후크 기능을
+기반으로 하지만, 해시 테이블을 기본 데이터 구조로 사용하고
+커널 스페이스에서 동작한다.
+이는 IPVS 모드의 kube-proxy는 iptables 모드의 kube-proxy보다
+지연 시간이 짧은 트래픽을 리다이렉션하고, 프록시 규칙을 동기화할 때 성능이
+훨씬 향상됨을 의미한다. 다른 프록시 모드와 비교했을 때, IPVS 모드는
+높은 네트워크 트래픽 처리량도 지원한다.
 
+IPVS는 트래픽을 백엔드 파드로 밸런싱하기 위한 추가 옵션을 제공한다.
+다음과 같다.
 
-The IPVS proxy mode is based on netfilter hook function that is similar to
-iptables mode, but uses hash table as the underlying data structure and works
-in the kernel space.
-
-
-The IPVS proxy mode is based on netfilter hook function that is similar to
-iptables mode, but uses hash table as the underlying data structure and works
-in the kernel space.
-That means kube-proxy in IPVS mode redirects traffic with a lower latency than
-kube-proxy in iptables mode, with much better performance when synchronising
-proxy rules. Compared to the other proxy modes, IPVS mode also supports a
-higher throughput of network traffic.
-
-IPVS provides more options for balancing traffic to backend Pods;
-these are:
-
-- `rr`: round-robin
-- `lc`: least connection (smallest number of open connections)
-- `dh`: destination hashing
-- `sh`: source hashing
-- `sed`: shortest expected delay
-- `nq`: never queue
+- `rr`: 라운드-로빈
+- `lc`: 최소 연결 (가장 적은 수의 열려있는 연결)
+- `dh`: 목적지 해싱
+- `sh`: 소스 해싱
+- `sed`: 최단 예상 지연 (shortest expected delay)
+- `nq`: 큐 미사용 (never queue)
 
 {{< note >}}
-To run kube-proxy in IPVS mode, you must make the IPVS Linux available on
-the node before you starting kube-proxy.
+IPVS 모드에서 kube-proxy를 실행하려면, kube-proxy를 시작하기 전에 노드에서 IPVS Linux를
+사용 가능하도록 해야한다.
 
-When kube-proxy starts in IPVS proxy mode, it verifies whether IPVS
-kernel modules are available. If the IPVS kernel modules are not detected, then kube-proxy
-falls back to running in iptables proxy mode.
+kube-proxy가 IPVS 프록시 모드에서 시작될 때, IPVS 커널 모듈을
+사용할 수 있는지 확인한다. IPVS 커널 모듈이 감지되지 않으면, kube-proxy는
+iptables 프록시 모드에서 다시 실행된다.
 {{< /note >}}
 
-![Services overview diagram for IPVS proxy](/images/docs/services-ipvs-overview.svg)
+![IPVS 프록시에 대한 서비스 개요 다이어그램](/images/docs/services-ipvs-overview.svg)
 
-In these proxy models, the traffic bound for the Service’s IP:Port is
-proxied to an appropriate backend without the clients knowing anything
-about Kubernetes or Services or Pods.
+이 프록시 모델에서 클라이언트가 쿠버네티스 또는 서비스 또는 파드에
+대해 알지 못하는 경우 서비스의 IP:포트로 향하는 트래픽은
+적절한 백엔드로 프록시된다.
 
-If you want to make sure that connections from a particular client
-are passed to the same Pod each time, you can select the session affinity based
-the on client's IP addresses by setting `service.spec.sessionAffinity` to "ClientIP"
-(the default is "None").
-You can also set the maximum session sticky time by setting
-`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds` appropriately.
-(the default value is 10800, which works out to be 3 hours).
+특정 클라이언트의 연결이 매번 동일한 파드로
+전달되도록 하려면, `service.spec.sessionAffinity`를 "ClientIP"로 설정하여
+클라이언트의 IP 주소를 기반으로 세션 어피니티(Affinity)를 선택할 수 있다.
+(기본값은 "없음")
+`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`를 적절히 설정하여
+최대 세션 고정 시간을 설정할 수도 있다.
+(기본값은 10800으로, 3시간)
 
-## Multi-Port Services
+## 멀티-포트 서비스
 
-For some Services, you need to expose more than one port.
-Kubernetes lets you configure multiple port definitions on a Service object.
-When using multiple ports for a Service, you must give all of your ports names
-so that these are unambiguous.
-For example:
+일부 서비스의 경우, 둘 이상의 포트를 노출해야 한다.
+쿠버네티스는 서비스 오브젝트에서 멀티 포트 정의를 구성할 수 있도록 지원한다.
+서비스에 멀티 포트를 사용하는 경우, 모든 포트 이름을
+명확하게 지정해야 한다.
+예를 들면
 
 ```yaml
 apiVersion: v1
@@ -340,30 +333,34 @@ spec:
   selector:
     app: MyApp
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 9376
-  - name: https
-    protocol: TCP
-    port: 443
-    targetPort: 9377
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9376
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9377
 ```
 
 {{< note >}}
-As with Kubernetes {{< glossary_tooltip term_id="name" text="names">}} in general, names for ports
-must only contain lowercase alphanumeric characters and `-`. Port names must
-also start and end with an alphanumeric character.
+쿠버네티스의 일반적인 {{< glossary_tooltip term_id="name" text="이름">}}과 마찬가지로, 포트 이름은
+소문자 영숫자와 `-` 만 포함해야 한다. 포트 이름은
+영숫자로 시작하고 끝나야 한다.
 
-For example, the names `123-abc` and `web` are valid, but `123_abc` and `-web` are not.
+예를 들어, `123-abc` 와 `web` 은 유효하지만, `123_abc` 와 `-web` 은 유효하지 않다.
 {{< /note >}}
 
-## Choosing your own IP address
+## 자신의 IP 주소 선택
 
-You can specify your own cluster IP address as part of a `Service` creation
-request.  To do this, set the `.spec.clusterIP` field. For example, if you
-already have an existing DNS entry that you wish to reuse, or legacy systems
-that are configured for a specific IP address and difficult to re-configure.
+`서비스` 생성 요청시 고유한 클러스터 IP 주소를 지정할 수 있다.
+
+이를 위해서는, `.spec.clusterIP` 필드를 설정한다.
+
+
+To do this, set the `.spec.clusterIP` field.
+
+For example, if you already have an existing DNS entry that you wish to reuse, or legacy systems that are configured for a specific IP address and difficult to re-configure.
 
 The IP address that you choose must be a valid IPv4 or IPv6 address from within the
 `service-cluster-ip-range` CIDR range that is configured for the API server.

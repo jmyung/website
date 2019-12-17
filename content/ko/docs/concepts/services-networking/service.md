@@ -44,7 +44,7 @@ _서비스_ 로 들어가보자.
 
 ## 서비스 리소스 {#서비스-리소스}
 
-쿠버네티스에서 서비스는 파드의 논리적 집합과 그것들을 액세스할 수 있는
+쿠버네티스에서 서비스는 파드의 논리적 집합과 그것들에 접근할 수 있는
 정책을 정의하는 추상화이다. (때로는 이 패턴을
 마이크로-서비스라고 한다.) 서비스가 대상으로 하는 파드 집합은 일반적으로
 {{< glossary_tooltip text="셀렉터" term_id="selector" >}}가 결정한다.
@@ -273,7 +273,7 @@ kube-proxy가 iptables 모드에서 실행 중이고 선택된 첫 번째 파드
 IPVS 규칙을 쿠버네티스 서비스와 엔드포인트와 주기적으로 동기화한다.
 이 제어 루프는 IPVS 상태가 원하는 상태와 일치하도록
 보장한다.
-서비스에 액세스하면, IPVS는 트래픽을 백엔드 파드 중 하나로 보낸다.
+서비스에 접근하면, IPVS는 트래픽을 백엔드 파드 중 하나로 보낸다.
 
 IPVS 프록시 모드는 iptables 모드와 유사한 netfilter 후크 기능을
 기반으로 하지만, 해시 테이블을 기본 데이터 구조로 사용하고
@@ -353,37 +353,33 @@ spec:
 
 ## 자신의 IP 주소 선택
 
-`서비스` 생성 요청시 고유한 클러스터 IP 주소를 지정할 수 있다.
+`서비스` 생성 요청시 고유한 클러스터 IP 주소를 지정할 수
+있다. 이를 위해, `.spec.clusterIP` 필드를 설정한다. 예를 들어,
+재사용하려는 기존 DNS 항목이 있거나, 특정 IP 주소로 구성되어
+재구성이 어려운 레거시 시스템인 경우이다.
 
-이를 위해서는, `.spec.clusterIP` 필드를 설정한다.
+선택한 IP 주소는 API 서버에 대해 구성된 `service-cluster-ip-range`
+CIDR 범위 내의 유효한 IPv4 또는 IPv6 주소 여야 한다.
+
+유효하지 않은 clusterIP 주소 값으로 서비스를 생성하려고 하면, API 서버는
+422 HTTP 상태 코드를 리턴하여 문제점이 있음을 알린다.
 
 
-To do this, set the `.spec.clusterIP` field.
+## 서비스 발견
 
-For example, if you already have an existing DNS entry that you wish to reuse, or legacy systems that are configured for a specific IP address and difficult to re-configure.
+쿠버네티스는 서비스를 찾는 두 가지 기본 모드를 지원한다. - 환경 변수와 DNS
 
-The IP address that you choose must be a valid IPv4 or IPv6 address from within the
-`service-cluster-ip-range` CIDR range that is configured for the API server.
-If you try to create a Service with an invalid clusterIP address value, the API
-server will returns a 422 HTTP status code to indicate that there's a problem.
+### 환경 변수
 
-## Discovering services
+파드가 노드에서 실행될 때, kubelet은 각 활성화된 서비스에 대해
+환경 변수 세트를 추가한다. [도커 링크
+호환](https://docs.docker.com/userguide/dockerlinks/) 변수 ([makeLinkVariables](http://releases.k8s.io/{{< param "githubbranch" >}}/pkg/kubelet/envvars/envvars.go#L49) 참조)와
+보다 간단한 `{SVCNAME}_SERVICE_HOST` 및 `{SVCNAME}_SERVICE_PORT` 변수를 지원하고,
+이때 서비스 이름은 대문자이고 대시는 밑줄로 변환된다.
 
-Kubernetes supports 2 primary modes of finding a Service - environment
-variables and DNS.
-
-### Environment variables
-
-When a Pod is run on a Node, the kubelet adds a set of environment variables
-for each active Service.  It supports both [Docker links
-compatible](https://docs.docker.com/userguide/dockerlinks/) variables (see
-[makeLinkVariables](http://releases.k8s.io/{{< param "githubbranch" >}}/pkg/kubelet/envvars/envvars.go#L49))
-and simpler `{SVCNAME}_SERVICE_HOST` and `{SVCNAME}_SERVICE_PORT` variables,
-where the Service name is upper-cased and dashes are converted to underscores.
-
-For example, the Service `"redis-master"` which exposes TCP port 6379 and has been
-allocated cluster IP address 10.0.0.11, produces the following environment
-variables:
+예를 들어, TCP 포트 6379를 개방하고
+클러스터 IP 주소 10.0.0.11이 할당된 서비스 `"redis-master"`는,
+다음 환경 변수를 생성한다.
 
 ```shell
 REDIS_MASTER_SERVICE_HOST=10.0.0.11
@@ -396,141 +392,139 @@ REDIS_MASTER_PORT_6379_TCP_ADDR=10.0.0.11
 ```
 
 {{< note >}}
-When you have a Pod that needs to access a Service, and you are using
-the environment variable method to publish the port and cluster IP to the client
-Pods, you must create the Service *before* the client Pods come into existence.
-Otherwise, those client Pods won't have their environment variables populated.
+서비스에 접근이 필요한 파드가 있고, 환경 변수를
+사용해 포트 및 클러스터 IP를 클라이언트 파드에 부여하는
+경우, 클라이언트 파드가 생성되기 *전에* 서비스를 만들어야 한다.
+그렇지 않으면, 해당 클라이언트 파드는 환경 변수를 생성할 수 없다.
 
-If you only use DNS to discover the cluster IP for a Service, you don't need to
-worry about this ordering issue.
+DNS 만 사용하여 서비스의 클러스터 IP를 검색하는 경우, 이 순서
+이슈에 대해 신경 쓸 필요가 없다.
 {{< /note >}}
 
 ### DNS
 
-You can (and almost always should) set up a DNS service for your Kubernetes
-cluster using an [add-on](/docs/concepts/cluster-administration/addons/).
+[애드-온](/docs/concepts/cluster-administration/addons/)을 사용하여 쿠버네티스
+클러스터의 DNS 서비스를 설정할 수(대개는 필수적임) 있다.
 
-A cluster-aware DNS server, such as CoreDNS, watches the Kubernetes API for new
-Services and creates a set of DNS records for each one.  If DNS has been enabled
-throughout your cluster then all Pods should automatically be able to resolve
-Services by their DNS name.
+CoreDNS와 같은, 클러스터-인식 DNS 서버는 새로운 서비스를 위해 쿠버네티스 API를 감시하고
+각각에 대한 DNS 레코드 세트를 생성한다. 클러스터 전체에서 DNS가 활성화된 경우
+모든 파드는 DNS 이름으로 서비스를 자동으로
+확인할 수 있어야 한다.
 
-For example, if you have a Service called `"my-service"` in a Kubernetes
-Namespace `"my-ns"`, the control plane and the DNS Service acting together
-create a DNS record for `"my-service.my-ns"`. Pods in the `"my-ns"` Namespace
-should be able to find it by simply doing a name lookup for `my-service`
-(`"my-service.my-ns"` would also work).
+예를 들면, 쿠버네티스 네임스페이스 `"my-ns"`에 `"my-service"`라는
+서비스가 있는 경우, 컨트롤 플레인과 DNS 서비스가 함께 작동하여
+`"my-service.my-ns"`에 대한 DNS 레코드를 만든다. `"my-ns"` 네임 스페이스의 파드들은
+간단히 `my-service`에 대한 이름 조회를 수행하여 찾을 수 있어야 한다
+(`"my-service.my-ns"` 역시 동작함).
 
-Pods in other Namespaces must qualify the name as `my-service.my-ns`. These names
-will resolve to the cluster IP assigned for the Service.
+다른 네임스페이스의 파드들은 이름을 `my-service.my-ns`으로 사용해야 한다. 이 이름은
+서비스에 할당된 클러스터 IP로 변환된다.
 
-Kubernetes also supports DNS SRV (Service) records for named ports.  If the
-`"my-service.my-ns"` Service has a port named `"http"` with protocol set to
-`TCP`, you can do a DNS SRV query for `_http._tcp.my-service.my-ns` to discover
-the port number for `"http"`, as well as the IP address.
+쿠버네티스는 또한 알려진 포트에 대한 DNS SRV (서비스) 레코드를 지원한다.
+`"my-service.my-ns"` 서비스에 프로토콜이 `TCP`로 설정된 `"http"`라는 포트가 있는 경우,
+IP 주소와 `"http"`에 대한 포트 번호를 검색하기 위해 `_http._tcp.my-service.my-ns` 에 대한
+DNS SRV 쿼리를 수행할 수 있다.
 
-The Kubernetes DNS server is the only way to access `ExternalName` Services.
-You can find more information about `ExternalName` resolution in
-[DNS Pods and Services](/docs/concepts/services-networking/dns-pod-service/).
+쿠버네티스 DNS 서버는 `ExternalName` 서비스에 접근할 수 있는 유일한 방법이다.
+[DNS 파드와 서비스](/docs/concepts/services-networking/dns-pod-service/)에서
+`ExternalName` 검색에 대한 자세한 정보를 찾을 수 있다.
 
-## Headless Services
+## 헤드리스(Headless) 서비스
 
-Sometimes you don't need load-balancing and a single Service IP.  In
-this case, you can create what are termed “headless” Services, by explicitly
-specifying `"None"` for the cluster IP (`.spec.clusterIP`).
+때때로 로드-밸런싱과 단일 서비스 IP는 필요치 않다. 이 경우,
+"헤드리스" 서비스라는 것을 만들 수 있는데, 명시적으로
+클러스터 IP (`.spec.clusterIP`)에 "None"을 지정한다.
 
-You can use a headless Service to interface with other service discovery mechanisms,
-without being tied to Kubernetes' implementation. For example, you could implement
-a custom {{< glossary_tooltip term_id="operator-pattern" text="Operator" >}} upon
-this API.
+쿠버네티스의 구현에 묶이지 않고, 헤드리스 서비스를 사용하여
+다른 서비스 검색 메커니즘과 인터페이스할 수 있다.
 
-For such `Services`, a cluster IP is not allocated, kube-proxy does not handle
-these Services, and there is no load balancing or proxying done by the platform
-for them. How DNS is automatically configured depends on whether the Service has
-selectors defined.
+헤드리스 `서비스`의 경우, 클러스터 IP가 할당되지 않고, kube-proxy가
+이러한 서비스를 처리하지 않으며, 플랫폼에 의해 로드 밸런싱 또는 프록시를
+하지 않는다. DNS가 자동으로 구성되는 방법은 서비스에 셀렉터가 정의되어 있는지
+여부에 달려있다.
 
-### With selectors
+### 셀렉터가 있는 경우
 
-For headless Services that define selectors, the endpoints controller creates
-`Endpoints` records in the API, and modifies the DNS configuration to return
-records (addresses) that point directly to the `Pods` backing the `Service`.
+셀렉터를 정의하는 헤드리스 서비스의 경우, 엔드포인트 컨트롤러는
+API에서 `엔드포인트` 레코드를 생성하고, DNS 구성을 수정하여
+`서비스` 를 지원하는 `파드` 를 직접 가리키는 레코드 (주소)를 반환한다.
 
-### Without selectors
+### 셀렉터가 없는 경우
 
-For headless Services that do not define selectors, the endpoints controller does
-not create `Endpoints` records. However, the DNS system looks for and configures
-either:
+셀렉터를 정의하지 않는 헤드리스 서비스의 경우, 엔드포인트 컨트롤러는
+`엔드포인트` 레코드를 생성하지 않는다. 그러나 DNS 시스템은 다음을 검색하고
+구성한다.
 
-  * CNAME records for [`ExternalName`](#externalname)-type Services.
-  * A records for any `Endpoints` that share a name with the Service, for all
-    other types.
+  * [`ExternalName`](#externalname)-유형 서비스에 대한 CNAME 레코드
+  * 다른 모든 유형에 대해, 서비스의 이름을 공유하는 모든 `엔드포인트`에
+    대한 레코드
 
-## Publishing Services (ServiceTypes) {#publishing-services-service-types}
+## 서비스 퍼블리싱 (ServiceTypes) {#publishing-services-service-types}
 
-For some parts of your application (for example, frontends) you may want to expose a
-Service onto an external IP address, that's outside of your cluster.
+애플리케이션 중 일부(예: 프론트엔드)는 서비스를 클러스터 밖에
+위치한 외부 IP 주소에 노출시킬 수 있다.
 
-Kubernetes `ServiceTypes` allow you to specify what kind of Service you want.
-The default is `ClusterIP`.
+쿠버네티스 `ServiceTypes`는 원하는 서비스 종류를 지정할 수 있도록 해준다.
+기본 값은 `ClusterIP`이다.
 
-`Type` values and their behaviors are:
+`Type` 값과 그 동작은 다음과 같다.
 
-   * `ClusterIP`: Exposes the Service on a cluster-internal IP. Choosing this value
-     makes the Service only reachable from within the cluster. This is the
-     default `ServiceType`.
-   * [`NodePort`](#nodeport): Exposes the Service on each Node's IP at a static port
-     (the `NodePort`). A `ClusterIP` Service, to which the `NodePort` Service
-     routes, is automatically created.  You'll be able to contact the `NodePort` Service,
-     from outside the cluster,
-     by requesting `<NodeIP>:<NodePort>`.
-   * [`LoadBalancer`](#loadbalancer): Exposes the Service externally using a cloud
-     provider's load balancer. `NodePort` and `ClusterIP` Services, to which the external
-     load balancer routes, are automatically created.
-   * [`ExternalName`](#externalname): Maps the Service to the contents of the
-     `externalName` field (e.g. `foo.bar.example.com`), by returning a `CNAME` record
+   * `ClusterIP`: 서비스를 클러스터-내부 IP에 노출시킨다. 이 값을 선택하면
+     클러스터 내에서만 서비스에 도달할 수 있다. 이 것은
+     `ServiceTypes`의 기본 값이다.
+   * [`NodePort`](#nodeport): 고정 포트 (`NodePort`)로 각 노드의 IP에 서비스를
+     노출시킨다. `NodePort` 서비스가 라우팅되는 `ClusterIP` 서비스가
+     자동으로 생성된다. `<NodeIP>:<NodePort>`를 요청하여,
+     클러스터 외부에서
+     `NodePort` 서비스에 접속할 수 있다.
+   * [`LoadBalancer`](#loadbalancer): 클라우드 공급자의 로드 밸런서를 사용하여
+     서비스를 외부에 노출시킨다. 외부 로드 밸런서가 라우팅되는
+     `NodePort`와 `ClusterIP` 서비스가 자동으로 생성된다.
+   * [`ExternalName`](#externalname): 값과 함께 CNAME 레코드를 리턴하여, 서비스를
+     `externalName` 필드의 컨텐츠 (예:`foo.bar.example.com`)에
 
-     with its value. No proxying of any kind is set up.
+     맵핑한다. 어떤 종류의 프록시도 설정되어 있지 않다.
      {{< note >}}
-     You need CoreDNS version 1.7 or higher to use the `ExternalName` type.
+     `ExternalName` 유형을 사용하려면 CoreDNS 버전 1.7 이상이 필요하다.
      {{< /note >}}
 
-You can also use [Ingress](/docs/concepts/services-networking/ingress/) to expose your Service. Ingress is not a Service type, but it acts as the entry point for your cluster. It lets you consolidate your routing rules into a single resource as it can expose multiple services under the same IP address.
+[인그레스](/docs/concepts/services-networking/ingress/)를 사용하여 서비스를 노출시킬 수도 있다. 인그레스는 서비스 유형이 아니지만, 클러스터의 진입점 역할을 한다. 동일한 IP 주소로 여러 서비스를 노출시킬 수 있기 때문에 라우팅 규칙을 단일 리소스로 통합할 수 있다.
 
-### Type NodePort {#nodeport}
+### NodePort 유형 {#nodeport}
 
-If you set the `type` field to `NodePort`, the Kubernetes control plane
-allocates a port from a range specified by `--service-node-port-range` flag (default: 30000-32767).
-Each node proxies that port (the same port number on every Node) into your Service.
-Your Service reports the allocated port in its `.spec.ports[*].nodePort` field.
+`type` 필드를 `NodePort`로 설정하면, 쿠버네티스 컨트롤 플레인은
+`--service-node-port-range` 플래그로 지정된 범위에서 포트를 할당한다 (기본값 : 30000-32767).
+각 노드는 해당 포트 (모든 노드에서 동일한 포트 번호)를 서비스로 프록시한다.
+서비스는 할당된 포트를 `.spec.ports[*].nodePort` 필드에 나타낸다.
 
 
-If you want to specify particular IP(s) to proxy the port, you can set the `--nodeport-addresses` flag in kube-proxy to particular IP block(s); this is supported since Kubernetes v1.10.
-This flag takes a comma-delimited list of IP blocks (e.g. 10.0.0.0/8, 192.0.2.0/25) to specify IP address ranges that kube-proxy should consider as local to this node.
+포트를 프록시하기 위해 특정 IP를 지정하려면 kube-proxy의 `--nodeport-addresses` 플래그를 특정 IP 블록으로 설정할 수 있다. 이것은 쿠버네티스 v1.10.부터 지원된다.
+이 플래그는 쉼표로 구분된 IP 블록 목록 (예: 10.0.0.0/8, 192.0.2.0/25)을 사용하여 kube-proxy가 로컬 노드로 고려해야하는 IP 주소 범위를 지정한다.
 
-For example, if you start kube-proxy with the `--nodeport-addresses=127.0.0.0/8` flag, kube-proxy only selects the loopback interface for NodePort Services. The default for `--nodeport-addresses` is an empty list. This means that kube-proxy should consider all available network interfaces for NodePort. (That's also compatible with earlier Kubernetes releases).
+예를 들어, `--nodeport-addresses=127.0.0.0/8` 플래그로 kube-proxy를 시작하면, kube-proxy는 NodePort 서비스에 대하여 루프백 인터페이스만 선택한다. `--nodeport-addresses`의 기본 값은 비어있는 목록이다. 이것은 kube-proxy가 NodePort에 대해 사용 가능한 모든 네트워크 인터페이스를 고려해야한다는 것을 의미한다. (이는 이전 쿠버네티스 릴리스와도 호환된다).
 
-If you want a specific port number, you can specify a value in the `nodePort`
-field. The control plane will either allocate you that port or report that
-the API transaction failed.
-This means that you need to take care about possible port collisions yourself.
-You also have to use a valid port number, one that's inside the range configured
-for NodePort use.
+특정 포트 번호를 원한다면, `nodePort` 필드에 값을 지정할 수
+있다. 컨트롤 플레인은 해당 포트를 할당하거나 API 트랜잭션이
+실패했다고 보고한다.
+이는 가능한 포트 충돌에 주의해야 하는 것을 의미한다.
+또한 NodePort 사용을 위해 구성된 범위 내에 있는, 유효한 포트 번호를
+사용해야 한다.
 
-Using a NodePort gives you the freedom to set up your own load balancing solution,
-to configure environments that are not fully supported by Kubernetes, or even
-to just expose one or more nodes' IPs directly.
+NodePort를 사용하면 자유롭게 자체 로드 밸런싱 솔루션을 설정하거나,
+쿠버네티스가 완벽하게 지원하지 않는 환경을 구성하거나,
+하나 이상의 노드 IP를 직접 노출시킬 수 있다.
 
-Note that this Service is visible as `<NodeIP>:spec.ports[*].nodePort`
-and `.spec.clusterIP:spec.ports[*].port`. (If the `--nodeport-addresses` flag in kube-proxy is set, <NodeIP> would be filtered NodeIP(s).)
+이 서비스는 `<NodeIP>:spec.ports[*].nodePort`와
+`.spec.clusterIP:spec.ports[*].port`로 표기된다. (kube-proxy에서 `--nodeport-addresses` 플래그가 설정되면, <NodeIP>는 NodeIP를 필터링한다.)
 
-### Type LoadBalancer {#loadbalancer}
+### 로드밸런서 유형 {#loadbalancer}
 
-On cloud providers which support external load balancers, setting the `type`
-field to `LoadBalancer` provisions a load balancer for your Service.
-The actual creation of the load balancer happens asynchronously, and
-information about the provisioned balancer is published in the Service's
-`.status.loadBalancer` field.
-For example:
+외부 로드 밸런서를 지원하는 클라우드 공급자 상에서, `type`
+필드를 `LoadBalancer`로 설정하면 서비스에 대한 로드 밸런서를 프로비저닝한다.
+로드 밸런서의 실제 생성은 비동기적으로 수행되고,
+프로비저닝된 밸런서에 대한 정보는 서비스의
+`.status.loadBalancer` 필드에 발행된다.
+예를 들면
 
 ```yaml
 apiVersion: v1
@@ -541,55 +535,54 @@ spec:
   selector:
     app: MyApp
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 9376
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
   clusterIP: 10.0.171.239
-  loadBalancerIP: 78.11.24.19
   type: LoadBalancer
 status:
   loadBalancer:
     ingress:
-    - ip: 146.148.47.155
+    - ip: 192.0.2.127
 ```
 
-Traffic from the external load balancer is directed at the backend Pods. The cloud provider decides how it is load balanced.
+외부 로드 밸런서의 트래픽은 백엔드 파드로 전달된다. 클라우드 공급자는 로드 밸런싱 방식을 결정한다.
 
 
-Some cloud providers allow you to specify the `loadBalancerIP`. In those cases, the load-balancer is created
-with the user-specified `loadBalancerIP`. If the `loadBalancerIP` field is not specified,
-the loadBalancer is set up with an ephemeral IP address. If you specify a `loadBalancerIP`
-but your cloud provider does not support the feature, the `loadbalancerIP` field that you
-set is ignored.
+일부 클라우드 공급자는 `loadBalancerIP`를 지정할 수 있도록 허용한다. 이 경우, 로드 밸런서는
+사용자 지정 `loadBalancerIP`로 생성된다. `loadBalancerIP` 필드가 지정되지 않으면,
+임시 IP 주소로 loadBalancer가 설정된다. `loadBalancerIP`를 지정했지만
+클라우드 공급자가이 기능을 지원하지 않는 경우, 설정한 `loadbalancerIP` 필드는
+무시된다.
 
 {{< note >}}
-If you're using SCTP, see the [caveat](#caveat-sctp-loadbalancer-service-type) below about the
-`LoadBalancer` Service type.
+SCTP를 사용하는 경우, `LoadBalancer` 서비스 유형에 대한 아래의 [경고](#caveat-sctp-loadbalancer-service-type)를
+참고한다.
 {{< /note >}}
 
 {{< note >}}
 
-On **Azure**, if you want to use a user-specified public type `loadBalancerIP`, you first need
-to create a static type public IP address resource. This public IP address resource should
-be in the same resource group of the other automatically created resources of the cluster.
-For example, `MC_myResourceGroup_myAKSCluster_eastus`.
+**Azure** 에서 사용자 지정 공개(public) 유형 `loadBalancerIP`를 사용하려면, 먼저
+정적 유형 공개 IP 주소 리소스를 생성해야 한다. 이 공개 IP 주소 리소스는
+클러스터에서 자동으로 생성된 다른 리소스와 동일한 리소스 그룹에 있어야 한다.
+예를 들면, `MC_myResourceGroup_myAKSCluster_eastus`이다.
 
-Specify the assigned IP address as loadBalancerIP. Ensure that you have updated the securityGroupName in the cloud provider configuration file. For information about troubleshooting `CreatingLoadBalancerFailed` permission issues see, [Use a static IP address with the Azure Kubernetes Service (AKS) load balancer](https://docs.microsoft.com/en-us/azure/aks/static-ip) or [CreatingLoadBalancerFailed on AKS cluster with advanced networking](https://github.com/Azure/AKS/issues/357).
+할당된 IP 주소를 loadBalancerIP로 지정한다. 클라우드 공급자 구성 파일에서 securityGroupName을 업데이트했는지 확인한다. `CreatingLoadBalancerFailed` 권한 문제 해결에 대한 자세한 내용은 [Azure Kubernetes Service (AKS) 로드 밸런서에서 고정 IP 주소 사용](https://docs.microsoft.com/en-us/azure/aks/static-ip) 또는 [고급 네트워킹 AKS 클러스터에서 CreateLoadBalancerFailed](https://github.com/Azure/AKS/issues/357)를 참고한다.
 
 {{< /note >}}
 
-#### Internal load balancer
-In a mixed environment it is sometimes necessary to route traffic from Services inside the same
-(virtual) network address block.
+#### 내부 로드 밸런서
+혼재된 환경에서는 서비스의 트래픽을 동일한 (가상) 네트워크 주소 블록 내로
+라우팅해야하는 경우가 있다.
 
-In a split-horizon DNS environment you would need two Services to be able to route both external and internal traffic to your endpoints.
+수평 분할 DNS 환경에서는 외부와 내부 트래픽을 엔드포인트로 라우팅 할 수 있는 두 개의 서비스가 필요하다.
 
-You can achieve this by adding one the following annotations to a Service.
-The annotation to add depends on the cloud Service provider you're using.
+서비스에 다음 어노테이션 중 하나를 추가하여 이를 수행할 수 있다.
+추가할 어노테이션은 사용중인 클라우드 서비스 공급자에 따라 다르다.
 
 {{< tabs name="service_tabs" >}}
 {{% tab name="Default" %}}
-Select one of the tabs.
+탭 중 하나를 선택
 {{% /tab %}}
 {{% tab name="GCP" %}}
 ```yaml
@@ -600,8 +593,6 @@ metadata:
         cloud.google.com/load-balancer-type: "Internal"
 [...]
 ```
-Use `cloud.google.com/load-balancer-type: "internal"` for masters with version 1.7.0 to 1.7.3.
-For more information, see the [docs](https://cloud.google.com/kubernetes-engine/docs/internal-load-balancing).
 {{% /tab %}}
 {{% tab name="AWS" %}}
 ```yaml
@@ -609,7 +600,7 @@ For more information, see the [docs](https://cloud.google.com/kubernetes-engine/
 metadata:
     name: my-service
     annotations:
-        service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
 [...]
 ```
 {{% /tab %}}
@@ -646,10 +637,10 @@ metadata:
 {{< /tabs >}}
 
 
-#### TLS support on AWS {#ssl-support-on-aws}
+#### AWS에서 TLS 지원 {#ssl-support-on-aws}
 
-For partial TLS / SSL support on clusters running on AWS, you can add three
-annotations to a `LoadBalancer` service:
+AWS에서 실행되는 클러스터에서 부분적으로 TLS / SSL을 지원하기 위해, `LoadBalancer` 서비스에 세 가지
+어노테이션을 추가할 수 있다.
 
 ```yaml
 metadata:
@@ -658,9 +649,9 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012
 ```
 
-The first specifies the ARN of the certificate to use. It can be either a
-certificate from a third party issuer that was uploaded to IAM or one created
-within AWS Certificate Manager.
+첫 번째는 사용할 인증서의 ARN을 지정한다. IAM에 업로드된
+써드파티 발급자의 인증서이거나 AWS Certificate Manager에서
+생성된 인증서일 수 있다.
 
 ```yaml
 metadata:
@@ -669,20 +660,20 @@ metadata:
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: (https|http|ssl|tcp)
 ```
 
-The second annotation specifies which protocol a Pod speaks. For HTTPS and
-SSL, the ELB expects the Pod to authenticate itself over the encrypted
-connection, using a certificate.
+두 번째 어노테이션은 파드가 알려주는 프로토콜을 지정한다. HTTPS과
+SSL의 경우, ELB는 인증서를 사용하여 암호화된 연결을 통해 파드가 스스로를
+인증할 것으로 예상한다.
 
-HTTP and HTTPS selects layer 7 proxying: the ELB terminates
-the connection with the user, parse headers and inject the `X-Forwarded-For`
-header with the user's IP address (Pods only see the IP address of the
-ELB at the other end of its connection) when forwarding requests.
+HTTP와 HTTPS는 7 계층 프록시를 선택한다. ELB는 요청을 전달할 때
+사용자와의 연결을 종료하고, 헤더를 파싱하고 사용자의 IP 주소로 `X-Forwarded-For`
+헤더를 삽입한다. (파드는 해당 연결의 다른 종단에서의
+ELB의 IP 주소만 참조).
 
-TCP and SSL selects layer 4 proxying: the ELB forwards traffic without
-modifying the headers.
+TCP 및 SSL은 4 계층 프록시를 선택한다. ELB는 헤더를 수정하지 않고
+트래픽을 전달한다.
 
-In a mixed-use environment where some ports are secured and others are left unencrypted,
-you can use the following annotations:
+일부 포트는 보안성을 갖추고 다른 포트는 암호화되지 않은 혼재된 사용 환경에서는
+다음 어노테이션을 사용할 수 있다.
 
 ```yaml
     metadata:
@@ -692,20 +683,20 @@ you can use the following annotations:
         service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443,8443"
 ```
 
-In the above example, if the Service contained three ports, `80`, `443`, and
-`8443`, then `443` and `8443` would use the SSL certificate, but `80` would just
-be proxied HTTP.
+위의 예에서, 서비스에 `80`, `443`, `8443`의 3개 포트가 포함된 경우,
+`443`, `8443`은 SSL 인증서를 사용하지만, `80`은 단순히
+프록시만 하는 HTTP이다.
 
-From Kubernetes v1.9 onwrds you can use [predefined AWS SSL policies](http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html) with HTTPS or SSL listeners for your Services.
-To see which policies are available for use, you can the `aws` command line tool:
+쿠버네티스 v1.9부터는 서비스에 대한 HTTPS 또는 SSL 리스너와 함께 [사전에 정의된 AWS SSL 정책](http://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-security-policy-table.html)을 사용할 수 있다.
+사용 가능한 정책을 확인하려면, `aws` 명령 줄 도구를 사용한다.
 
 ```bash
 aws elb describe-load-balancer-policies --query 'PolicyDescriptions[].PolicyName'
 ```
 
-You can then specify any one of those policies using the
+그리고
 "`service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy`"
-annotation; for example:
+어노테이션을 사용하여 이러한 정책 중 하나를 지정할 수 있다. 예를 들면
 
 ```yaml
     metadata:
@@ -714,11 +705,11 @@ annotation; for example:
         service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: "ELBSecurityPolicy-TLS-1-2-2017-01"
 ```
 
-#### PROXY protocol support on AWS
+#### AWS에서 지원하는 프록시 프로토콜
 
-To enable [PROXY protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt)
-support for clusters running on AWS, you can use the following service
-annotation:
+AWS에서 실행되는 클러스터에 대한 [프록시 프로토콜](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt)
+지원을 활성화하려면, 다음의 서비스 어노테이션을
+사용할 수 있다.
 
 ```yaml
     metadata:
@@ -727,48 +718,48 @@ annotation:
         service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
 ```
 
-Since version 1.3.0, the use of this annotation applies to all ports proxied by the ELB
-and cannot be configured otherwise.
+버전 1.3.0 부터, 이 어노테이션의 사용은 ELB에 의해 프록시되는 모든 포트에 적용되며
+다르게 구성 할 수 없다.
 
-#### ELB Access Logs on AWS
+#### AWS의 ELB 접근 로그
 
-There are several annotations to manage access logs for ELB Services on AWS.
+AWS ELB 서비스의 접근 로그를 관리하기 위한 몇 가지 어노테이션이 있다.
 
-The annotation `service.beta.kubernetes.io/aws-load-balancer-access-log-enabled`
-controls whether access logs are enabled.
+`service.beta.kubernetes.io/aws-load-balancer-access-log-enabled` 어노테이션은
+접근 로그의 활성화 여부를 제어한다.
 
-The annotation `service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval`
-controls the interval in minutes for publishing the access logs. You can specify
-an interval of either 5 or 60 minutes.
+`service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval` 어노테이션은
+접근 로그를 게시하는 간격을 분 단위로 제어한다. 5분 또는 60분의
+간격을 지정할 수 있다.
 
-The annotation `service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name`
-controls the name of the Amazon S3 bucket where load balancer access logs are
-stored.
+`service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name` 어노테이션은
+로드 밸런서 접근 로그가 저장되는 Amazon S3 버킷의 이름을
+제어한다.
 
-The annotation `service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix`
-specifies the logical hierarchy you created for your Amazon S3 bucket.
+`service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix` 어노테이션은
+Amazon S3 버킷을 생성한 논리적 계층을 지정한다.
 
 ```yaml
     metadata:
       name: my-service
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-access-log-enabled: "true"
-        # Specifies whether access logs are enabled for the load balancer
+        # 접근 로그의 활성화 여부를 제어.
         service.beta.kubernetes.io/aws-load-balancer-access-log-emit-interval: "60"
-        # The interval for publishing the access logs. You can specify an interval of either 5 or 60 (minutes).
+        # 접근 로그를 게시하는 간격을 분 단위로 제어. 5분 또는 60분의 간격을 지정.
         service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-name: "my-bucket"
-        # The name of the Amazon S3 bucket where the access logs are stored
+        # 로드 밸런서 접근 로그가 저장되는 Amazon S3 버킷의 이름을 제어.
         service.beta.kubernetes.io/aws-load-balancer-access-log-s3-bucket-prefix: "my-bucket-prefix/prod"
-        # The logical hierarchy you created for your Amazon S3 bucket, for example `my-bucket-prefix/prod`
+        # Amazon S3 버킷을 생성한 논리적 계층을 지정. 예: `my-bucket-prefix/prod`
 ```
 
-#### Connection Draining on AWS
+#### AWS의 연결 드레이닝 (Draining)
 
-Connection draining for Classic ELBs can be managed with the annotation
-`service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled` set
-to the value of `"true"`. The annotation
-`service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout` can
-also be used to set maximum time, in seconds, to keep the existing connections open before deregistering the instances.
+Classic ELB의 연결 드레이닝은
+`service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled` 어노테이션을
+`"true"`값으로 설정하여 관리할 수 ​​있다. `service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout` 어노테이션을
+사용하여 인스턴스를 해제하기 전에,
+기존 연결을 열어 두는 목적으로 최대 시간을 초 단위로 설정할 수도 있다.
 
 
 ```yaml
@@ -779,53 +770,49 @@ also be used to set maximum time, in seconds, to keep the existing connections o
         service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "60"
 ```
 
-#### Other ELB annotations
+#### 다른 ELB 어노테이션
 
-There are other annotations to manage Classic Elastic Load Balancers that are described below.
+이하는 클래식 엘라스틱 로드 밸런서를 관리하기 위한 다른 어노테이션이다.
 
 ```yaml
     metadata:
       name: my-service
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "60"
-        # The time, in seconds, that the connection is allowed to be idle (no data has been sent over the connection) before it is closed by the load balancer
+        # 로드 밸런서가 연결을 닫기 전에, 초 단위로 연결이 유휴 상태 (연결을 통해 전송 된 데이터가 없음)로 되는 시간
 
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-        # Specifies whether cross-zone load balancing is enabled for the load balancer
+        # 로드 밸런서에 교차-영역 로드 밸런싱을 사용할 지 여부를 지정
 
         service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "environment=prod,owner=devops"
-        # A comma-separated list of key-value pairs which will be recorded as
-        # additional tags in the ELB.
+        # 쉼표로 구분된 key-value 목록은 ELB에
+        # 추가 태그로 기록됨
 
         service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: ""
-        # The number of successive successful health checks required for a backend to
-        # be considered healthy for traffic. Defaults to 2, must be between 2 and 10
+        # 백엔드가 정상인 것으로 간주되는데 필요한 연속적인
+        # 헬스 체크 성공 횟수이다. 기본값은 2이며, 2와 10 사이여야 한다.
 
         service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "3"
-        # The number of unsuccessful health checks required for a backend to be
-        # considered unhealthy for traffic. Defaults to 6, must be between 2 and 10
+        # 백엔드가 비정상인 것으로 간주되는데 필요한
+        # 헬스 체크 실패 횟수이다. 기본값은 6이며, 2와 10 사이여야 한다.
 
         service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "20"
-        # The approximate interval, in seconds, between health checks of an
-        # individual instance. Defaults to 10, must be between 5 and 300
+        # 개별 인스턴스의 상태 점검 사이의
+        # 대략적인 간격 (초 단위). 기본값은 10이며, 5와 300 사이여야 한다.
         service.beta.kubernetes.io/aws-load-balancer-healthcheck-timeout: "5"
-        # The amount of time, in seconds, during which no response means a failed
-        # health check. This value must be less than the service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval
-        # value. Defaults to 5, must be between 2 and 60
+        # 헬스 체크 실패를 의미하는 무 응답의 총 시간 (초 단위)
+        # 이 값은 service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval
+        # 값 보다 작아야한다. 기본값은 5이며, 2와 60 사이여야 한다.
 
         service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "sg-53fae93f,sg-42efd82e"
-        # A list of additional security groups to be added to the ELB
+        # ELB에 추가될 추가 보안 그룹 목록
 ```
 
-#### Network Load Balancer support on AWS [alpha] {#aws-nlb-support}
+#### AWS의 네트워크 로드 밸런서 지원 {#aws-nlb-support}
 
-{{< warning >}}
-This is an alpha feature and is not yet recommended for production clusters.
-{{< /warning >}}
+{{< feature-state for_k8s_version="v1.15" state="beta" >}}
 
-Starting from Kubernetes v1.9.0, you can use AWS Network Load Balancer (NLB) with Services. To
-use a Network Load Balancer on AWS, use the annotation `service.beta.kubernetes.io/aws-load-balancer-type`
-with the value set to `nlb`.
+AWS에서 Network Load Balancer를 사용하려면, `nlb` 값이 설정된 `service.beta.kubernetes.io/aws-load-balancer-type` 어노테이션을 사용한다.
 
 ```yaml
     metadata:
@@ -835,61 +822,61 @@ with the value set to `nlb`.
 ```
 
 {{< note >}}
-NLB only works with certain instance classes; see the [AWS documentation](http://docs.aws.amazon.com/elasticloadbalancing/latest/network/target-group-register-targets.html#register-deregister-targets)
-on Elastic Load Balancing for a list of supported instance types.
+NLB는 특정 인스턴스 클래스에서만 작동한다. 지원되는 인스턴스 유형 목록은 엘라스틱 로드 밸런싱에 대한 [AWS 문서](http://docs.aws.amazon.com/elasticloadbalancing/latest/network/target-group-register-targets.html#register-deregister-targets)
+를 참고한다.
 {{< /note >}}
 
-Unlike Classic Elastic Load Balancers, Network Load Balancers (NLBs) forward the
-client's IP address through to the node. If a Service's `.spec.externalTrafficPolicy`
-is set to `Cluster`, the client's IP address is not propagated to the end
-Pods.
+클래식 엘라스틱 로드 밸런서와 달리, 네트워크 로드 밸런서 (NLB)는
+클라이언트의 IP 주소를 노드로 전달한다. 서비스의 `.spec.externalTrafficPolicy`가
+`Cluster`로 설정되어 있으면, 클라이언트의 IP 주소가 종단 파드로
+전파되지 않는다.
 
-By setting `.spec.externalTrafficPolicy` to `Local`, the client IP addresses is
-propagated to the end Pods, but this could result in uneven distribution of
-traffic. Nodes without any Pods for a particular LoadBalancer Service will fail
-the NLB Target Group's health check on the auto-assigned
-`.spec.healthCheckNodePort` and not receive any traffic.
+`.spec.externalTrafficPolicy`를 `Local`로 설정하면, 클라이언트 IP 주소가
+종단 파드로 전파되지만, 트래픽이 고르지 않게
+분배될 수 있다. 특정 LoadBalancer 서비스에 대해 파드가 없는 노드는 자동 할당된
+`.spec.healthCheckNodePort`에서 NLB 대상 그룹의
+헬스 체크에 실패하고 트래픽을 수신하지 않는다.
 
-In order to achieve even traffic, either use a DaemonSet, or specify a
-[pod anti-affinity](/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
-to not locate on the same node.
+트래픽을 균일하게 하려면, DaemonSet을 사용하거나
+[파드 anti-affinity](/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity)
+를 지정하여 동일한 노드에 위치하지 않도록 한다.
 
-You can also use NLB Services with the [internal load balancer](/docs/concepts/services-networking/service/#internal-load-balancer)
-annotation.
+[내부 로드 밸런서](/docs/concepts/services-networking/service/#internal-load-balancer) 어노테이션과 함께 NLB 서비스를
+사용할 수도 있다.
 
-In order for client traffic to reach instances behind an NLB, the Node security
-groups are modified with the following IP rules:
+클라이언트 트래픽이 NLB 뒤의 인스턴스에 도달하기 위해, 노드 보안
+그룹은 다음 IP 규칙으로 수정된다.
 
-| Rule | Protocol | Port(s) | IpRange(s) | IpRange Description |
+| 규칙 | 프로토콜 | 포트 | IP 범위 | IP 범위 설명 |
 |------|----------|---------|------------|---------------------|
-| Health Check | TCP | NodePort(s) (`.spec.healthCheckNodePort` for `.spec.externalTrafficPolicy = Local`) | VPC CIDR | kubernetes.io/rule/nlb/health=\<loadBalancerName\> |
-| Client Traffic | TCP | NodePort(s) | `.spec.loadBalancerSourceRanges` (defaults to `0.0.0.0/0`) | kubernetes.io/rule/nlb/client=\<loadBalancerName\> |
-| MTU Discovery | ICMP | 3,4 | `.spec.loadBalancerSourceRanges` (defaults to `0.0.0.0/0`) | kubernetes.io/rule/nlb/mtu=\<loadBalancerName\> |
+| 헬스 체크 | TCP | NodePort(s) (`.spec.healthCheckNodePort` for `.spec.externalTrafficPolicy = Local`) | VPC CIDR | kubernetes.io/rule/nlb/health=\<loadBalancerName\> |
+| 클라이언트 트래픽 | TCP | NodePort(s) | `.spec.loadBalancerSourceRanges` (defaults to `0.0.0.0/0`) | kubernetes.io/rule/nlb/client=\<loadBalancerName\> |
+| MTU 탐색 | ICMP | 3,4 | `.spec.loadBalancerSourceRanges` (defaults to `0.0.0.0/0`) | kubernetes.io/rule/nlb/mtu=\<loadBalancerName\> |
 
-In order to limit which client IP's can access the Network Load Balancer,
-specify `loadBalancerSourceRanges`.
+네트워크 로드 밸런서에 접근할 수 있는 클라이언트 IP를 제한하려면
+`loadBalancerSourceRanges`를 지정한다.
 
 ```yaml
 spec:
   loadBalancerSourceRanges:
-  - "143.231.0.0/16"
+    - "143.231.0.0/16"
 ```
 
 {{< note >}}
-If `.spec.loadBalancerSourceRanges` is not set, Kubernetes
-allows traffic from `0.0.0.0/0` to the Node Security Group(s). If nodes have
-public IP addresses, be aware that non-NLB traffic can also reach all instances
-in those modified security groups.
+`.spec.loadBalancerSourceRanges`가 설정되어 있지 않으면, 쿠버네티스는
+`0.0.0.0/0`에서 노드 보안 그룹으로의 트래픽을 허용한다. 노드에 퍼블릭 IP 주소가
+있는 경우, 비(non)-NLB 트래픽도 해당 수정된 보안 그룹의
+모든 인스턴스에 도달할 수 있다.
 
 {{< /note >}}
 
-### Type ExternalName {#externalname}
+### ExternalName 유형 {#externalname}
 
-Services of type ExternalName map a Service to a DNS name, not to a typical selector such as
-`my-service` or `cassandra`. You specify these Services with the `spec.externalName` parameter.
+ExternalName 유형의 서비스는 `my-service` 또는 `cassandra`와 같은 일반적인 셀렉터에 대한 서비스가 아닌,
+DNS 이름에 대한 서비스에 매핑한다. `spec.externalName` 파라미터를 사용하여 이러한 서비스를 지정한다.
 
-This Service definition, for example, maps
-the `my-service` Service in the `prod` namespace to `my.database.example.com`:
+예를 들면, 이 서비스 정의는 `prod` 네임 스페이스의
+`my-service` 서비스를 `my.database.example.com`에 매핑한다.
 
 ```yaml
 apiVersion: v1
@@ -902,31 +889,38 @@ spec:
   externalName: my.database.example.com
 ```
 {{< note >}}
-ExternalName accepts an IPv4 address string, but as a DNS names comprised of digits, not as an IP address. ExternalNames that resemble IPv4 addresses are not resolved by CoreDNS or ingress-nginx because ExternalName
-is intended to specify a canonical DNS name. To hardcode an IP address, consider using
-[headless Services](#headless-services).
+ExternalName은 IPv4 주소 문자열을 허용하지만, IP 주소가 아닌 숫자로 구성된 DNS 이름을 허용한다. Pv4 주소와 유사한 ExternalName은 CoreDNS 또는 ingress-nginx에 의해 확인되지 않는데, ExternalName은
+정식(canonical) DNS 이름을 지정하기 때문이다. IP 주소를 하드 코딩하려면,
+[headless Services](#headless-services) 사용을 고려한다.
 {{< /note >}}
 
-When looking up the host `my-service.prod.svc.cluster.local`, the cluster DNS Service
-returns a `CNAME` record with the value `my.database.example.com`. Accessing
-`my-service` works in the same way as other Services but with the crucial
-difference that redirection happens at the DNS level rather than via proxying or
-forwarding. Should you later decide to move your database into your cluster, you
-can start its Pods, add appropriate selectors or endpoints, and change the
-Service's `type`.
+`my-service.prod.svc.cluster.local` 호스트를 검색하면, 클러스터 DNS 서비스는
+`my.database.example.com` 값의 `CNAME` 레코드를 반환한다. `my-service`에 접근하는 것은
+다른 서비스와 같은 방식으로 작동하지만, 리다이렉션은 프록시 또는
+포워딩을 통하지 않고 DNS 수준에서 발생한다는 중요한
+차이점이 있다. 나중에 데이터베이스를 클러스터로 이동하기로 결정한 경우, 해당
+파드를 시작하고 적절한 셀렉터 또는 엔드포인트를 추가하고
+서비스의 `유형(type)`을 변경할 수 있다.
 
+{{< warning >}}
+HTTP 및 HTTPS를 포함한, 몇몇 일반적인 프로토콜에 ExternalName을 사용하는 것은 문제가 있을 수 있다. ExternalName을 사용하는 경우, 클러스터 내부의 클라이언트가 사용하는 호스트 이름(hostname)이 ExternalName이 참조하는 이름과 다르다.
+
+호스트 이름을 사용하는 프로토콜의 경우, 이러한 차이로 인해 오류가 발생하거나 예기치 않은 응답이 발생할 수 있다. HTTP 요청에는 오리진 서버가 인식하지 못하는 `Host :` 헤더가 있다. TLS 서버는 클라이언트가 연결된 호스트 이름과 일치하는 인증서를 제공 할 수 없다.
+{{< /warning >}}
 
 {{< note >}}
-This section is indebted to the [Kubernetes Tips - Part
-1](https://akomljen.com/kubernetes-tips-part-1/) blog post from [Alen Komljen](https://akomljen.com/).
+이 섹션은 [Alen Komljen](https://akomljen.com/)의 [쿠버네티스 팁 - Part
+1](https://akomljen.com/kubernetes-tips-part-1/) 블로그 게시물에 대한 내용이다.
 {{< /note >}}
 
-### External IPs
+### 외부 IP
 
-If there are external IPs that route to one or more cluster nodes, Kubernetes Services can be exposed on those
-`externalIPs`. Traffic that ingresses into the cluster with the external IP (as destination IP), on the Service port,
-will be routed to one of the Service endpoints. `externalIPs` are not managed by Kubernetes and are the responsibility
-of the cluster administrator.
+하나 이상의 클러스터 노드로 라우팅되는 외부 IP가 있는 경우, 쿠버네티스 서비스는 이러한
+`externalIPs`에 노출될 수 있다.
+
+
+Traffic that ingresses into the cluster with the external IP (as destination IP), on the Service port, will be routed to one of the Service endpoints.
+`externalIPs` are not managed by Kubernetes and are the responsibility of the cluster administrator.
 
 In the Service spec, `externalIPs` can be specified along with any of the `ServiceTypes`.
 In the example below, "`my-service`" can be accessed by clients on "`80.11.12.10:80`" (`externalIP:port`)
@@ -940,12 +934,12 @@ spec:
   selector:
     app: MyApp
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 9376
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9376
   externalIPs:
-  - 80.11.12.10
+    - 80.11.12.10
 ```
 
 ## Shortcomings
@@ -1059,7 +1053,7 @@ IPVS is designed for load balancing and based on in-kernel hash tables. So you c
 Service is a top-level resource in the Kubernetes REST API. You can find more details
 about the API object at: [Service API object](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#service-v1-core).
 
-## 지원 프로토콜 {#지원-프로토콜}
+## Supported protocols {#protocol-support}
 
 ### TCP
 
@@ -1159,5 +1153,6 @@ which encompass the current ClusterIP, NodePort, and LoadBalancer modes and more
 
 * Read [Connecting Applications with Services](/docs/concepts/services-networking/connect-applications-service/)
 * Read about [Ingress](/docs/concepts/services-networking/ingress/)
+* Read about [Endpoint Slices](/docs/concepts/services-networking/endpoint-slices/)
 
 {{% /capture %}}

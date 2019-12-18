@@ -916,14 +916,12 @@ HTTP 및 HTTPS를 포함한, 몇몇 일반적인 프로토콜에 ExternalName을
 ### 외부 IP
 
 하나 이상의 클러스터 노드로 라우팅되는 외부 IP가 있는 경우, 쿠버네티스 서비스는 이러한
-`externalIPs`에 노출될 수 있다.
+`externalIPs`에 노출될 수 있다. 서비스 포트에서 외부 IP (목적지 IP)를 사용하여 클러스터로 들어오는 트래픽은
+서비스 엔드포인트 중 하나로 라우팅된다. `externalIPs`는 쿠버네티스에 의해 관리되지 않으며
+클러스터 관리자에게 책임이 있다.
 
-
-Traffic that ingresses into the cluster with the external IP (as destination IP), on the Service port, will be routed to one of the Service endpoints.
-`externalIPs` are not managed by Kubernetes and are the responsibility of the cluster administrator.
-
-In the Service spec, `externalIPs` can be specified along with any of the `ServiceTypes`.
-In the example below, "`my-service`" can be accessed by clients on "`80.11.12.10:80`" (`externalIP:port`)
+서비스 명세에서, `externalIPs`는 모든 `ServiceTypes`와 함께 지정할 수 있다.
+아래 예에서, 클라이언트는 "`80.11.12.10:80`"(`외부 IP:포트`)로 "`my-service`"에 접근할 수 있다.
 
 ```yaml
 apiVersion: v1
@@ -942,156 +940,156 @@ spec:
     - 80.11.12.10
 ```
 
-## Shortcomings
+## 단점
 
-Using the userspace proxy for VIPs, work at small to medium scale, but will
-not scale to very large clusters with thousands of Services.  The [original
-design proposal for portals](http://issue.k8s.io/1107) has more details on
-this.
+VIP용으로 유저스페이스 프록시를 사용하면, 중소 급 스케일에서는 동작하지만, 수천 개의
+서비스가 포함된 대규모 클러스터로는 확장되지 않는다. [포털에 대한
+독창적인 설계 제안](http://issue.k8s.io/1107)에 이에 대한 자세한 내용이
+있다.
 
-Using the userspace proxy obscures the source IP address of a packet accessing
-a Service.
-This makes some kinds of network filtering (firewalling) impossible.  The iptables
-proxy mode does not
-obscure in-cluster source IPs, but it does still impact clients coming through
-a load balancer or node-port.
+유저스페이스 프록시를 사용하면 서비스에 접근하는 패킷의 소스 IP 주소가
+가려진다.
+이것은 일종의 네트워크 필터링 (방화벽)을 불가능하게 만든다. iptables
+프록시 모드는 클러스터 내
+소스 IP를 가리지 않지만, 여전히 로드 밸런서 또는 노드-포트를 통해 오는
+클라이언트에 영향을 미친다.
 
-The `Type` field is designed as nested functionality - each level adds to the
-previous.  This is not strictly required on all cloud providers (e.g. Google Compute Engine does
-not need to allocate a `NodePort` to make `LoadBalancer` work, but AWS does)
-but the current API requires it.
+`Type` 필드는 중첩된 기능으로 설계되었다. - 각 레벨은 이전 레벨에
+추가된다. 이는 모든 클라우드 공급자에 반드시 필요한 것은 아니지만, (예: Google Compute Engine는
+  `LoadBalancer`를 작동시키기 위해 `NodePort`를 할당할 필요는 없지만, AWS는 필요하다),
+  현재 API에는 필여하다.
 
-## Virtual IP implementation {#the-gory-details-of-virtual-ips}
+## 가상 IP 구현 {#the-gory-details-of-virtual-ips}
 
-The previous information should be sufficient for many people who just want to
-use Services.  However, there is a lot going on behind the scenes that may be
-worth understanding.
+서비스를 사용하려는 많은 사람들에게 이전 정보가
+충분해야 한다. 그러나, 이해가 필요한 부분 뒤에는
+많은 일이 있다.
 
-### Avoiding collisions
+### 충돌 방지
 
-One of the primary philosophies of Kubernetes is that you should not be
-exposed to situations that could cause your actions to fail through no fault
-of your own. For the design of the Service resource, this means not making
-you choose your own port number for a if that choice might collide with
-someone else's choice.  That is an isolation failure.
+쿠버네티스의 주요 철학 중 하나는 잘못한 것이
+없는 경우 실패할 수 있는 상황에 노출되어서는
+안된다는 것이다. 서비스 리소스 설계 시, 다른 사람의 포트 선택과
+충돌할 경우에 대비해 자신의 포트 번호를 선택하지
+않아도 된다. 그것은 격리 실패이다.
 
-In order to allow you to choose a port number for your Services, we must
-ensure that no two Services can collide. Kubernetes does that by allocating each
-Service its own IP address.
+서비스에 대한 포트 번호를 선택할 수 있도록 하기 위해, 두 개의
+서비스가 충돌하지 않도록 해야한다. 쿠버네티스는 각 서비스에 고유한 IP 주소를
+할당하여 이를 수행한다.
 
-To ensure each Service receives a unique IP, an internal allocator atomically
-updates a global allocation map in {{< glossary_tooltip term_id="etcd" >}}
-prior to creating each Service. The map object must exist in the registry for
-Services to get IP address assignments, otherwise creations will
-fail with a message indicating an IP address could not be allocated.
+각 서비스가 고유한 IP를 받도록 하기 위해, 내부 할당기는
+각 서비스를 만들기 전에 {{< glossary_tooltip term_id="etcd" >}}에서
+글로벌 할당 맵을 원자적으로(atomically) 업데이트한다. 서비스가 IP 주소 할당을 가져오려면
+레지스트리에 맵 오브젝트가 있어야 하는데, 그렇지 않으면
+IP 주소를 할당할 수 없다는 메시지와 함께 생성에 실패한다.
 
-In the control plane, a background controller is responsible for creating that
-map (needed to support migrating from older versions of Kubernetes that used
-in-memory locking). Kubernetes also uses controllers to checking for invalid
-assignments (eg due to administrator intervention) and for cleaning up allocated
-IP addresses that are no longer used by any Services.
+컨트롤 플레인에서, 백그라운드 컨트롤러는 해당 맵을
+생성해야 한다. (인-메모리 잠금을 사용하는 이전 버전의 쿠버네티스에서 마이그레이션
+지원 필요함) 쿠버네티스는 또한 컨트롤러를 사용하여 유효하지 않은
+할당 (예: 관리자 개입)을 체크하고 더 이상 서비스에서 사용하지 않는 할당된
+IP 주소를 정리한다.
 
-### Service IP addresses {#ips-and-vips}
+### 서비스 IP 주소 {#ips-and-vips}
 
-Unlike Pod IP addresses, which actually route to a fixed destination,
-Service IPs are not actually answered by a single host.  Instead, kube-proxy
-uses iptables (packet processing logic in Linux) to define _virtual_ IP addresses
-which are transparently redirected as needed.  When clients connect to the
-VIP, their traffic is automatically transported to an appropriate endpoint.
-The environment variables and DNS for Services are actually populated in
-terms of the Service's virtual IP address (and port).
+실제로 고정된 목적지로 라우팅되는 파드 IP 주소와 달리,
+서비스 IP는 실제로 단일 호스트에서 응답하지 않는다. 대신에, kube-proxy는
+iptables (Linux의 패킷 처리 로직)를 사용하여 필요에 따라
+명백하게 리다이렉션되는 _가상_ IP 주소를 정의한다. 클라이언트가 VIP에
+연결하면, 트래픽이 자동으로 적절한 엔드포인트로 전송된다.
+환경 변수와 서비스 용 DNS는 실제로 서비스의
+가상 IP 주소 (및 포트)로 채워진다.
 
-kube-proxy supports three proxy modes&mdash;userspace, iptables and IPVS&mdash;which
-each operate slightly differently.
+kube-proxy는 조금씩 다르게 작동하는 세 가지 프록시 모드&mdash;유저스페이스, iptables and IPVS&mdash;를
+지원한다.
 
-#### Userspace
+#### 유저스페이스
 
-As an example, consider the image processing application described above.
-When the backend Service is created, the Kubernetes master assigns a virtual
-IP address, for example 10.0.0.1.  Assuming the Service port is 1234, the
-Service is observed by all of the kube-proxy instances in the cluster.
-When a proxy sees a new Service, it opens a new random port, establishes an
-iptables redirect from the virtual IP address to this new port, and starts accepting
-connections on it.
+예를 들어, 위에서 설명한 이미지 처리 애플리케이션을 고려한다.
+백엔드 서비스가 생성되면, 쿠버네티스 마스터는 가상
+IP 주소(예 : 10.0.0.1)를 할당한다. 서비스 포트를 1234라고 가정하면, 서비스는
+클러스터의 모든 kube-proxy 인스턴스에서 관찰된다.
+프록시가 새 서비스를 발견하면, 새로운 임의의 포트를 열고, 가상 IP 주소에서
+이 새로운 포트로 iptables 리다이렉션을 설정 한 후,
+연결을 수락하기 시작한다.
 
-When a client connects to the Service's virtual IP address, the iptables
-rule kicks in, and redirects the packets to the proxy's own port.
-The “Service proxy” chooses a backend, and starts proxying traffic from the client to the backend.
+클라이언트가 서비스의 가상 IP 주소에 연결하면, iptables
+규칙이 시작되고 패킷을 프록시의 자체 포트로 리다이렉션한다.
+"서비스 프록시"는 백엔드를 선택하고, 클라이언트에서 백엔드로의 트래픽을 프록시하기 시작한다.
 
-This means that Service owners can choose any port they want without risk of
-collision.  Clients can simply connect to an IP and port, without being aware
-of which Pods they are actually accessing.
+이는 서비스 소유자가 충돌 위험없이 원하는 어떤 포트든 선택할 수 있음을
+의미한다. 클라이언트는 실제로 접근하는 파드를 몰라도, IP와 포트에
+간단히 연결할 수 있다.
 
 #### iptables
 
-Again, consider the image processing application described above.
-When the backend Service is created, the Kubernetes control plane assigns a virtual
-IP address, for example 10.0.0.1.  Assuming the Service port is 1234, the
-Service is observed by all of the kube-proxy instances in the cluster.
-When a proxy sees a new Service, it installs a series of iptables rules which
-redirect from the virtual IP address  to per-Service rules.  The per-Service
-rules link to per-Endpoint rules which redirect traffic (using destination NAT)
-to the backends.
+다시 한번, 위에서 설명한 이미지 처리 애플리케이션을 고려한다.
+백엔드 서비스가 생성되면, 쿠버네티스 컨트롤 플레인은 가상
+IP 주소(예 : 10.0.0.1)를 할당한다. 서비스 포트를 1234라고 가정하면, 서비스는
+클러스터의 모든 kube-proxy 인스턴스에서 관찰된다.
+프록시가 새로운 서비스를 발견하면, 가상 IP 주소에서 서비스-별 규칙으로
+리다이렉션되는 일련의 iptables 규칙을 설치한다. 서비스-별
+규칙은 트래픽을 (목적지 NAT를 사용하여) 백엔드로 리다이렉션하는 엔드포인트-별 규칙에
+연결된다.
 
-When a client connects to the Service's virtual IP address the iptables rule kicks in.
-A backend is chosen (either based on session affinity or randomly) and packets are
-redirected to the backend.  Unlike the userspace proxy, packets are never
-copied to userspace, the kube-proxy does not have to be running for the virtual
-IP address to work, and Nodes see traffic arriving from the unaltered client IP
-address.
+클라이언트가 서비스의 가상 IP 주소에 연결하면 iptables 규칙이 시작된다.
+(세션 어피니티(Affinity)에 따라 또는 무작위로) 백엔드가 선택되고 패킷이
+백엔드로 리다이렉션된다. 유저스페이스 프록시와 달리, 패킷은 유저스페이스로
+복사되지 않으며, 가상 IP 주소가 작동하기 위해 kube-proxy가
+실행중일 필요는 없으며, 노드는 변경되지 않은 클라이언트 IP 주소에서 오는
+트래픽을 본다.
 
-This same basic flow executes when traffic comes in through a node-port or
-through a load-balancer, though in those cases the client IP does get altered.
+트래픽이 노드-포트 또는 로드 밸런서를 통해 들어오는 경우에도,
+이와 동일한 기본 흐름이 실행되지만, 클라이언트 IP는 변경된다.
 
 #### IPVS
 
-iptables operations slow down dramatically in large scale cluster e.g 10,000 Services.
-IPVS is designed for load balancing and based on in-kernel hash tables. So you can achieve performance consistency in large number of Services from IPVS-based kube-proxy. Meanwhile, IPVS-based kube-proxy has more sophisticated load balancing algorithms (least conns, locality, weighted, persistence).
+iptables 작업은 대규모 클러스터 (예: 10,000) 서비스에서 크게 느려진다.
+IPVS는 로드 밸런싱을 위해 설계되었고 커널-내부 해시 테이블을 기반으로 한다. 따라서 IPVS 기반 kube-proxy로 부터 많은 개수의 서비스에서 일관성 있는 성능을 가질 수 있다. 한편, IPVS 기반 kube-proxy는 보다 정교한 로드 밸런싱 알고리즘 (least conns, locality, weighted, persistence)을 가진다.
 
-## API Object
+## API 오브젝트
 
-Service is a top-level resource in the Kubernetes REST API. You can find more details
-about the API object at: [Service API object](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#service-v1-core).
+서비스는 쿠버네티스 REST API의 최상위 리소스이다. API 오브젝트에 대한
+자세한 내용은 다음을 참고한다. [Service API object](/docs/reference/generated/kubernetes-api/{{< param "version" >}}/#service-v1-core)
 
-## Supported protocols {#protocol-support}
+## 지원되는 프로토콜 {#protocol-support}
 
 ### TCP
 
 {{< feature-state for_k8s_version="v1.0" state="stable" >}}
 
-You can use TCP for any kind of Service, and it's the default network protocol.
+모든 종류의 서비스에 TCP를 사용할 수 있으며, 기본 네트워크 프로토콜이다.
 
 ### UDP
 
 {{< feature-state for_k8s_version="v1.0" state="stable" >}}
 
-You can use UDP for most Services. For type=LoadBalancer Services, UDP support
-depends on the cloud provider offering this facility.
+대부분의 서비스에 UDP를 사용할 수 있다. type=LoadBalancer 서비스의 경우, UDP 지원은
+이 기능을 제공하는 클라우드 공급자에 따라 다르다.
 
 ### HTTP
 
 {{< feature-state for_k8s_version="v1.1" state="stable" >}}
 
-If your cloud provider supports it, you can use a Service in LoadBalancer mode
-to set up external HTTP / HTTPS reverse proxying, forwarded to the Endpoints
-of the Service.
+클라우드 공급자가 이를 지원하는 경우, LoadBalancer 모드의
+서비스를 사용하여 서비스의 엔드포인트로 전달되는 외부 HTTP / HTTPS 리버스 프록시를
+설정할 수 있다.
 
 {{< note >}}
-You can also use {{< glossary_tooltip term_id="ingress" >}} in place of Service
-to expose HTTP / HTTPS Services.
+서비스 대신 {{< glossary_tooltip term_id="ingress" text="인그레스" >}} 를 사용하여
+HTTP / HTTPS 서비스를 노출할 수도 있다.
 {{< /note >}}
 
-### PROXY protocol
+### PROXY 프로토콜
 
 {{< feature-state for_k8s_version="v1.1" state="stable" >}}
 
-If your cloud provider supports it (eg, [AWS](/docs/concepts/cluster-administration/cloud-providers/#aws)),
-you can use a Service in LoadBalancer mode to configure a load balancer outside
-of Kubernetes itself, that will forward connections prefixed with
-[PROXY protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt).
+클라우드 공급자가 지원하는 경우에 (예: [AWS](/docs/concepts/cluster-administration/cloud-providers/#aws)),
+LoadBalancer 모드의 서비스를 사용하여 쿠버네티스 자체 외부에
+로드 밸런서를 구성하면, 접두사가
+[PROXY 프로토콜](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt) 인 연결을 전달한다.
 
-The load balancer will send an initial series of octets describing the
-incoming connection, similar to this example
+로드 밸런서는 들어오는 연결을 설명하는 초기 일련의
+옥텟(octets)을 전송하며, 이 예와 유사하다.
 
 ```
 PROXY TCP4 192.0.2.202 10.0.42.7 12345 7\r\n
@@ -1102,57 +1100,57 @@ followed by the data from the client.
 
 {{< feature-state for_k8s_version="v1.12" state="alpha" >}}
 
-Kubernetes supports SCTP as a `protocol` value in Service, Endpoint, NetworkPolicy and Pod definitions as an alpha feature. To enable this feature, the cluster administrator needs to enable the `SCTPSupport` feature gate on the apiserver, for example, `--feature-gates=SCTPSupport=true,…`.
+쿠버네티스는 서비스, 엔드포인트, 네트워크 정책 및 파드 정의에서 알파 기능으로 SCTP를 `프로토콜` 값으로 지원한다. 이 기능을 활성화하기 위해서는, 클러스터 관리자가 API 서버에서 `--feature-gates=SCTPSupport=true,…`처럼 `SCTPSupport` 기능 게이트를 활성화 해야한다.
 
-When the feature gate is enabled, you can set the `protocol` field of a Service, Endpoint, NetworkPolicy or Pod to `SCTP`. Kubernetes sets up the network accordingly for the SCTP associations, just like it does for TCP connections.
+기능 게이트가 활성화되면, 서비스, 엔드포인트, 네트워크 정책 또는 파드의 `프로토콜` 필드를 `SCTP`로 설정할 수 있다. 쿠버네티스는 TCP 연결과 마찬가지로, SCTP 연결에 맞게 네트워크를 설정한다.
 
-#### Warnings {#caveat-sctp-overview}
+#### 경고 {#caveat-sctp-overview}
 
-##### Support for multihomed SCTP associations {#caveat-sctp-multihomed}
+##### 멀티홈(multihomed) SCTP 연결을 위한 지원 {#caveat-sctp-multihomed}
 
 {{< warning >}}
-The support of multihomed SCTP associations requires that the CNI plugin can support the assignment of multiple interfaces and IP addresses to a Pod.
+멀티홈 SCTP 연결을 위해서는 먼저 CNI 플러그인이 파드에 대해 멀티 인터페이스 및 IP 주소 할당이 지원되어야 한다.
 
-NAT for multihomed SCTP associations requires special logic in the corresponding kernel modules.
+멀티홈 SCTP 연결을 위한 NAT에는 해당 커널 모듈 내에 특수한 로직이 필요하다.
 {{< /warning >}}
 
-##### Service with type=LoadBalancer {#caveat-sctp-loadbalancer-service-type}
+##### type=LoadBalancer 서비스 {#caveat-sctp-loadbalancer-service-type}
 
 {{< warning >}}
-You can only create a Service with `type` LoadBalancer plus `protocol` SCTP if the cloud provider's load balancer implementation supports SCTP as a protocol. Otherwise, the Service creation request is rejected. The current set of cloud load balancer providers (Azure, AWS, CloudStack, GCE, OpenStack) all lack support for SCTP.
+클라우드 공급자의 로드 밸런서 구현이 프로토콜로서 SCTP를 지원하는 경우에만 LoadBalancer `유형`과 SCTP `프로토콜`을 사용하여 서비스를 생성할 수 있다. 그렇지 않으면, 서비스 생성 요청이 거부된다. 현재 클라우드 로드 밸런서 공급자 세트 (Azure, AWS, CloudStack, GCE, OpenStack)는 모두 SCTP에 대한 지원이 없다.
 {{< /warning >}}
 
 ##### Windows {#caveat-sctp-windows-os}
 
 {{< warning >}}
-SCTP is not supported on Windows based nodes.
+SCTP는 Windows 기반 노드를 지원하지 않는다.
 {{< /warning >}}
 
-##### Userspace kube-proxy {#caveat-sctp-kube-proxy-userspace}
+##### 유저스페이스 kube-proxy {#caveat-sctp-kube-proxy-userspace}
 
 {{< warning >}}
-The kube-proxy does not support the management of SCTP associations when it is in userspace mode.
+kube-proxy는 유저스페이스 모드에 있을 때 SCTP 연결 관리를 지원하지 않는다.
 {{< /warning >}}
 
-## Future work
+## 향후 작업
 
-In the future, the proxy policy for Services can become more nuanced than
-simple round-robin balancing, for example master-elected or sharded.  We also
-envision that some Services will have "real" load balancers, in which case the
-virtual IP address will simply transport the packets there.
+향후, 서비스에 대한 프록시 정책은 예를 들어, 마스터-선택 또는 샤드 같은
+단순한 라운드-로빈 밸런싱보다 미묘한 차이가 생길 수 있다. 또한
+일부 서비스에는 "실제" 로드 밸런서가 있을 것으로 예상되는데, 이 경우
+가상 IP 주소는 단순히 패킷을 그곳으로 전송한다.
 
-The Kubernetes project intends to improve support for L7 (HTTP) Services.
+쿠버네티스 프로젝트는 L7 (HTTP) 서비스에 대한 지원을 개선하려고 한다.
 
-The Kubernetes project intends to have more flexible ingress modes for Services
-which encompass the current ClusterIP, NodePort, and LoadBalancer modes and more.
+쿠버네티스 프로젝트는 현재 ClusterIP, NodePort 및 LoadBalancer 모드 등을 포함하는 서비스에 대해
+보다 유연한 인그레스 모드를 지원하려고 한다.
 
 
 {{% /capture %}}
 
 {{% capture whatsnext %}}
 
-* Read [Connecting Applications with Services](/docs/concepts/services-networking/connect-applications-service/)
-* Read about [Ingress](/docs/concepts/services-networking/ingress/)
-* Read about [Endpoint Slices](/docs/concepts/services-networking/endpoint-slices/)
+* [서비스와 애플리케이션 연결](/docs/concepts/services-networking/connect-applications-service/) 알아보기
+* [인그레스](/docs/concepts/services-networking/ingress/)에 대해 알아보기
+* [엔드포인트 슬라이스](/docs/concepts/services-networking/endpoint-slices/)에 대해 알아보기
 
 {{% /capture %}}

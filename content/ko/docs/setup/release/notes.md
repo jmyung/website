@@ -62,8 +62,8 @@ filename | sha512 hash
 
 ## v1.17.0 이후 체인지로그
 
-릴리즈 노트의 전체 체인지로그는 이제 [https://relnotes.k8s.io][1]에서 사용자 정의 가능한 
-형식으로 호스팅된다. 확인하고 의견을 보내주기 
+릴리즈 노트의 전체 체인지로그는 이제 [https://relnotes.k8s.io][1]에서 사용자 정의 가능한
+형식으로 호스팅된다. 확인하고 의견을 보내주기
 바란다!
 
 [1]: https://relnotes.k8s.io/?releaseVersions=1.18.0
@@ -90,30 +90,30 @@ SIG CLI는 이미 오랫동안 디버그 유틸리티의 필요성에 대해 논
 
 ### 쿠버네티스를 위한 윈도우 CSI 지원 알파 소개
 
-With the release of Kubernetes 1.18, an alpha version of CSI Proxy for Windows is getting released. CSI proxy enables non-privileged (pre-approved) containers to perform privileged storage operations on Windows. CSI drivers can now be supported in Windows by leveraging CSI proxy.
-SIG Storage made a lot of progress in the 1.18 release.
-In particular, the following storage features are moving to GA in Kubernetes 1.18:
-- Raw Block Support: Allow volumes to be surfaced as block devices inside containers instead of just mounted filesystems.
-- Volume Cloning: Duplicate a PersistentVolumeClaim and underlying storage volume using the Kubernetes API via CSI.
-- CSIDriver Kubernetes API Object: Simplifies CSI driver discovery and allows CSI Drivers to customize Kubernetes behavior.
+쿠버네티스 1.18 릴리스에서는 윈도우 용 CSI Proxy의 알파 버전이 릴리스된다. CSI 프록시를 사용하면 권한이 없는 (사전 승인된) 컨테이너가 윈도우에서 권한있는 저장소 작업을 수행할 수 있다. CSI 프록시를 활용하여 윈도우에서 CSI 드라이버를 지원할 수 있다.
+SIG 스토리지는 1.18 릴리스에서 많은 진전을 이루었다.
+특히, 다음 스토리지 기능이 쿠버네티스 1.18에서 GA로 이전되었다.
+- 원시(Raw) 블록 지원 : 볼륨을 마운트된 파일 시스템 대신, 컨테이너 내에 블록 장치로 표시할 수 있다.
+- 볼륨 복제 : CSI를 통해 쿠버네티스 API를 사용하여 PersistentVolumeClaim 및 기본 스토리지 볼륨을 복제한다.
+- CSIDriver 쿠버네티스 API 오브젝트: CSI 드라이버 검색을 단순화하고 CSI 드라이버가 쿠버네티스 동작을 사용자 정의할 수 있다.
 
-SIG Storage is also introducing the following new storage features as alpha in Kubernetes 1.18:
-- Windows CSI Support: Enabling containerized CSI node plugins in Windows via new [CSIProxy](https://github.com/kubernetes-csi/csi-proxy)
-- Recursive Volume Ownership OnRootMismatch Option: Add a new “OnRootMismatch” policy that can help shorten the mount time for volumes that require ownership change and have many directories and files.
+SIG 스토리지는 쿠버네티스 1.18에서 다음과 같은 새로운 스토리지 기능을 알파로 도입했다.
+- 윈도우 CSI 지원 : 새로운 [CSIProxy](https://github.com/kubernetes-csi/csi-proxy)를 통해 윈도우에서 컨테이너화 된 CSI 노드 플러그인 활성화
+- 재귀 볼륨 소유권 OnRootMismatch 옵션 : 소유권 변경이 필요하고 많은 디렉토리와 파일이 있는 볼륨의 마운트 시간을 단축할 수 있는 새로운 “OnRootMismatch” 정책을 추가한다.
 
-### Other notable announcements
+### 다른 중요한 발표
 
-SIG Network is moving IPv6 to Beta in Kubernetes 1.18, after incrementing significantly the test coverage with new CI jobs.
+새로운 CI 작업으로 테스트 커버리지를 크게 늘린 이후, SIG 네트워크는 쿠버네티스 1.18에서 IPv6를 베타로 전환한다.
 
-NodeLocal DNSCache is an add-on that runs a dnsCache pod as a daemonset to improve clusterDNS performance and reliability. The feature has been in Alpha since 1.13 release. The SIG Network is announcing the GA graduation of Node Local DNSCache [#1351](https://github.com/kubernetes/enhancements/pull/1351)
+NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS 성능과 안정성을 향상시키는 애드온이다. 이 기능은 1.13 릴리스 이후 알파 버전으로 존재한다. SIG 네트워크는 Node Local DNSCache [#1351](https://github.com/kubernetes/enhancements/pull/1351)의 GA 졸업을 발표한다.
 
-## Known Issues
+## 알려진 이슈
 
-No Known Issues Reported
+알려진 이슈가 보고되지 않음
 
-## Urgent Upgrade Notes
+## 긴급 업그레이드 노트
 
-### (No, really, you MUST read this before you upgrade)
+### (업그레이드하기 전에 반드시 읽어야한다)
 
 #### kube-apiserver:
 - in an `--encryption-provider-config` config file, an explicit `cacheSize: 0` parameter previously silently defaulted to caching 1000 keys. In Kubernetes 1.18, this now returns a config validation error. To disable caching, you can specify a negative cacheSize value in Kubernetes 1.18+.
@@ -126,7 +126,7 @@ No Known Issues Reported
 
 #### kubectl:
 - `kubectl` and k8s.io/client-go no longer default to a server address of `http://localhost:8080`. If you own one of these legacy clusters, you are *strongly* encouraged to secure your server. If you cannot secure your server, you can set the `$KUBERNETES_MASTER` environment variable to `http://localhost:8080` to continue defaulting the server address. `kubectl` users can also set the server address using the `--server` flag, or in a kubeconfig file specified via `--kubeconfig` or `$KUBECONFIG`. ([#86173](https://github.com/kubernetes/kubernetes/pull/86173), [@soltysh](https://github.com/soltysh)) [SIG API Machinery, CLI and Testing]
-- `kubectl run` has removed the previously deprecated generators, along with flags unrelated to creating pods. `kubectl run` now only creates pods. See specific `kubectl create` subcommands to create objects other than pods. 
+- `kubectl run` has removed the previously deprecated generators, along with flags unrelated to creating pods. `kubectl run` now only creates pods. See specific `kubectl create` subcommands to create objects other than pods.
 ([#87077](https://github.com/kubernetes/kubernetes/pull/87077), [@soltysh](https://github.com/soltysh)) [SIG Architecture, CLI and Testing]
 - The deprecated command `kubectl rolling-update` has been removed ([#88057](https://github.com/kubernetes/kubernetes/pull/88057), [@julianvmodesto](https://github.com/julianvmodesto)) [SIG Architecture, CLI and Testing]
 
@@ -193,13 +193,13 @@ No Known Issues Reported
       - node_memory_working_set_bytes --> node_memory_working_set_bytes
       - container_cpu_usage_seconds_total --> container_cpu_usage_seconds
       - container_memory_working_set_bytes --> container_memory_working_set_bytes
-      - scrape_error --> scrape_error 
+      - scrape_error --> scrape_error
       ([#86282](https://github.com/kubernetes/kubernetes/pull/86282), [@RainbowMango](https://github.com/RainbowMango)) [SIG Node]
 - In a future release, kubelet will no longer create the CSI NodePublishVolume target directory, in accordance with the CSI specification. CSI drivers may need to be updated accordingly to properly create and process the target path. ([#75535](https://github.com/kubernetes/kubernetes/issues/75535)) [SIG Storage]
 
 #### kube-proxy:
 - `--healthz-port` and `--metrics-port` flags are deprecated, please use `--healthz-bind-address` and `--metrics-bind-address` instead ([#88512](https://github.com/kubernetes/kubernetes/pull/88512), [@SataQiu](https://github.com/SataQiu)) [SIG Network]
-- a new `EndpointSliceProxying` feature gate has been added to control the use of EndpointSlices in kube-proxy. The EndpointSlice feature gate that used to control this behavior no longer affects kube-proxy. This feature has been disabled by default. ([#86137](https://github.com/kubernetes/kubernetes/pull/86137), [@robscott](https://github.com/robscott)) 
+- a new `EndpointSliceProxying` feature gate has been added to control the use of EndpointSlices in kube-proxy. The EndpointSlice feature gate that used to control this behavior no longer affects kube-proxy. This feature has been disabled by default. ([#86137](https://github.com/kubernetes/kubernetes/pull/86137), [@robscott](https://github.com/robscott))
 
 #### kubeadm:
 - command line option "kubelet-version" for `kubeadm upgrade node` has been deprecated and will be removed in a future release. ([#87942](https://github.com/kubernetes/kubernetes/pull/87942), [@SataQiu](https://github.com/SataQiu)) [SIG Cluster Lifecycle]
@@ -245,7 +245,7 @@ No Known Issues Reported
 - The alpha feature `ServiceAccountIssuerDiscovery` enables publishing OIDC discovery information and service account token verification keys at `/.well-known/openid-configuration` and `/openid/v1/jwks` endpoints by API servers configured to issue service account tokens. ([#80724](https://github.com/kubernetes/kubernetes/pull/80724), [@cceckman](https://github.com/cceckman)) [SIG API Machinery, Auth, Cluster Lifecycle and Testing]
 - CustomResourceDefinition schemas that use `x-kubernetes-list-map-keys` to specify properties that uniquely identify list items must make those properties required or have a default value, to ensure those properties are present for all list items. See https://kubernetes.io/docs/reference/using-api/api-concepts/&#35;merge-strategy for details. ([#88076](https://github.com/kubernetes/kubernetes/pull/88076), [@eloyekunle](https://github.com/eloyekunle)) [SIG API Machinery and Testing]
 - CustomResourceDefinition schemas that use `x-kubernetes-list-type: map` or `x-kubernetes-list-type: set` now enable validation that the list items in the corresponding custom resources are unique. ([#84920](https://github.com/kubernetes/kubernetes/pull/84920), [@sttts](https://github.com/sttts)) [SIG API Machinery]
- 
+
 #### Configuration file changes:
 
 #### kube-apiserver:
@@ -257,7 +257,7 @@ No Known Issues Reported
   - Kube-scheduler can run more than one scheduling profile. Given a pod, the profile is selected by using its `.spec.schedulerName`. ([#88285](https://github.com/kubernetes/kubernetes/pull/88285), [@alculquicondor](https://github.com/alculquicondor)) [SIG Apps, Scheduling and Testing]
   - Scheduler Extenders can now be configured in the v1alpha2 component config ([#88768](https://github.com/kubernetes/kubernetes/pull/88768), [@damemi](https://github.com/damemi)) [SIG Release, Scheduling and Testing]
   - The PostFilter of scheduler framework is renamed to PreScore in kubescheduler.config.k8s.io/v1alpha2. ([#87751](https://github.com/kubernetes/kubernetes/pull/87751), [@skilxn-go](https://github.com/skilxn-go)) [SIG Scheduling and Testing]
- 
+
 #### kube-proxy:
 - Added kube-proxy flags `--ipvs-tcp-timeout`, `--ipvs-tcpfin-timeout`, `--ipvs-udp-timeout` to configure IPVS connection timeouts. ([#85517](https://github.com/kubernetes/kubernetes/pull/85517), [@andrewsykim](https://github.com/andrewsykim)) [SIG Cluster Lifecycle and Network]
 - Added optional `--detect-local-mode` flag to kube-proxy. Valid values are "ClusterCIDR" (default matching previous behavior) and "NodeCIDR" ([#87748](https://github.com/kubernetes/kubernetes/pull/87748), [@satyasm](https://github.com/satyasm)) [SIG Cluster Lifecycle, Network and Scheduling]
@@ -689,8 +689,8 @@ filename | sha512 hash
 
 - Add `rest_client_rate_limiter_duration_seconds` metric to component-base to track client side rate limiter latency in seconds. Broken down by verb and URL. ([#88134](https://github.com/kubernetes/kubernetes/pull/88134), [@jennybuckley](https://github.com/jennybuckley)) [SIG API Machinery, Cluster Lifecycle and Instrumentation]
 - Allow user to specify resource using --filename flag when invoking kubectl exec ([#88460](https://github.com/kubernetes/kubernetes/pull/88460), [@soltysh](https://github.com/soltysh)) [SIG CLI and Testing]
-- Apiserver add a new flag --goaway-chance which is the fraction of requests that will be closed gracefully(GOAWAY) to prevent HTTP/2 clients from getting stuck on a single apiserver. 
-  After the connection closed(received GOAWAY), the client's other in-flight requests won't be affected, and the client will reconnect. 
+- Apiserver add a new flag --goaway-chance which is the fraction of requests that will be closed gracefully(GOAWAY) to prevent HTTP/2 clients from getting stuck on a single apiserver.
+  After the connection closed(received GOAWAY), the client's other in-flight requests won't be affected, and the client will reconnect.
   The flag min value is 0 (off), max is .02 (1/50 requests); .001 (1/1000) is a recommended starting point.
   Clusters with single apiservers, or which don't use a load balancer, should NOT enable this. ([#88567](https://github.com/kubernetes/kubernetes/pull/88567), [@answer1991](https://github.com/answer1991)) [SIG API Machinery]
 - Azure: add support for single stack IPv6 ([#88448](https://github.com/kubernetes/kubernetes/pull/88448), [@aramase](https://github.com/aramase)) [SIG Cloud Provider]
@@ -739,7 +739,7 @@ filename | sha512 hash
 - Kubelets perform fewer unnecessary pod status update operations on the API server. ([#88591](https://github.com/kubernetes/kubernetes/pull/88591), [@smarterclayton](https://github.com/smarterclayton)) [SIG Node and Scalability]
 - Plugin/PluginConfig and Policy APIs are mutually exclusive when running the scheduler ([#88864](https://github.com/kubernetes/kubernetes/pull/88864), [@alculquicondor](https://github.com/alculquicondor)) [SIG Scheduling]
 - Specifying PluginConfig for the same plugin more than once fails scheduler startup.
-  
+
   Specifying extenders and configuring .ignoredResources for the NodeResourcesFit plugin fails ([#88870](https://github.com/kubernetes/kubernetes/pull/88870), [@alculquicondor](https://github.com/alculquicondor)) [SIG Scheduling]
 - Support TLS Server Name overrides in kubeconfig file and via --tls-server-name in kubectl ([#88769](https://github.com/kubernetes/kubernetes/pull/88769), [@deads2k](https://github.com/deads2k)) [SIG API Machinery, Auth and CLI]
 - Terminating a restartPolicy=Never pod no longer has a chance to report the pod succeeded when it actually failed. ([#88440](https://github.com/kubernetes/kubernetes/pull/88440), [@smarterclayton](https://github.com/smarterclayton)) [SIG Node and Testing]
@@ -806,18 +806,18 @@ filename | sha512 hash
   If you are setting `--redirect-container-streaming=true`, then you must migrate off this configuration. The flag will no longer be able to be enabled starting in v1.20. If you are not setting the flag, no action is necessary. ([#88290](https://github.com/kubernetes/kubernetes/pull/88290), [@tallclair](https://github.com/tallclair)) [SIG API Machinery and Node]
 
 - Yes.
-  
+
   Feature Name: Support using network resources (VNet, LB, IP, etc.) in different AAD Tenant and Subscription than those for the cluster.
-  
+
   Changes in Pull Request:
-  
+
     1. Add properties `networkResourceTenantID` and `networkResourceSubscriptionID` in cloud provider auth config section, which indicates the location of network resources.
     2. Add function `GetMultiTenantServicePrincipalToken` to fetch multi-tenant service principal token, which will be used by Azure VM/VMSS Clients in this feature.
     3. Add function `GetNetworkResourceServicePrincipalToken` to fetch network resource service principal token, which will be used by Azure Network Resource (Load Balancer, Public IP, Route Table, Network Security Group and their sub level resources) Clients in this feature.
     4. Related unit tests.
-  
+
   None.
-  
+
   User Documentation: In PR https://github.com/kubernetes-sigs/cloud-provider-azure/pull/301 ([#88384](https://github.com/kubernetes/kubernetes/pull/88384), [@bowen5](https://github.com/bowen5)) [SIG Cloud Provider]
 
 ## Changes by Kind
@@ -833,8 +833,8 @@ filename | sha512 hash
 - Added support for multiple sizes huge pages on a container level ([#84051](https://github.com/kubernetes/kubernetes/pull/84051), [@bart0sh](https://github.com/bart0sh)) [SIG Apps, Node and Storage]
 - AppProtocol is a new field on Service and Endpoints resources, enabled with the ServiceAppProtocol feature gate. ([#88503](https://github.com/kubernetes/kubernetes/pull/88503), [@robscott](https://github.com/robscott)) [SIG Apps and Network]
 - Fixed missing validation of uniqueness of list items in lists with `x-kubernetes-list-type: map` or x-kubernetes-list-type: set` in CustomResources. ([#84920](https://github.com/kubernetes/kubernetes/pull/84920), [@sttts](https://github.com/sttts)) [SIG API Machinery]
-- Introduces optional --detect-local flag to kube-proxy. 
-  Currently the only supported value is "cluster-cidr", 
+- Introduces optional --detect-local flag to kube-proxy.
+  Currently the only supported value is "cluster-cidr",
   which is the default if not specified. ([#87748](https://github.com/kubernetes/kubernetes/pull/87748), [@satyasm](https://github.com/satyasm)) [SIG Cluster Lifecycle, Network and Scheduling]
 - Kube-scheduler can run more than one scheduling profile. Given a pod, the profile is selected by using its `.spec.SchedulerName`. ([#88285](https://github.com/kubernetes/kubernetes/pull/88285), [@alculquicondor](https://github.com/alculquicondor)) [SIG Apps, Scheduling and Testing]
 - Moving Windows RunAsUserName feature to GA ([#87790](https://github.com/kubernetes/kubernetes/pull/87790), [@marosset](https://github.com/marosset)) [SIG Apps and Windows]
@@ -1048,9 +1048,9 @@ filename | sha512 hash
 
 - aggragation api will have alpha support for network proxy ([#87515](https://github.com/kubernetes/kubernetes/pull/87515), [@Sh4d1](https://github.com/Sh4d1)) [SIG API Machinery]
 - API request throttling (due to a high rate of requests) is now reported in client-go logs at log level 2.  The messages are of the form
-  
+
   Throttling request took 1.50705208s, request: GET:<URL>
-  
+
   The presence of these messages, may indicate to the administrator the need to tune the cluster accordingly. ([#87740](https://github.com/kubernetes/kubernetes/pull/87740), [@jennybuckley](https://github.com/jennybuckley)) [SIG API Machinery]
 - kubeadm: reject a node joining the cluster if a node with the same name already exists ([#81056](https://github.com/kubernetes/kubernetes/pull/81056), [@neolit123](https://github.com/neolit123)) [SIG Cluster Lifecycle]
 - disableAvailabilitySetNodes is added to avoid VM list for VMSS clusters. It should only be used when vmType is "vmss" and all the nodes (including masters) are VMSS virtual machines. ([#87685](https://github.com/kubernetes/kubernetes/pull/87685), [@feiskyer](https://github.com/feiskyer)) [SIG Cloud Provider]

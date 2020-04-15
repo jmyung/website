@@ -133,7 +133,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 #### client-go:
 - 생성된 클라이언트 세트, 동적, 메타데이터 및 스케일 클라이언트의 메소드에 대한 서명이 `context.Context`를 첫 번째 인수로 채택하도록 수정되었다. Create, Update 및 Patch 메소드의 서명이 각각 CreateOptions, UpdateOptions 및 PatchOptions를 허용하도록 업데이트 되었다. Delete 및 DeleteCollection 메소드의 서명은 이제 참조 대신 값으로 DeleteOptions를 허용한다. 이전 인터페이스를 사용하여 생성된 클라이언트 세트가 새로운 "더 이상 사용되지 않는(deprecated)" 패키지에 추가되어 새로운 API로 증분(incremental) 마이그레이션 할 수 있다. 더 이상 사용되지 않는 패키지는 1.21 릴리스에서 제거된다. http://sigs.k8s.io/clientgofix 에서 도구를 사용하여 새로운 서명에 대한 메소드 호출을 다시 쓸 수 있다.
 
-- 다음의 더 이상 사용되지 않는 메트릭이 제거되었습니다. 해당 메트릭으로 변환한다.
+- 다음의 더 이상 사용되지 않는 메트릭이 제거되었다. 해당 메트릭으로 변환한다.
   - 다음 교체 메트릭은 v1.14.0부터 제공된다.
       - `rest_client_request_latency_seconds` -> `rest_client_request_duration_seconds`
       - `scheduler_scheduling_latency_seconds` -> `scheduler_scheduling_duration_seconds `
@@ -176,33 +176,33 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 ### 더 이상 사용되지 않음 (Deprecation)
 
 #### kube-apiserver:
-- the following deprecated APIs can no longer be served:
-  - All resources under `apps/v1beta1` and `apps/v1beta2` - use `apps/v1` instead
-  - `daemonsets`, `deployments`, `replicasets` resources under `extensions/v1beta1` - use `apps/v1` instead
-  - `networkpolicies` resources under `extensions/v1beta1` - use `networking.k8s.io/v1` instead
-  - `podsecuritypolicies` resources under `extensions/v1beta1` - use `policy/v1beta1` instead ([#85903](https://github.com/kubernetes/kubernetes/pull/85903), [@liggitt](https://github.com/liggitt)) [SIG API Machinery, Apps, Cluster Lifecycle, Instrumentation and Testing]
+- 다음의 더 이상 사용되지 않는 API는 더 이상 제공되지 않는다.
+  - `apps/v1beta1`와 `apps/v1beta2`의 모든 리소스 대신 `apps/v1`를 사용한다.
+  - `extensions/v1beta1`의 `daemonsets`, `deployments`, `replicasets` 리소스 대신 `apps/v1`를 사용한다.
+  - `extensions/v1beta1`의 `networkpolicies` 리소스 대신 `networking.k8s.io/v1`를 사용한다.
+  - `extensions/v1beta1`의 `podsecuritypolicies`의 리소스 대신 `policy/v1beta1`를 사용한다. ([#85903](https://github.com/kubernetes/kubernetes/pull/85903), [@liggitt](https://github.com/liggitt)) [SIG API Machinery, 앱, 클러스터 라이프사이클, Instrumentation 및 테스트]
 
 #### kube-controller-manager:
-- Azure service annotation service.beta.kubernetes.io/azure-load-balancer-disable-tcp-reset has been deprecated. Its support would be removed in a future release. ([#88462](https://github.com/kubernetes/kubernetes/pull/88462), [@feiskyer](https://github.com/feiskyer)) [SIG Cloud Provider]
+- Azure 서비스 어노테이션 service.beta.kubernetes.io/azure-load-balancer-disable-tcp-reset은 더 이상 사용되지 않는다. 향후 릴리스에서는 지원이 제거될 것이다. ([#88462](https://github.com/kubernetes/kubernetes/pull/88462), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
 
 #### kubelet:
-- The StreamingProxyRedirects feature and `--redirect-container-streaming` flag are deprecated, and will be removed in a future release. The default behavior (proxy streaming requests through the kubelet) will be the only supported option. If you are setting `--redirect-container-streaming=true`, then you must migrate off this configuration. The flag will no longer be able to be enabled starting in v1.20. If you are not setting the flag, no action is necessary. ([#88290](https://github.com/kubernetes/kubernetes/pull/88290), [@tallclair](https://github.com/tallclair)) [SIG API Machinery and Node]
-- resource metrics endpoint `/metrics/resource/v1alpha1` as well as all metrics under this endpoint have been deprecated. Please convert to the following metrics emitted by endpoint `/metrics/resource`:
+- StreamingProxyRedirects 기능과 `--redirect-container-streaming` 플래그는 더 이상 사용되지 않으며 향후 릴리스에서 제거될 예정이다. 디폴트 동작 (kubelet을 통한 프록시 스트리밍 요청)이 유일하게 지원되는 옵션이다. `--redirect-container-streaming=true`로 설정하는 경우, 이 설정으로부터 마이그레이션 해야한다. v1.20부터는 이 플래그를 더 이상 사용할 수 없다. 플래그를 설정하지 않으면, 아무것도 할 필요가 없다. ([#88290](https://github.com/kubernetes/kubernetes/pull/88290), [@tallclair](https://github.com/tallclair)) [SIG API Machinery와 노드]
+- `/metrics/resource/v1alpha1` 리소스 메트릭 엔드포인트 및 이 엔드포인트 이하 모든 메트릭은 더 이상 사용되지 않는다. `/metrics/resource` 엔드포인트에서 생성된 다음 메트릭으로 변환해야 한다.
       - scrape_error --> scrape_error
       - node_cpu_usage_seconds_total --> node_cpu_usage_seconds
       - node_memory_working_set_bytes --> node_memory_working_set_bytes
       - container_cpu_usage_seconds_total --> container_cpu_usage_seconds
       - container_memory_working_set_bytes --> container_memory_working_set_bytes
       - scrape_error --> scrape_error
-      ([#86282](https://github.com/kubernetes/kubernetes/pull/86282), [@RainbowMango](https://github.com/RainbowMango)) [SIG Node]
-- In a future release, kubelet will no longer create the CSI NodePublishVolume target directory, in accordance with the CSI specification. CSI drivers may need to be updated accordingly to properly create and process the target path. ([#75535](https://github.com/kubernetes/kubernetes/issues/75535)) [SIG Storage]
+      ([#86282](https://github.com/kubernetes/kubernetes/pull/86282), [@RainbowMango](https://github.com/RainbowMango)) [SIG 노드]
+- 향후 릴리스에서, kubelet은 CSI 명세에 따라 더 이상 CSI NodePublishVolume 대상 디렉토리를 만들지 않는다. 대상 경로를 적절하게 생성하고 처리하려면 CSI 드라이버를 상황에 맞게 업데이트 해야한다. ([#75535](https://github.com/kubernetes/kubernetes/issues/75535)) [SIG 스토리지]
 
 #### kube-proxy:
-- `--healthz-port` and `--metrics-port` flags are deprecated, please use `--healthz-bind-address` and `--metrics-bind-address` instead ([#88512](https://github.com/kubernetes/kubernetes/pull/88512), [@SataQiu](https://github.com/SataQiu)) [SIG Network]
-- a new `EndpointSliceProxying` feature gate has been added to control the use of EndpointSlices in kube-proxy. The EndpointSlice feature gate that used to control this behavior no longer affects kube-proxy. This feature has been disabled by default. ([#86137](https://github.com/kubernetes/kubernetes/pull/86137), [@robscott](https://github.com/robscott))
+- `--healthz-port`와 `--metrics-port` 플래그는 더 이상 사용되지 않으므로, 대신 `--healthz-bind-address`와 `--metrics-bind-address`를 사용한다. ([#88512](https://github.com/kubernetes/kubernetes/pull/88512), [@SataQiu](https://github.com/SataQiu)) [SIG 네트워크]
+- kube-proxy에서 EndpointSlices의 사용을 제어하기 위해 새로운 `EndpointSliceProxying` 기능 게이트가 추가되었다. 이 동작을 제어하는데 사용된 EndpointSlice 기능 게이트는 더 이상 kube-proxy에 영향을 미치지 않는다. 이 기능은 기본적으로 비활성화되어 있다. ([#86137](https://github.com/kubernetes/kubernetes/pull/86137), [@robscott](https://github.com/robscott))
 
 #### kubeadm:
-- command line option "kubelet-version" for `kubeadm upgrade node` has been deprecated and will be removed in a future release. ([#87942](https://github.com/kubernetes/kubernetes/pull/87942), [@SataQiu](https://github.com/SataQiu)) [SIG Cluster Lifecycle]
+- `kubeadm upgrade node`에 대한 커맨드 라인 옵션 "kubelet-version"은 더 이상 사용되지 않으며 향후 릴리스에서 제거 될 예정이다. ([#87942](https://github.com/kubernetes/kubernetes/pull/87942), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클]
 - deprecate the usage of the experimental flag '--use-api' under the 'kubeadm alpha certs renew' command. ([#88827](https://github.com/kubernetes/kubernetes/pull/88827), [@neolit123](https://github.com/neolit123)) [SIG Cluster Lifecycle]
 - kube-dns is deprecated and will not be supported in a future version ([#86574](https://github.com/kubernetes/kubernetes/pull/86574), [@SataQiu](https://github.com/SataQiu)) [SIG Cluster Lifecycle]
 - the `ClusterStatus` struct present in the kubeadm-config ConfigMap is deprecated and will be removed in a future version. It is going to be maintained by kubeadm until it gets removed. The same information can be found on `etcd` and `kube-apiserver` pod annotations, `kubeadm.kubernetes.io/etcd.advertise-client-urls` and `kubeadm.kubernetes.io/kube-apiserver.advertise-address.endpoint` respectively. ([#87656](https://github.com/kubernetes/kubernetes/pull/87656), [@ereslibre](https://github.com/ereslibre)) [SIG Cluster Lifecycle]

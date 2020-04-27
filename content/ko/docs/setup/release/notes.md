@@ -1,14 +1,14 @@
 ---
-title: v1.18 릴리즈 노트
+title: v1.18 릴리스 노트
 weight: 10
 card:
-  name: download
+  name: 다운로드
   weight: 20
   anchors:
   - anchor: "#"
-    title: Current Release Notes
-  - anchor: "#urgent-upgrade-notes"
-    title: Urgent Upgrade Notes
+    title: 최신 릴리스 노트
+  - anchor: "#긴급-업그레이드-노트"
+    title: 긴급 업그레이드 노트
 ---
 
 <!-- NEW RELEASE NOTES ENTRY -->
@@ -62,7 +62,7 @@ card:
 
 ## v1.17.0 이후 체인지로그
 
-릴리즈 노트의 전체 체인지로그는 이제 [https://relnotes.k8s.io][1]에서 사용자 정의 가능한
+릴리스 노트의 전체 체인지로그는 이제 [https://relnotes.k8s.io][1]에서 사용자 정의 가능한
 형식으로 호스팅된다. 확인하고 의견을 보내주기
 바란다!
 
@@ -221,7 +221,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - 스케줄러 정책 API에서 `AlwaysCheckAllPredicates`은 더 이상 사용되지 않는다. ([#86369](https://github.com/kubernetes/kubernetes/pull/86369), [@Huang-Wei](https://github.com/Huang-Wei)) [SIG 스케줄링]
 
 #### 기타 지원 중단:
-- k8s.io/node-api 컴포넌트는 더 이상 업데이트되지 않는다. 대신, k8s.io/api의 RuntimeClass 타입과 k8s.io/client-go의 생성된 클라이언트를 사용한다. ([#87503](https://github.com/kubernetes/kubernetes/pull/87503), [@liggitt](https://github.com/liggitt)) [SIG 노드와 릴리즈]
+- k8s.io/node-api 컴포넌트는 더 이상 업데이트되지 않는다. 대신, k8s.io/api의 RuntimeClass 타입과 k8s.io/client-go의 생성된 클라이언트를 사용한다. ([#87503](https://github.com/kubernetes/kubernetes/pull/87503), [@liggitt](https://github.com/liggitt)) [SIG 노드와 릴리스]
 - apiserver_request_total에서 'client' 레이블을 제거했다. ([#87669](https://github.com/kubernetes/kubernetes/pull/87669), [@logicalhan](https://github.com/logicalhan)) [SIG API Machinery 와 Instrumentation]
 
 ### API 변경
@@ -237,7 +237,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
   - 경로 정의는 `pathType` 필드를 추가했는데, 지정 경로가 유입되는 요청과 어떻게 일치해야 하는지 표시하는 것을 허용한다. 유효 값은 `Exact`, `Prefix`, `ImplementationSpecific` 이다. ([#88587](https://github.com/kubernetes/kubernetes/pull/88587), [@cmluciano](https://github.com/cmluciano)) [SIG 앱, 클러스터 라이프사이클과 네트워크]
 - 알파 기능인 `AnyVolumeDataSource`는 PersistentVolumeClaim 오브젝트가 spec.dataSource 필드를 사용하여 사용자 정의 유형을 데이터 소스로 참조 할 수 있도록 한다. ([#88636](https://github.com/kubernetes/kubernetes/pull/88636), [@bswartz](https://github.com/bswartz)) [SIG 앱, 스토리지]
 - 알파 기능인 `ConfigurableFSGroupPolicy`은 v1 파드가 spec.securityContext.fsGroupChangePolicy 정책을 지정하여 파드에 마운트된 볼륨에 파일 권한이 적용되는 방식을 제어할 수 있다. ([#88488](https://github.com/kubernetes/kubernetes/pull/88488), [@gnufied](https://github.com/gnufied)) [SIG 스토리지]
-- 알파 기능인 `ServiceAppProtocol`을 사용하면 ServicePort 및 EndpointPort 정의에서 `appProtocol` 필드를 설정할 수 있다. ([#88503](https://github.com/kubernetes/kubernetes/pull/88503), [@robscott](https://github.com/robscott)) [SIG 앱 , 네트워크]
+- 알파 기능인 `ServiceAppProtocol`을 사용하면 ServicePort 및 EndpointPort 정의에서 `appProtocol` 필드를 설정할 수 있다. ([#88503](https://github.com/kubernetes/kubernetes/pull/88503), [@robscott](https://github.com/robscott)) [SIG 앱, 네트워크]
 - 알파 기능인 `ImmutableEphemeralVolumes`는 시크릿 및 컨피그맵 오브젝트의 `immutable` 필드를 통해 내용을 변경할 수 없는(immutable) 것으로 표시할 수 있다. ([#86377](https://github.com/kubernetes/kubernetes/pull/86377), [@wojtek-t](https://github.com/wojtek-t)) [SIG 앱, CLI, 테스팅]
 
 #### 다른 API 변경:
@@ -255,7 +255,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - 다중 스케줄링 프로파일을 지원하는 kubescheduler.config.k8s.io/v1alpha2 설정 파일 버전이 승인되었다. ([#87628](https://github.com/kubernetes/kubernetes/pull/87628), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링]
   - `kubescheduler.config.k8s.io/v1alpha2`에서 HardPodAffinityWeight가 최상위 ComponentConfig 파라미터에서 InterPodAffinity 플러그인의 PluginConfig 파라미터로 이동했다. ([#88002](https://github.com/kubernetes/kubernetes/pull/88002), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링, 테스트]
   - Kube-scheduler는 둘 이상의 스케줄링 프로파일을 실행할 수 있다. 파드가 주어지면, 프로파일은 `.spec.schedulerName`을 사용하여 선택된다. ([#88285](https://github.com/kubernetes/kubernetes/pull/88285), [@alculquicondor](https://github.com/alculquicondor)) [SIG 앱, 스케줄링, 테스트]
-  - v1alpha2 컴포넌트 설정에서 스케줄러 Extender를 설정할 수 있다. ([#88768](https://github.com/kubernetes/kubernetes/pull/88768), [@damemi](https://github.com/damemi)) [SIG 릴리즈, 스케줄링, 테스트]
+  - v1alpha2 컴포넌트 설정에서 스케줄러 Extender를 설정할 수 있다. ([#88768](https://github.com/kubernetes/kubernetes/pull/88768), [@damemi](https://github.com/damemi)) [SIG 릴리스, 스케줄링, 테스트]
   - 스케줄러 프레임 워크의 PostFilter는 kubescheduler.config.k8s.io/v1alpha2에서 PreScore로 이름이 변경되었다. ([#87751](https://github.com/kubernetes/kubernetes/pull/87751), [@skilxn-go](https://github.com/skilxn-go)) [SIG 스케줄링, 테스트]
 
 #### kube-proxy:
@@ -274,7 +274,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
   - TaintBasedEvictions ([#87487](https://github.com/kubernetes/kubernetes/pull/87487), [@skilxn-go](https://github.com/skilxn-go)) [SIG API Machinery, 앱, 노드, 스케줄링, 테스트]
   - BlockVolume 및 CSIBlockVolume ([#88673](https://github.com/kubernetes/kubernetes/pull/88673), [@jsafrane](https://github.com/jsafrane)) [SIG 스토리지]
   - 윈도우 RunAsUserName ([#87790](https://github.com/kubernetes/kubernetes/pull/87790), [@marosset](https://github.com/marosset)) [SIG 앱 및 윈도우]
-- 이전 릴리즈에서는 관련 기능이 무조건 활성화되었으므로 다음 기능 게이트가 제거되었다. CustomResourceValidation, CustomResourceSubresources, CustomResourceWebhookConversion, CustomResourcePublishOpenAPI, CustomResourceDefaulting ([#87475](https://github.com/kubernetes/kubernetes/pull/87475), [@liggitt](https://github.com/liggitt)) [SIG API Machinery]
+- 이전 릴리스에서는 관련 기능이 무조건 활성화되었으므로 다음 기능 게이트가 제거되었다. CustomResourceValidation, CustomResourceSubresources, CustomResourceWebhookConversion, CustomResourcePublishOpenAPI, CustomResourceDefaulting ([#87475](https://github.com/kubernetes/kubernetes/pull/87475), [@liggitt](https://github.com/liggitt)) [SIG API Machinery]
 
 ### 기능
 
@@ -314,7 +314,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - Kubeadm: kubeadm-flags.env에서 윈도우 특화된 kubelet 플래그 지원 ([#88287](https://github.com/kubernetes/kubernetes/pull/88287), [@gab-satchi](https://github.com/gab-satchi)) [SIG 클러스터 라이프사이클, 윈도우]
 - Kubeadm: 이미지를 풀링 실패 후 자동 재시도 지원 ([#86899](https://github.com/kubernetes/kubernetes/pull/86899), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클]
 - Kubeadm: 알 수 없는 k8s 버전이 전달되면 가장 근접한 알려진 etcd 버전으로 폴백 업그레이드 지원 ([#88373](https://github.com/kubernetes/kubernetes/pull/88373), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클]
-- Kubectl/drain: 비활성화-제거(eviction) 옵션을 추가. 제거(eviction)가 지원되는 경우에도, 삭제하기 위해 강제로 드레인(drain)한다. 이것은 PodDisruptionBudgets 확인을 우회하므로 주의해서 사용해야 한다. ([#85571](https://github.com/kubernetes/kubernetes/pull/85571), [@michaelgugino](https://github.com/michaelgugino)) [SIG CLI]
+- Kubectl/drain: 비활성화-축출(eviction) 옵션을 추가. 축출(eviction)이 지원되는 경우에도, 삭제하기 위해 강제로 드레인(drain)한다. 이것은 PodDisruptionBudgets 확인을 우회하므로 주의해서 사용해야 한다. ([#85571](https://github.com/kubernetes/kubernetes/pull/85571), [@michaelgugino](https://github.com/michaelgugino)) [SIG CLI]
 - Kubectl/drain: skip-wait-for-delete-timeout 옵션 추가. 파드의 `DeletionTimestamp`가 N초 보다 오래된 경우, 파드를 기다리는 것을 건너뛴다. 건너 뛰려면 초가 0보다 커야한다. ([#85577](https://github.com/kubernetes/kubernetes/pull/85577), [@michaelgugino](https://github.com/michaelgugino)) [SIG CLI]
 - 사전 구성된 로드밸런서의 Azure 클라우드 공급자에 `preConfiguredBackendPoolLoadBalancerTypes` 옵션이 추가됐다. 가능한 값: `""`, `"internal"`, `"external"`,`"all"` ([#86338](https://github.com/kubernetes/kubernetes/pull/86338), [@gossion](https://github.com/gossion)) [SIG 클라우드 공급자]
 - PodTopologySpread 플러그인은 이제 스케줄링 결정을 할 때 terteringPod를 제외한다. ([#87845](https://github.com/kubernetes/kubernetes/pull/87845), [@Huang-Wei](https://github.com/Huang-Wei)) [SIG 스케줄링]
@@ -329,7 +329,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - PodTopologySpread (기능 게이트 `EvenPodsSpread`) 기능은 1.18에서 디폴트로 활성화되었다. ([#88105](https://github.com/kubernetes/kubernetes/pull/88105), [@Huang-Wei](https://github.com/Huang-Wei)) [SIG 스케줄링, 테스트]
 - kubelet 및 디폴트 도커 런타임은 이제 대상 컨테이너의 리눅스 프로세스 네임스페이스에서 임시 컨테이너 실행을 지원한다. 다른 컨테이너 런타임은 이 기능에 대한 지원을 구현해야 해당 런타임에서 사용할 수 있다. ([#84731](https://github.com/kubernetes/kubernetes/pull/84731), [@verb](https://github.com/verb)) [SIG 노드]
 - `CPUManager` 상태 파일의 기본 포멧이 변경되었다. 업그레이드는 원활해야 하지만 이전 포멧을 참조한 써드파티 도구는 업데이트 해야 한다. ([#84462](https://github.com/kubernetes/kubernetes/pull/84462), [@klueska](https://github.com/klueska)) [SIG 노드, 테스트]
-- CNI 버전을 v0.8.5으로 업데이트 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus)) [SIG API Machinery, 클러스터 라이프사이클, 네트워크, 릴리즈, 테스트]
+- CNI 버전을 v0.8.5으로 업데이트 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus)) [SIG API Machinery, 클러스터 라이프사이클, 네트워크, 릴리스, 테스트]
 - Webhook는 네트워크 프록시를 알파 버전으로 지원한다. ([#85870](https://github.com/kubernetes/kubernetes/pull/85870), [@Jefftree](https://github.com/Jefftree)) [SIG API Machinery, 인증, 테스트]
 - 클라이언트 인증서 파일이 제공되면, 새 연결을 위해 파일을 다시 로드하고 인증서가 변경되면 연결을 닫는다. ([#79083](https://github.com/kubernetes/kubernetes/pull/79083), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery, 인증, 노드, 테스트]
 - --force 플래그로 kubectl을 사용하여 오브젝트를 삭제할 때 더 이상 --grace-period=0을 지정할 필요가 없다. ([#87776](https://github.com/kubernetes/kubernetes/pull/87776), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
@@ -363,78 +363,78 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
   - kubelet_docker_operations_timeout
   - network_plugin_operations_latency_microseconds ([#83841](https://github.com/kubernetes/kubernetes/pull/83841), [@RainbowMango](https://github.com/RainbowMango)) [SIG 네트워크, 노드]
 - Kube-apiserver 메트릭은 이제 /healthz, /livez, /readyz 요청에 대한 요청 수, 대기 시간 및 응답 크기를 포함한다. ([#83598](https://github.com/kubernetes/kubernetes/pull/83598), [@jktomer](https://github.com/jktomer)) [SIG API Machinery]
-- Kubelet now exports a `server_expiration_renew_failure` and `client_expiration_renew_failure` metric counter if the certificate rotations cannot be performed. ([#84614](https://github.com/kubernetes/kubernetes/pull/84614), [@rphillips](https://github.com/rphillips)) [SIG API Machinery, Auth, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation, Node and Release]
-- Kubelet: the metric process_start_time_seconds be marked as with the ALPHA stability level. ([#85446](https://github.com/kubernetes/kubernetes/pull/85446), [@RainbowMango](https://github.com/RainbowMango)) [SIG API Machinery, 클러스터 라이프사이클, Instrumentation, 노드]
-- New metric `kubelet_pleg_last_seen_seconds` to aid diagnosis of PLEG not healthy issues. ([#86251](https://github.com/kubernetes/kubernetes/pull/86251), [@bboreham](https://github.com/bboreham)) [SIG 노드]
+- Kubelet은 이제 인증서 교체(rotation)를 수행할 수 없는 경우, `server_expiration_renew_failure` 및 `client_expiration_renew_failure` 메트릭 카운터를 제공한다. ([#84614](https://github.com/kubernetes/kubernetes/pull/84614), [@rphillips](https://github.com/rphillips)) [SIG API Machinery, 인증, CLI, 클라우드 공급자, 클러스터 라이프사이클, Instrumentation, 노드, 릴리스]
+- Kubelet: 메트릭 process_start_time_seconds는 ALPHA 안정성 레벨로 표시된다. ([#85446](https://github.com/kubernetes/kubernetes/pull/85446), [@RainbowMango](https://github.com/RainbowMango)) [SIG API Machinery, 클러스터 라이프사이클, Instrumentation, 노드]
+- PLEG의 진단을 돕기 위한 새로운 메트릭 `kubelet_pleg_last_seen_seconds` 는 헬스 이슈가 아 앱, . ([#86251](https://github.com/kubernetes/kubernetes/pull/86251), [@bboreham](https://github.com/bboreham)) [SIG 노드]
 
-### Other (Bug, Cleanup or Flake)
+### 기타 (버그, 정리(Cleanup) or Flake(플레이크))
 
-- Fixed a regression with clients prior to 1.15 not being able to update podIP in pod status, or podCIDR in node spec, against >= 1.16 API servers ([#88505](https://github.com/kubernetes/kubernetes/pull/88505), [@liggitt](https://github.com/liggitt)) [SIG 앱 , 네트워크]
-- Fixed "kubectl describe statefulsets.apps" printing garbage for rolling update partition ([#85846](https://github.com/kubernetes/kubernetes/pull/85846), [@phil9909](https://github.com/phil9909)) [SIG CLI]
-- Add a event to PV when filesystem on PV does not match actual filesystem on disk ([#86982](https://github.com/kubernetes/kubernetes/pull/86982), [@gnufied](https://github.com/gnufied)) [SIG 스토리지]
-- Add azure disk WriteAccelerator support ([#87945](https://github.com/kubernetes/kubernetes/pull/87945), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
-- Add delays between goroutines for vm instance update ([#88094](https://github.com/kubernetes/kubernetes/pull/88094), [@aramase](https://github.com/aramase)) [SIG 클라우드 공급자]
-- Add init containers log to cluster dump info. ([#88324](https://github.com/kubernetes/kubernetes/pull/88324), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- Addons: elasticsearch discovery supports IPv6 ([#85543](https://github.com/kubernetes/kubernetes/pull/85543), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클 and Instrumentation]
-- Adds "volume.beta.kubernetes.io/migrated-to" annotation to PV's and PVC's when they are migrated to signal external provisioners to pick up those objects for Provisioning and Deleting. ([#87098](https://github.com/kubernetes/kubernetes/pull/87098), [@davidz627](https://github.com/davidz627)) [SIG  Storage]
-- All api-server log request lines in a more greppable format. ([#87203](https://github.com/kubernetes/kubernetes/pull/87203), [@lavalamp](https://github.com/lavalamp)) [SIG API Machinery]
-- Azure VMSS LoadBalancerBackendAddressPools updating has been improved with sequential-sync + concurrent-async requests. ([#88699](https://github.com/kubernetes/kubernetes/pull/88699), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Azure cloud provider now obtains AAD token who audience claim will not have spn: prefix ([#87590](https://github.com/kubernetes/kubernetes/pull/87590), [@weinong](https://github.com/weinong)) [SIG 클라우드 공급자]
-- AzureFile and CephFS use the new Mount library that prevents logging of sensitive mount options. ([#88684](https://github.com/kubernetes/kubernetes/pull/88684), [@saad-ali](https://github.com/saad-ali)) [SIG 스토리지]
-- Bind dns-horizontal containers to linux nodes to avoid Windows scheduling on kubernetes cluster includes linux nodes and windows nodes ([#83364](https://github.com/kubernetes/kubernetes/pull/83364), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클 and Windows]
-- Bind kube-dns containers to linux nodes to avoid Windows scheduling ([#83358](https://github.com/kubernetes/kubernetes/pull/83358), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클 and Windows]
-- Bind metadata-agent containers to linux nodes to avoid Windows scheduling on kubernetes cluster includes linux nodes and windows nodes ([#83363](https://github.com/kubernetes/kubernetes/pull/83363), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클, Instrumentation and Windows]
-- Bind metrics-server containers to linux nodes to avoid Windows scheduling on kubernetes cluster includes linux nodes and windows nodes ([#83362](https://github.com/kubernetes/kubernetes/pull/83362), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클, Instrumentation and Windows]
-- Bug fixes: Make sure we include latest packages node &#35;351 (@caseydavenport) ([#84163](https://github.com/kubernetes/kubernetes/pull/84163), [@david-tigera](https://github.com/david-tigera)) [SIG 클러스터 라이프사이클]
-- CPU limits are now respected for Windows containers. If a node is over-provisioned, no weighting is used, only limits are respected. ([#86101](https://github.com/kubernetes/kubernetes/pull/86101), [@PatrickLang](https://github.com/PatrickLang)) [SIG 노드, Testing and Windows]
-- Changed core_pattern on COS nodes to be an absolute path. ([#86329](https://github.com/kubernetes/kubernetes/pull/86329), [@mml](https://github.com/mml)) [SIG 클러스터 라이프사이클, 노드]
-- Client-go certificate manager rotation gained the ability to preserve optional intermediate chains accompanying issued certificates ([#88744](https://github.com/kubernetes/kubernetes/pull/88744), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery and Auth]
-- Cloud provider config CloudProviderBackoffMode has been removed since it won't be used anymore. ([#88463](https://github.com/kubernetes/kubernetes/pull/88463), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Conformance image now depends on stretch-slim instead of debian-hyperkube-base as that image is being deprecated and removed. ([#88702](https://github.com/kubernetes/kubernetes/pull/88702), [@dims](https://github.com/dims)) [SIG 클러스터 라이프사이클, Release, 테스트]
-- Deprecate --generator flag from kubectl create commands ([#88655](https://github.com/kubernetes/kubernetes/pull/88655), [@soltysh](https://github.com/soltysh)) [SIG CLI]
-- During initialization phase (preflight), kubeadm now verifies the presence of the conntrack executable ([#85857](https://github.com/kubernetes/kubernetes/pull/85857), [@hnanni](https://github.com/hnanni)) [SIG 클러스터 라이프사이클]
-- EndpointSlice should not contain endpoints for terminating pods ([#89056](https://github.com/kubernetes/kubernetes/pull/89056), [@andrewsykim](https://github.com/andrewsykim)) [SIG 앱 , 네트워크]
-- Evictions due to pods breaching their ephemeral storage limits are now recorded by the `kubelet_evictions` metric and can be alerted on. ([#87906](https://github.com/kubernetes/kubernetes/pull/87906), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드]
-- Filter published OpenAPI schema by making nullable, required fields non-required in order to avoid kubectl to wrongly reject null values. ([#85722](https://github.com/kubernetes/kubernetes/pull/85722), [@sttts](https://github.com/sttts)) [SIG API Machinery]
-- Fix /readyz to return error immediately after a shutdown is initiated, before the --shutdown-delay-duration has elapsed. ([#88911](https://github.com/kubernetes/kubernetes/pull/88911), [@tkashem](https://github.com/tkashem)) [SIG API Machinery]
-- Fix API Server potential memory leak issue in processing watch request. ([#85410](https://github.com/kubernetes/kubernetes/pull/85410), [@answer1991](https://github.com/answer1991)) [SIG API Machinery]
-- Fix EndpointSlice controller race condition and ensure that it handles external changes to EndpointSlices. ([#85703](https://github.com/kubernetes/kubernetes/pull/85703), [@robscott](https://github.com/robscott)) [SIG 앱 , 네트워크]
-- Fix IPv6 addresses lost issue in pure ipv6 vsphere environment ([#86001](https://github.com/kubernetes/kubernetes/pull/86001), [@hubv](https://github.com/hubv)) [SIG 클라우드 공급자]
-- Fix LoadBalancer rule checking so that no unexpected LoadBalancer updates are made ([#85990](https://github.com/kubernetes/kubernetes/pull/85990), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Fix a bug in kube-proxy that caused it to crash when using load balancers with a different IP family ([#87117](https://github.com/kubernetes/kubernetes/pull/87117), [@aojea](https://github.com/aojea)) [SIG 네트워크]
-- Fix a bug in port-forward: named port not working with service ([#85511](https://github.com/kubernetes/kubernetes/pull/85511), [@oke-py](https://github.com/oke-py)) [SIG CLI]
-- Fix a bug in the dual-stack IPVS proxier where stale IPv6 endpoints were not being cleaned up ([#87695](https://github.com/kubernetes/kubernetes/pull/87695), [@andrewsykim](https://github.com/andrewsykim)) [SIG 네트워크]
+- 1.15 이전으로 클라이언트 회귀가 1.16 이상의 API 서버에 대해, 파드 상태의 podIP 또는 노드 명세의 podCIDR을 업데이트 할 수 없었던 문제를 수정했다. ([#88505](https://github.com/kubernetes/kubernetes/pull/88505), [@liggitt](https://github.com/liggitt)) [SIG 앱, 네트워크]
+- 롤링 업데이트 파티션에 대한 "kubectl describe statefulsets.apps" 출력 가비지 수정 ([#85846](https://github.com/kubernetes/kubernetes/pull/85846), [@phil9909](https://github.com/phil9909)) [SIG CLI]
+- PV의 파일시스템이 디스크의 실제 파일시스템과 일치하지 않을 때 PV에 이벤트 추가 ([#86982](https://github.com/kubernetes/kubernetes/pull/86982), [@gnufied](https://github.com/gnufied)) [SIG 스토리지]
+- azure 디스크 WriteAccelerator 지원 추가 ([#87945](https://github.com/kubernetes/kubernetes/pull/87945), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
+- VM 인스턴스 업데이트를 위해 고 루틴(goroutines) 간 지연(delay) 추가 ([#88094](https://github.com/kubernetes/kubernetes/pull/88094), [@aramase](https://github.com/aramase)) [SIG 클라우드 공급자]
+- 클러스터 덤프 정보에 init 컨테이너 로그를 추가. ([#88324](https://github.com/kubernetes/kubernetes/pull/88324), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
+- 애드온 : elasticsearch 디스커버리(discovery)는 IPv6를 지원한다 ([#85543](https://github.com/kubernetes/kubernetes/pull/85543), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클, Instrumentation]
+- PV 및 PVC에 "volume.beta.kubernetes.io/migrated-to" 어노테이션을 추가하면, 
+PV 및 PVC가 마이그레이션되어 프로비저닝 및 삭제를 위해 해당 오브젝트를 선택할 수 있도록 외부 프로비저너에 신호를 보낸다. ([#87098](https://github.com/kubernetes/kubernetes/pull/87098), [@davidz627](https://github.com/davidz627)) [SIG 스토리지]
+-  모든 api-server 로그 요청 라인은 grep으로 찾기 쉬운 형식으로 되어 있다. ([#87203](https://github.com/kubernetes/kubernetes/pull/87203), [@lavalamp](https://github.com/lavalamp)) [SIG API Machinery]
+- Azure VMSS LoadBalancerBackendAddressPools 업데이트는 순차적 동기화 + 동시-비동기 요청으로 개선되었다. ([#88699](https://github.com/kubernetes/kubernetes/pull/88699), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
+- Azure 클라우드 공급자는 이제 청중 클레임에 spn: prefix가 없는 AAD 토큰을 얻는다. ([#87590](https://github.com/kubernetes/kubernetes/pull/87590), [@weinong](https://github.com/weinong)) [SIG 클라우드 공급자]
+- AzureFile 및 CephFS는 민감한 마운트 옵션의 로깅을 방지하는 새로운 마운트 라이브러리를 사용한다. ([#88684](https://github.com/kubernetes/kubernetes/pull/88684), [@saad-ali](https://github.com/saad-ali)) [SIG 스토리지]
+- 리눅스 노드와 윈도우 노드를 포함하는 쿠버네티스 클러스터에서 윈도우 스케줄링을 피하기 위해, dns-horizontal 컨테이너를 Linux 노드에 바인딩한다. ([#83364](https://github.com/kubernetes/kubernetes/pull/83364), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클, 윈도우]
+- 리눅스 노드와 윈도우 노드를 포함하는 쿠버네티스 클러스터에서 윈도우 스케줄링을 피하기 위해, metadata-agent 컨테이너를 Linux 노드에 바인딩한다. ([#83363](https://github.com/kubernetes/kubernetes/pull/83363), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클, Instrumentation, 윈도우]
+- 리눅스 노드와 윈도우 노드를 포함하는 쿠버네티스 클러스터에서 윈도우 스케줄링을 피하기 위해, metrics-server 컨테이너를 Linux 노드에 바인딩한다. ([#83362](https://github.com/kubernetes/kubernetes/pull/83362), [@wawa0210](https://github.com/wawa0210)) [SIG 클러스터 라이프사이클, Instrumentation, 윈도우]
+- 버그 수정: 최신 패키지 노드를 포함해야 한다 &#35;351 (@caseydavenport) ([#84163](https://github.com/kubernetes/kubernetes/pull/84163), [@david-tigera](https://github.com/david-tigera)) [SIG 클러스터 라이프사이클]
+- CPU 리밋(limit)은 이제 윈도우 컨테이너에 적용된다. 노드가 오버-프로비저닝된 경우, 가중치가 사용되지 않으며 리밋만 고려된다. ([#86101](https://github.com/kubernetes/kubernetes/pull/86101), [@PatrickLang](https://github.com/PatrickLang)) [SIG 노드, 테스트, 윈도우]
+- COS 노드의 core_pattern을 절대 경로로 변경했다. ([#86329](https://github.com/kubernetes/kubernetes/pull/86329), [@mml](https://github.com/mml)) [SIG 클러스터 라이프사이클, 노드]
+- Client-go 인증서 관리자 교체는 발급된 인증서와 함께 선택적인 중급(intermediate)의 체인을 유지하는 기능을 얻었다. ([#88744](https://github.com/kubernetes/kubernetes/pull/88744), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery, 인증]
+- 클라우드 공급자 설정인 CloudProviderBackoffMode가 더 이상 사용되지 않으므로 제거되었다. ([#88463](https://github.com/kubernetes/kubernetes/pull/88463), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
+- 적합(Conformance) 이미지는 이제 이미지가 더 이상 사용되지 않고 제거되므로 debian-hyperkube-base 대신에 stretch-slim에 의존한다. ([#88702](https://github.com/kubernetes/kubernetes/pull/88702), [@dims](https://github.com/dims)) [SIG 클러스터 라이프사이클, 릴리스, 테스트]
+- kubectl create 커맨드에서 --generator 플래그는 더이상 사용되지 않음 ([#88655](https://github.com/kubernetes/kubernetes/pull/88655), [@soltysh](https://github.com/soltysh)) [SIG CLI]
+- 초기화 단계 (preflight) 동안, kubeadm은 이제 conntrack 실행 파일이 있는지 확인한다. ([#85857](https://github.com/kubernetes/kubernetes/pull/85857), [@hnanni](https://github.com/hnanni)) [SIG 클러스터 라이프사이클]
+- 엔드포인트슬라이드(EndpointSlice)에는 파드 종료를 위한 엔드포인트가 없어야 한다. ([#89056](https://github.com/kubernetes/kubernetes/pull/89056), [@andrewsykim](https://github.com/andrewsykim)) [SIG 앱, 네트워크]
+- 임시 저장 한도를 초과하는 파드로 인한 축출(Eviction)은 이제 `kubelet_evictions` 메트릭에 의해 기록되며 경고할 수 있다. ([#87906](https://github.com/kubernetes/kubernetes/pull/87906), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드]
+- kubectl이 널 값을 잘못 거부하지 않도록 하기 위해 널입력가능(nullable), 필수/비필수 필드를 만들어 공개된 OpenAPI 스키마를 필터링 ([#85722](https://github.com/kubernetes/kubernetes/pull/85722), [@sttts](https://github.com/sttts)) [SIG API Machinery]
+- --shutdown-delay-duration이 경과하기 전에, 종료가 시작된 직후 오류를 반환하도록 /readyz를 수정 ([#88911](https://github.com/kubernetes/kubernetes/pull/88911), [@tkashem](https://github.com/tkashem)) [SIG API Machinery]
+- 감시(watch) 요청 처리시 API Server 잠재적 메모리 누수 이슈를 수정 ([#85410](https://github.com/kubernetes/kubernetes/pull/85410), [@answer1991](https://github.com/answer1991)) [SIG API Machinery]
+- EndpointSlice 컨트롤러 경합 조건(race condition)을 수정하고 EndpointSlices의 외부 변경을 처리하는지 확인한다. ([#85703](https://github.com/kubernetes/kubernetes/pull/85703), [@robscott](https://github.com/robscott)) [SIG 앱, 네트워크]
+- 순수한 ipv6 vsphere 환경에서 손실된 IPv6 주소 이슈 수정 ([#86001](https://github.com/kubernetes/kubernetes/pull/86001), [@hubv](https://github.com/hubv)) [SIG 클라우드 공급자]
+- 예기치 않은 LoadBalancer 업데이트가 발생하지 않도록 LoadBalancer 규칙 검사 수정 ([#85990](https://github.com/kubernetes/kubernetes/pull/85990), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
+- Kube-proxy에서 다른 IP 군으로 로드 밸런서를 사용할 때 다운되는 버그 수정 ([#87117](https://github.com/kubernetes/kubernetes/pull/87117), [@aojea](https://github.com/aojea)) [SIG 네트워크]
+- port-forward 버그 수정 : 네임드 포트가 서비스와 작동하지 않음 ([#85511](https://github.com/kubernetes/kubernetes/pull/85511), [@oke-py](https://github.com/oke-py)) [SIG CLI]
+- 오래된 IPv6 엔드포인트가 정리되지 않은 듀얼 스택 IPVS 프록시의 버그 수정 ([#87695](https://github.com/kubernetes/kubernetes/pull/87695), [@andrewsykim](https://github.com/andrewsykim)) [SIG 네트워크]
 - Fix a bug that orphan revision cannot be adopted and statefulset cannot be synced ([#86801](https://github.com/kubernetes/kubernetes/pull/86801), [@likakuli](https://github.com/likakuli)) [SIG 앱]
-- Fix a bug where ExternalTrafficPolicy is not applied to service ExternalIPs. ([#88786](https://github.com/kubernetes/kubernetes/pull/88786), [@freehan](https://github.com/freehan)) [SIG 네트워크]
-- Fix a bug where kubenet fails to parse the tc output. ([#83572](https://github.com/kubernetes/kubernetes/pull/83572), [@chendotjs](https://github.com/chendotjs)) [SIG 네트워크]
-- Fix a regression in kubenet that prevent pods to obtain ip addresses ([#85993](https://github.com/kubernetes/kubernetes/pull/85993), [@chendotjs](https://github.com/chendotjs)) [SIG 네트워크, 노드]
-- Fix azure file AuthorizationFailure ([#85475](https://github.com/kubernetes/kubernetes/pull/85475), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
-- Fix bug where EndpointSlice controller would attempt to modify shared objects. ([#85368](https://github.com/kubernetes/kubernetes/pull/85368), [@robscott](https://github.com/robscott)) [SIG API Machinery, Apps , 네트워크]
-- Fix handling of aws-load-balancer-security-groups annotation. Security-Groups assigned with this annotation are no longer modified by kubernetes which is the expected behaviour of most users. Also no unnecessary Security-Groups are created anymore if this annotation is used. ([#83446](https://github.com/kubernetes/kubernetes/pull/83446), [@Elias481](https://github.com/Elias481)) [SIG 클라우드 공급자]
-- Fix invalid VMSS updates due to incorrect cache ([#89002](https://github.com/kubernetes/kubernetes/pull/89002), [@ArchangelSDY](https://github.com/ArchangelSDY)) [SIG 클라우드 공급자]
-- Fix isCurrentInstance for Windows by removing the dependency of hostname. ([#89138](https://github.com/kubernetes/kubernetes/pull/89138), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Fix issue #85805 about a resource not found in azure cloud provider when LoadBalancer specified in another resource group. ([#86502](https://github.com/kubernetes/kubernetes/pull/86502), [@levimm](https://github.com/levimm)) [SIG 클라우드 공급자]
-- Fix kubectl annotate error when local=true is set ([#86952](https://github.com/kubernetes/kubernetes/pull/86952), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- Fix kubectl create deployment image name ([#86636](https://github.com/kubernetes/kubernetes/pull/86636), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- Fix `kubectl drain ignore` daemonsets and others. ([#87361](https://github.com/kubernetes/kubernetes/pull/87361), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- Fix missing "apiVersion" for "involvedObject" in Events for Nodes. ([#87537](https://github.com/kubernetes/kubernetes/pull/87537), [@uthark](https://github.com/uthark)) [SIG 앱, 노드]
-- Fix nil pointer dereference in azure cloud provider ([#85975](https://github.com/kubernetes/kubernetes/pull/85975), [@ldx](https://github.com/ldx)) [SIG 클라우드 공급자]
-- Fix regression in statefulset conversion which prevents applying a statefulset multiple times. ([#87706](https://github.com/kubernetes/kubernetes/pull/87706), [@liggitt](https://github.com/liggitt)) [SIG 앱, 테스트]
-- Fix route conflicted operations when updating multiple routes together ([#88209](https://github.com/kubernetes/kubernetes/pull/88209), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Fix that prevents repeated fetching of PVC/PV objects by kubelet when processing of pod volumes fails. While this prevents hammering API server in these error scenarios, it means that some errors in processing volume(s) for a pod could now take up to 2-3 minutes before retry. ([#88141](https://github.com/kubernetes/kubernetes/pull/88141), [@tedyu](https://github.com/tedyu)) [SIG 노드 and Storage]
-- Fix the bug PIP's DNS is deleted if no DNS label service annotation isn't set. ([#87246](https://github.com/kubernetes/kubernetes/pull/87246), [@nilo19](https://github.com/nilo19)) [SIG 클라우드 공급자]
-- Fix control plane hosts rolling upgrade causing thundering herd of LISTs on etcd leading to control plane unavailability. ([#86430](https://github.com/kubernetes/kubernetes/pull/86430), [@wojtek-t](https://github.com/wojtek-t)) [SIG API Machinery, Node, 테스트]
-- Fix: add azure disk migration support for CSINode ([#88014](https://github.com/kubernetes/kubernetes/pull/88014), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
+- ExternalTrafficPolicy가 ExternalIP 서비스에 적용되지 않는 버그를 수정 ([#88786](https://github.com/kubernetes/kubernetes/pull/88786), [@freehan](https://github.com/freehan)) [SIG 네트워크]
+- kubenet이 tc 출력을 파싱(parse)하지 못하는 버그를 수정 ([#83572](https://github.com/kubernetes/kubernetes/pull/83572), [@chendotjs](https://github.com/chendotjs)) [SIG 네트워크]
+- 파드가 IP 주소를 얻지 못하게 하는 kubenet의 회귀 문제 수정 ([#85993](https://github.com/kubernetes/kubernetes/pull/85993), [@chendotjs](https://github.com/chendotjs)) [SIG 네트워크, 노드]
+- azure 파일 AuthorizationFailure 수정 ([#85475](https://github.com/kubernetes/kubernetes/pull/85475), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
+- 엔드포인트슬라이스 컨트롤러가 공유 오브젝트를 수정하려고 하는 버그를 수정 ([#85368](https://github.com/kubernetes/kubernetes/pull/85368), [@robscott](https://github.com/robscott)) [SIG API Machinery, 앱, 네트워크]
+- aws-load-balancer-security-groups 어노테이션 처리 문제를 수정. 이 어노테이션이 할당된 보안 그룹은 더 이상 쿠버네티스에 의해 수정되지 않으며, 대부분의 사용자가 예상하는 동작이다. 이 어노테이션을 사용하면, 더 이상 불필요한 보안 그룹이 만들어지지 않는다. ([#83446](https://github.com/kubernetes/kubernetes/pull/83446), [@Elias481](https://github.com/Elias481)) [SIG 클라우드 공급자]
+- 잘못된 캐시로 인한 잘못된 VMSS 업데이트 수정 ([#89002](https://github.com/kubernetes/kubernetes/pull/89002), [@ArchangelSDY](https://github.com/ArchangelSDY)) [SIG 클라우드 공급자]
+- hostname의 종속성을 제거하여 윈도우 용 isCurrentInstance를 수정 ([#89138](https://github.com/kubernetes/kubernetes/pull/89138), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
+- LoadBalancer가 또다른 리소스 그룹에 지정된 경우 azure 클라우드 공급자에서 찾을 수 없는 리소스에 대한 이슈 #85805를 수정 ([#86502](https://github.com/kubernetes/kubernetes/pull/86502), [@levimm](https://github.com/levimm)) [SIG 클라우드 공급자]
+- local=true로 설정한 경우 kubectl 어노테이션 오류 수정 ([#86952](https://github.com/kubernetes/kubernetes/pull/86952), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
+- kubectl create deployment image 이름 수정 ([#86636](https://github.com/kubernetes/kubernetes/pull/86636), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
+- `kubectl drain ignore` 데몬셋(daemonset) 및 기타 수정 ([#87361](https://github.com/kubernetes/kubernetes/pull/87361), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
+- 노드 이벤트에서 "involvedObject"에 대한 "apiVersion"이 누락되는 문제를 수정 ([#87537](https://github.com/kubernetes/kubernetes/pull/87537), [@uthark](https://github.com/uthark)) [SIG 앱, 노드]
+- azure 클라우드 공급자에서 nil 포인터 역참조 수정 ([#85975](https://github.com/kubernetes/kubernetes/pull/85975), [@ldx](https://github.com/ldx)) [SIG 클라우드 공급자]
+- 스테이트풀셋(statefulset)을 여러 번 적용하지 못하게 하는 스테이트풀셋 변환에서 회귀 문제를 수정 ([#87706](https://github.com/kubernetes/kubernetes/pull/87706), [@liggitt](https://github.com/liggitt)) [SIG 앱, 테스트]
+- 여러 경로를 함께 업데이트 할 때 경로 충돌 작업 수정 ([#88209](https://github.com/kubernetes/kubernetes/pull/88209), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
+- 파드 볼륨 처리가 실패할 때 kubelet이 PVC/PV 오브젝트를 반복적으로 가져오는 것을 방지하도록 수정. 이렇게 하면 이 같은 오류 시나리오에서 API 서버로의 계속적인 연결시도(hammering)를 막을 수 있지만, 파드 볼륨 처리의 일부 오류가 재시도되기 까지 최대 2-3 분이 소요될 수 있다. ([#88141](https://github.com/kubernetes/kubernetes/pull/88141), [@tedyu](https://github.com/tedyu)) [SIG 노드, 스토리지]
+- DNS 레이블 서비스 어노테이션이 설정되지 않은 경우, PIP의 DNS가 삭제되는 버그 수정 ([#87246](https://github.com/kubernetes/kubernetes/pull/87246), [@nilo19](https://github.com/nilo19)) [SIG 클라우드 공급자]
+- 컨트롤 플레인을 사용할 수 없게 하는 etcd LIST에서 썬더링 허드(thundering herd)를 야기하는 컨트롤 플레인 호스트 롤링 업그레이드를 수정 ([#86430](https://github.com/kubernetes/kubernetes/pull/86430), [@wojtek-t](https://github.com/wojtek-t)) [SIG API Machinery, 노드, 테스트]
+- Fix: add azure disk migration support for CSINode ([#88014](https://github.com/kubernetes/kubernetes/pull/88014), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
 - Fix: add non-retriable errors in azure clients ([#87941](https://github.com/kubernetes/kubernetes/pull/87941), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
 - Fix: add remediation in azure disk attach/detach ([#88444](https://github.com/kubernetes/kubernetes/pull/88444), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
 - Fix: azure data disk should use same key as os disk by default ([#86351](https://github.com/kubernetes/kubernetes/pull/86351), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
-- Fix: azure disk could not mounted on Standard_DC4s/DC2s instances ([#86612](https://github.com/kubernetes/kubernetes/pull/86612), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
-- Fix: azure file mount timeout issue ([#88610](https://github.com/kubernetes/kubernetes/pull/88610), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
+- Fix: azure disk could not mounted on Standard_DC4s/DC2s instances ([#86612](https://github.com/kubernetes/kubernetes/pull/86612), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
+- Fix: azure file mount timeout issue ([#88610](https://github.com/kubernetes/kubernetes/pull/88610), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
 - Fix: check disk status before disk azure disk ([#88360](https://github.com/kubernetes/kubernetes/pull/88360), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
 - Fix: corrupted mount point in csi driver ([#88569](https://github.com/kubernetes/kubernetes/pull/88569), [@andyzhangx](https://github.com/andyzhangx)) [SIG 스토리지]
-- Fix: get azure disk lun timeout issue ([#88158](https://github.com/kubernetes/kubernetes/pull/88158), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
-- Fix: update azure disk max count ([#88201](https://github.com/kubernetes/kubernetes/pull/88201), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
-- Fixed "requested device X but found Y" attach error on AWS. ([#85675](https://github.com/kubernetes/kubernetes/pull/85675), [@jsafrane](https://github.com/jsafrane)) [SIG 클라우드 공급자 and Storage]
+- Fix: get azure disk lun timeout issue ([#88158](https://github.com/kubernetes/kubernetes/pull/88158), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
+- Fix: update azure disk max count ([#88201](https://github.com/kubernetes/kubernetes/pull/88201), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
+- Fixed "requested device X but found Y" attach error on AWS. ([#85675](https://github.com/kubernetes/kubernetes/pull/85675), [@jsafrane](https://github.com/jsafrane)) [SIG 클라우드 공급자, 스토리지]
 - Fixed NetworkPolicy validation that `Except` values are accepted when they are outside the CIDR range. ([#86578](https://github.com/kubernetes/kubernetes/pull/86578), [@tnqn](https://github.com/tnqn)) [SIG 네트워크]
 - Fixed a bug in the TopologyManager. Previously, the TopologyManager would only guarantee alignment if container creation was serialized in some way. Alignment is now guaranteed under all scenarios of container creation. ([#87759](https://github.com/kubernetes/kubernetes/pull/87759), [@klueska](https://github.com/klueska)) [SIG 노드]
 - Fixed a bug which could prevent a provider ID from ever being set for node if an error occurred determining the provider ID when the node was added. ([#87043](https://github.com/kubernetes/kubernetes/pull/87043), [@zjs](https://github.com/zjs)) [SIG 앱 and Cloud Provider]
@@ -464,7 +464,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - Improved yaml parsing performance ([#85458](https://github.com/kubernetes/kubernetes/pull/85458), [@cjcullen](https://github.com/cjcullen)) [SIG API Machinery, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation, 노드]
 - Improves performance of the node authorizer ([#87696](https://github.com/kubernetes/kubernetes/pull/87696), [@liggitt](https://github.com/liggitt)) [SIG 인증]
 - In GKE alpha clusters it will be possible to use the service annotation `cloud.google.com/network-tier: Standard` ([#88487](https://github.com/kubernetes/kubernetes/pull/88487), [@zioproto](https://github.com/zioproto)) [SIG 클라우드 공급자]
-- Includes FSType when describing CSI persistent volumes. ([#85293](https://github.com/kubernetes/kubernetes/pull/85293), [@huffmanca](https://github.com/huffmanca)) [SIG CLI and Storage]
+- Includes FSType when describing CSI persistent volumes. ([#85293](https://github.com/kubernetes/kubernetes/pull/85293), [@huffmanca](https://github.com/huffmanca)) [SIG CLI, 스토리지]
 - Iptables/userspace proxy: improve performance by getting local addresses only once per sync loop, instead of for every external IP ([#85617](https://github.com/kubernetes/kubernetes/pull/85617), [@andrewsykim](https://github.com/andrewsykim)) [SIG API Machinery, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation , 네트워크]
 - Kube-aggregator: always sets unavailableGauge metric to reflect the current state of a service. ([#87778](https://github.com/kubernetes/kubernetes/pull/87778), [@p0lyn0mial](https://github.com/p0lyn0mial)) [SIG API Machinery]
 - Kube-apiserver: fixed a conflict error encountered attempting to delete a pod with gracePeriodSeconds=0 and a resourceVersion precondition ([#85516](https://github.com/kubernetes/kubernetes/pull/85516), [@michaelgugino](https://github.com/michaelgugino)) [SIG API Machinery]
@@ -491,7 +491,7 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - `Kubectl describe <type>` and `kubectl top pod` will return a message saying `"No resources found"` or `"No resources found in <namespace> namespace"` if there are no results to display. ([#87527](https://github.com/kubernetes/kubernetes/pull/87527), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
 - `Kubectl drain node --dry-run` will list pods that would be evicted or deleted ([#82660](https://github.com/kubernetes/kubernetes/pull/82660), [@sallyom](https://github.com/sallyom)) [SIG CLI]
 - `Kubectl set resources` will no longer return an error if passed an empty change for a resource. `kubectl set subject` will no longer return an error if passed an empty change for a resource. ([#85490](https://github.com/kubernetes/kubernetes/pull/85490), [@sallyom](https://github.com/sallyom)) [SIG CLI]
-- Kubelet metrics gathered through metrics-server or prometheus should no longer timeout for Windows nodes running more than 3 pods. ([#87730](https://github.com/kubernetes/kubernetes/pull/87730), [@marosset](https://github.com/marosset)) [SIG 노드, Testing and Windows]
+- Kubelet metrics gathered through metrics-server or prometheus should no longer timeout for Windows nodes running more than 3 pods. ([#87730](https://github.com/kubernetes/kubernetes/pull/87730), [@marosset](https://github.com/marosset)) [SIG 노드, Testing, 윈도우]
 - Kubelet metrics have been changed to buckets. For example the `exec/{podNamespace}/{podID}/{containerName}` is now just exec. ([#87913](https://github.com/kubernetes/kubernetes/pull/87913), [@cheftako](https://github.com/cheftako)) [SIG 노드]
 - Kubelets perform fewer unnecessary pod status update operations on the API server. ([#88591](https://github.com/kubernetes/kubernetes/pull/88591), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드 and Scalability]
 - Kubernetes will try to acquire the iptables lock every 100 msec during 5 seconds instead of every second. This is especially useful for environments using kube-proxy in iptables mode with a high churn rate of services. ([#85771](https://github.com/kubernetes/kubernetes/pull/85771), [@aojea](https://github.com/aojea)) [SIG 네트워크]
@@ -499,8 +499,8 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 - Make Azure clients only retry on specified HTTP status codes ([#88017](https://github.com/kubernetes/kubernetes/pull/88017), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
 - Make error message and service event message more clear ([#86078](https://github.com/kubernetes/kubernetes/pull/86078), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
 - Minimize AWS NLB health check timeout when externalTrafficPolicy set to Local ([#73363](https://github.com/kubernetes/kubernetes/pull/73363), [@kellycampbell](https://github.com/kellycampbell)) [SIG 클라우드 공급자]
-- Pause image contains "Architecture" in non-amd64 images ([#87954](https://github.com/kubernetes/kubernetes/pull/87954), [@BenTheElder](https://github.com/BenTheElder)) [SIG 릴리즈]
-- Pause image upgraded to 3.2 in kubelet and kubeadm. ([#88173](https://github.com/kubernetes/kubernetes/pull/88173), [@BenTheElder](https://github.com/BenTheElder)) [SIG CLI, 클러스터 라이프사이클, Node, 테스트]
+- Pause image contains "Architecture" in non-amd64 images ([#87954](https://github.com/kubernetes/kubernetes/pull/87954), [@BenTheElder](https://github.com/BenTheElder)) [SIG 릴리스]
+- Pause image upgraded to 3.2 in kubelet and kubeadm. ([#88173](https://github.com/kubernetes/kubernetes/pull/88173), [@BenTheElder](https://github.com/BenTheElder)) [SIG CLI, 클러스터 라이프사이클, 노드, 테스트]
 - Plugin/PluginConfig and Policy APIs are mutually exclusive when running the scheduler ([#88864](https://github.com/kubernetes/kubernetes/pull/88864), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링]
 - Remove `FilteredNodesStatuses` argument from `PreScore`'s interface. ([#88189](https://github.com/kubernetes/kubernetes/pull/88189), [@skilxn-go](https://github.com/skilxn-go)) [SIG 스케줄링, 테스트]
 - Resolved a performance issue in the node authorizer index maintenance. ([#87693](https://github.com/kubernetes/kubernetes/pull/87693), [@liggitt](https://github.com/liggitt)) [SIG 인증]
@@ -526,12 +526,12 @@ NodeLocal DNSCache는 dnsCache 파드를 데몬셋으로 실행하여 clusterDNS
 
 - Update Calico to v3.8.4 ([#84163](https://github.com/kubernetes/kubernetes/pull/84163), [@david-tigera](https://github.com/david-tigera))[SIG 클러스터 라이프사이클]
 - Update aws-sdk-go dependency to v1.28.2 ([#87253](https://github.com/kubernetes/kubernetes/pull/87253), [@SaranBalaji90](https://github.com/SaranBalaji90))[SIG API Machinery and Cloud Provider]
-- Update CNI version to v0.8.5 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus))[SIG 릴리즈, Testing, Network, 클러스터 라이프사이클 and API Machinery]
-- Update cri-tools to v1.17.0 ([#86305](https://github.com/kubernetes/kubernetes/pull/86305), [@saschagrunert](https://github.com/saschagrunert))[SIG 릴리즈 and 클러스터 라이프사이클]
-- Pause image upgraded to 3.2 in kubelet and kubeadm ([#88173](https://github.com/kubernetes/kubernetes/pull/88173), [@BenTheElder](https://github.com/BenTheElder))[SIG CLI, Node, Testing and 클러스터 라이프사이클]
+- Update CNI version to v0.8.5 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus))[SIG 릴리스, Testing, Network, 클러스터 라이프사이클 and API Machinery]
+- Update cri-tools to v1.17.0 ([#86305](https://github.com/kubernetes/kubernetes/pull/86305), [@saschagrunert](https://github.com/saschagrunert))[SIG 릴리스 and 클러스터 라이프사이클]
+- Pause image upgraded to 3.2 in kubelet and kubeadm ([#88173](https://github.com/kubernetes/kubernetes/pull/88173), [@BenTheElder](https://github.com/BenTheElder))[SIG CLI, 노드, Testing and 클러스터 라이프사이클]
 - Update CoreDNS version to 1.6.7 in kubeadm ([#86260](https://github.com/kubernetes/kubernetes/pull/86260), [@rajansandeep](https://github.com/rajansandeep))[SIG 클러스터 라이프사이클]
 - Update golang.org/x/crypto to fix CVE-2020-9283 ([#8838](https://github.com/kubernetes/kubernetes/pull/88381), [@BenTheElder](https://github.com/BenTheElder))[SIG CLI, Instrumentation, API Machinery, 클러스터 라이프사이클 and Cloud Provider]
-- Update Go to 1.13.8 ([#87648](https://github.com/kubernetes/kubernetes/pull/87648), [@ialidzhikov](https://github.com/ialidzhikov))[SIG 릴리즈, 테스트]
+- Update Go to 1.13.8 ([#87648](https://github.com/kubernetes/kubernetes/pull/87648), [@ialidzhikov](https://github.com/ialidzhikov))[SIG 릴리스, 테스트]
 - Update Cluster-Autoscaler to 1.18.0 ([#89095](https://github.com/kubernetes/kubernetes/pull/89095), [@losipiuk](https://github.com/losipiuk))[SIG Autoscaling and 클러스터 라이프사이클]
 
 
@@ -593,7 +593,7 @@ filename | sha512 hash
 
 ### Other (Bug, Cleanup or Flake)
 
-- EndpointSlice should not contain endpoints for terminating pods ([#89056](https://github.com/kubernetes/kubernetes/pull/89056), [@andrewsykim](https://github.com/andrewsykim)) [SIG 앱 , 네트워크]
+- EndpointSlice should not contain endpoints for terminating pods ([#89056](https://github.com/kubernetes/kubernetes/pull/89056), [@andrewsykim](https://github.com/andrewsykim)) [SIG 앱, 네트워크]
 - Fix a bug where ExternalTrafficPolicy is not applied to service ExternalIPs. ([#88786](https://github.com/kubernetes/kubernetes/pull/88786), [@freehan](https://github.com/freehan)) [SIG 네트워크]
 - Fix invalid VMSS updates due to incorrect cache ([#89002](https://github.com/kubernetes/kubernetes/pull/89002), [@ArchangelSDY](https://github.com/ArchangelSDY)) [SIG 클라우드 공급자]
 - Fix isCurrentInstance for Windows by removing the dependency of hostname. ([#89138](https://github.com/kubernetes/kubernetes/pull/89138), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
@@ -668,21 +668,21 @@ filename | sha512 hash
 
 ### API Change
 
-- A new IngressClass resource has been added to enable better Ingress configuration. ([#88509](https://github.com/kubernetes/kubernetes/pull/88509), [@robscott](https://github.com/robscott)) [SIG API Machinery, Apps, CLI, Network, Node, 테스트]
-- Added GenericPVCDataSource feature gate to enable using arbitrary custom resources as the data source for a PVC. ([#88636](https://github.com/kubernetes/kubernetes/pull/88636), [@bswartz](https://github.com/bswartz)) [SIG 앱 and Storage]
-- Allow user to specify fsgroup permission change policy for pods ([#88488](https://github.com/kubernetes/kubernetes/pull/88488), [@gnufied](https://github.com/gnufied)) [SIG 앱 and Storage]
-- BlockVolume and CSIBlockVolume features are now GA. ([#88673](https://github.com/kubernetes/kubernetes/pull/88673), [@jsafrane](https://github.com/jsafrane)) [SIG 앱, Node and Storage]
+- A new IngressClass resource has been added to enable better Ingress configuration. ([#88509](https://github.com/kubernetes/kubernetes/pull/88509), [@robscott](https://github.com/robscott)) [SIG API Machinery, Apps, CLI, Network, 노드, 테스트]
+- Added GenericPVCDataSource feature gate to enable using arbitrary custom resources as the data source for a PVC. ([#88636](https://github.com/kubernetes/kubernetes/pull/88636), [@bswartz](https://github.com/bswartz)) [SIG 앱, 스토리지]
+- Allow user to specify fsgroup permission change policy for pods ([#88488](https://github.com/kubernetes/kubernetes/pull/88488), [@gnufied](https://github.com/gnufied)) [SIG 앱, 스토리지]
+- BlockVolume and CSIBlockVolume features are now GA. ([#88673](https://github.com/kubernetes/kubernetes/pull/88673), [@jsafrane](https://github.com/jsafrane)) [SIG 앱, 노드, 스토리지]
 - CustomResourceDefinition schemas that use `x-kubernetes-list-map-keys` to specify properties that uniquely identify list items must make those properties required or have a default value, to ensure those properties are present for all list items. See https://kubernetes.io/docs/reference/using-api/api-concepts/&#35;merge-strategy for details. ([#88076](https://github.com/kubernetes/kubernetes/pull/88076), [@eloyekunle](https://github.com/eloyekunle)) [SIG API Machinery, 테스트]
-- Fixes a regression with clients prior to 1.15 not being able to update podIP in pod status, or podCIDR in node spec, against >= 1.16 API servers ([#88505](https://github.com/kubernetes/kubernetes/pull/88505), [@liggitt](https://github.com/liggitt)) [SIG 앱 , 네트워크]
+- Fixes a regression with clients prior to 1.15 not being able to update podIP in pod status, or podCIDR in node spec, against >= 1.16 API servers ([#88505](https://github.com/kubernetes/kubernetes/pull/88505), [@liggitt](https://github.com/liggitt)) [SIG 앱, 네트워크]
 - Ingress: Add Exact and Prefix maching to Ingress PathTypes ([#88587](https://github.com/kubernetes/kubernetes/pull/88587), [@cmluciano](https://github.com/cmluciano)) [SIG 앱, 클러스터 라이프사이클 , 네트워크]
-- Ingress: Add alternate backends via TypedLocalObjectReference ([#88775](https://github.com/kubernetes/kubernetes/pull/88775), [@cmluciano](https://github.com/cmluciano)) [SIG 앱 , 네트워크]
+- Ingress: Add alternate backends via TypedLocalObjectReference ([#88775](https://github.com/kubernetes/kubernetes/pull/88775), [@cmluciano](https://github.com/cmluciano)) [SIG 앱, 네트워크]
 - Ingress: allow wildcard hosts in IngressRule ([#88858](https://github.com/kubernetes/kubernetes/pull/88858), [@cmluciano](https://github.com/cmluciano)) [SIG 네트워크]
 - Kube-controller-manager and kube-scheduler expose profiling by default to match the kube-apiserver.  Use `--enable-profiling=false` to disable. ([#88663](https://github.com/kubernetes/kubernetes/pull/88663), [@deads2k](https://github.com/deads2k)) [SIG API Machinery, Cloud Provider and Scheduling]
 - Move TaintBasedEvictions feature gates to GA ([#87487](https://github.com/kubernetes/kubernetes/pull/87487), [@skilxn-go](https://github.com/skilxn-go)) [SIG API Machinery, 앱, 노드, 스케줄링, 테스트]
-- New flag --endpointslice-updates-batch-period in kube-controller-manager can be used to reduce number of endpointslice updates generated by pod changes. ([#88745](https://github.com/kubernetes/kubernetes/pull/88745), [@mborsz](https://github.com/mborsz)) [SIG API Machinery, Apps , 네트워크]
-- Scheduler Extenders can now be configured in the v1alpha2 component config ([#88768](https://github.com/kubernetes/kubernetes/pull/88768), [@damemi](https://github.com/damemi)) [SIG 릴리즈, Scheduling, 테스트]
+- New flag --endpointslice-updates-batch-period in kube-controller-manager can be used to reduce number of endpointslice updates generated by pod changes. ([#88745](https://github.com/kubernetes/kubernetes/pull/88745), [@mborsz](https://github.com/mborsz)) [SIG API Machinery, 앱, 네트워크]
+- Scheduler Extenders can now be configured in the v1alpha2 component config ([#88768](https://github.com/kubernetes/kubernetes/pull/88768), [@damemi](https://github.com/damemi)) [SIG 릴리스, Scheduling, 테스트]
 - The apiserver/v1alph1&#35;EgressSelectorConfiguration API is now beta. ([#88502](https://github.com/kubernetes/kubernetes/pull/88502), [@caesarxuchao](https://github.com/caesarxuchao)) [SIG API Machinery]
-- The storage.k8s.io/CSIDriver has moved to GA, and is now available for use. ([#84814](https://github.com/kubernetes/kubernetes/pull/84814), [@huffmanca](https://github.com/huffmanca)) [SIG API Machinery, Apps, Auth, Node, Scheduling, Storage, 테스트]
+- The storage.k8s.io/CSIDriver has moved to GA, and is now available for use. ([#84814](https://github.com/kubernetes/kubernetes/pull/84814), [@huffmanca](https://github.com/huffmanca)) [SIG API Machinery, Apps, Auth, 노드, Scheduling, Storage, 테스트]
 - VolumePVCDataSource moves to GA in 1.18 release ([#88686](https://github.com/kubernetes/kubernetes/pull/88686), [@j-griffith](https://github.com/j-griffith)) [SIG 앱, CLI and 클러스터 라이프사이클]
 
 ### Feature
@@ -695,15 +695,15 @@ filename | sha512 hash
   Clusters with single apiservers, or which don't use a load balancer, should NOT enable this. ([#88567](https://github.com/kubernetes/kubernetes/pull/88567), [@answer1991](https://github.com/answer1991)) [SIG API Machinery]
 - Azure: add support for single stack IPv6 ([#88448](https://github.com/kubernetes/kubernetes/pull/88448), [@aramase](https://github.com/aramase)) [SIG 클라우드 공급자]
 - DefaultConstraints can be specified for the PodTopologySpread plugin in the component config ([#88671](https://github.com/kubernetes/kubernetes/pull/88671), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링]
-- Kubeadm: support Windows specific kubelet flags in kubeadm-flags.env ([#88287](https://github.com/kubernetes/kubernetes/pull/88287), [@gab-satchi](https://github.com/gab-satchi)) [SIG 클러스터 라이프사이클 and Windows]
+- Kubeadm: support Windows specific kubelet flags in kubeadm-flags.env ([#88287](https://github.com/kubernetes/kubernetes/pull/88287), [@gab-satchi](https://github.com/gab-satchi)) [SIG 클러스터 라이프사이클, 윈도우]
 - Kubectl cluster-info dump changed to only display a message telling you the location where the output was written when the output is not standard output. ([#88765](https://github.com/kubernetes/kubernetes/pull/88765), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
 - Print NotReady when pod is not ready based on its conditions. ([#88240](https://github.com/kubernetes/kubernetes/pull/88240), [@soltysh](https://github.com/soltysh)) [SIG CLI]
-- Scheduler Extender API is now located under k8s.io/kube-scheduler/extender ([#88540](https://github.com/kubernetes/kubernetes/pull/88540), [@damemi](https://github.com/damemi)) [SIG 릴리즈, Scheduling, 테스트]
+- Scheduler Extender API is now located under k8s.io/kube-scheduler/extender ([#88540](https://github.com/kubernetes/kubernetes/pull/88540), [@damemi](https://github.com/damemi)) [SIG 릴리스, Scheduling, 테스트]
 - Signatures on scale client methods have been modified to accept `context.Context` as a first argument. Signatures of Get, Update, and Patch methods have been updated to accept GetOptions, UpdateOptions and PatchOptions respectively. ([#88599](https://github.com/kubernetes/kubernetes/pull/88599), [@julianvmodesto](https://github.com/julianvmodesto)) [SIG API Machinery, Apps, Autoscaling and CLI]
 - Signatures on the dynamic client methods have been modified to accept `context.Context` as a first argument. Signatures of Delete and DeleteCollection methods now accept DeleteOptions by value instead of by reference. ([#88906](https://github.com/kubernetes/kubernetes/pull/88906), [@liggitt](https://github.com/liggitt)) [SIG API Machinery, Apps, CLI, 클러스터 라이프사이클, Storage, 테스트]
 - Signatures on the metadata client methods have been modified to accept `context.Context` as a first argument. Signatures of Delete and DeleteCollection methods now accept DeleteOptions by value instead of by reference. ([#88910](https://github.com/kubernetes/kubernetes/pull/88910), [@liggitt](https://github.com/liggitt)) [SIG API Machinery, Apps, 테스트]
 - Webhooks will have alpha support for network proxy ([#85870](https://github.com/kubernetes/kubernetes/pull/85870), [@Jefftree](https://github.com/Jefftree)) [SIG API Machinery, Auth, 테스트]
-- When client certificate files are provided, reload files for new connections, and close connections when a certificate changes. ([#79083](https://github.com/kubernetes/kubernetes/pull/79083), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery, Auth, Node, 테스트]
+- When client certificate files are provided, reload files for new connections, and close connections when a certificate changes. ([#79083](https://github.com/kubernetes/kubernetes/pull/79083), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery, Auth, 노드, 테스트]
 - When deleting objects using kubectl with the --force flag, you are no longer required to also specify --grace-period=0. ([#87776](https://github.com/kubernetes/kubernetes/pull/87776), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
 - `kubectl` now contains a `kubectl alpha debug` command. This command allows attaching an ephemeral container to a running pod for the purposes of debugging. ([#88004](https://github.com/kubernetes/kubernetes/pull/88004), [@verb](https://github.com/verb)) [SIG CLI]
 
@@ -715,10 +715,10 @@ filename | sha512 hash
 ### Other (Bug, Cleanup or Flake)
 
 - Azure VMSS LoadBalancerBackendAddressPools updating has been improved with squential-sync + concurrent-async requests. ([#88699](https://github.com/kubernetes/kubernetes/pull/88699), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- AzureFile and CephFS use new Mount library that prevents logging of sensitive mount options. ([#88684](https://github.com/kubernetes/kubernetes/pull/88684), [@saad-ali](https://github.com/saad-ali)) [SIG API Machinery, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation and Storage]
-- Build: Enable kube-cross image-building on K8s Infra ([#88562](https://github.com/kubernetes/kubernetes/pull/88562), [@justaugustus](https://github.com/justaugustus)) [SIG 릴리즈, 테스트]
+- AzureFile and CephFS use new Mount library that prevents logging of sensitive mount options. ([#88684](https://github.com/kubernetes/kubernetes/pull/88684), [@saad-ali](https://github.com/saad-ali)) [SIG API Machinery, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation, 스토리지]
+- Build: Enable kube-cross image-building on K8s Infra ([#88562](https://github.com/kubernetes/kubernetes/pull/88562), [@justaugustus](https://github.com/justaugustus)) [SIG 릴리스, 테스트]
 - Client-go certificate manager rotation gained the ability to preserve optional intermediate chains accompanying issued certificates ([#88744](https://github.com/kubernetes/kubernetes/pull/88744), [@jackkleeman](https://github.com/jackkleeman)) [SIG API Machinery and Auth]
-- Conformance image now depends on stretch-slim instead of debian-hyperkube-base as that image is being deprecated and removed. ([#88702](https://github.com/kubernetes/kubernetes/pull/88702), [@dims](https://github.com/dims)) [SIG 클러스터 라이프사이클, Release, 테스트]
+- Conformance image now depends on stretch-slim instead of debian-hyperkube-base as that image is being deprecated and removed. ([#88702](https://github.com/kubernetes/kubernetes/pull/88702), [@dims](https://github.com/dims)) [SIG 클러스터 라이프사이클, 릴리스, 테스트]
 - Deprecate --generator flag from kubectl create commands ([#88655](https://github.com/kubernetes/kubernetes/pull/88655), [@soltysh](https://github.com/soltysh)) [SIG CLI]
 - FIX: prevent apiserver from panicking when failing to load audit webhook config file ([#88879](https://github.com/kubernetes/kubernetes/pull/88879), [@JoshVanL](https://github.com/JoshVanL)) [SIG API Machinery and Auth]
 - Fix /readyz to return error immediately after a shutdown is initiated, before the --shutdown-delay-duration has elapsed. ([#88911](https://github.com/kubernetes/kubernetes/pull/88911), [@tkashem](https://github.com/tkashem)) [SIG API Machinery]
@@ -727,13 +727,13 @@ filename | sha512 hash
 - Fix handling of aws-load-balancer-security-groups annotation. Security-Groups assigned with this annotation are no longer modified by kubernetes which is the expected behaviour of most users. Also no unnecessary Security-Groups are created anymore if this annotation is used. ([#83446](https://github.com/kubernetes/kubernetes/pull/83446), [@Elias481](https://github.com/Elias481)) [SIG 클라우드 공급자]
 - Fix kubectl create deployment image name ([#86636](https://github.com/kubernetes/kubernetes/pull/86636), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
 - Fix missing "apiVersion" for "involvedObject" in Events for Nodes. ([#87537](https://github.com/kubernetes/kubernetes/pull/87537), [@uthark](https://github.com/uthark)) [SIG 앱, 노드]
-- Fix that prevents repeated fetching of PVC/PV objects by kubelet when processing of pod volumes fails. While this prevents hammering API server in these error scenarios, it means that some errors in processing volume(s) for a pod could now take up to 2-3 minutes before retry. ([#88141](https://github.com/kubernetes/kubernetes/pull/88141), [@tedyu](https://github.com/tedyu)) [SIG 노드 and Storage]
-- Fix: azure file mount timeout issue ([#88610](https://github.com/kubernetes/kubernetes/pull/88610), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
+- Fix that prevents repeated fetching of PVC/PV objects by kubelet when processing of pod volumes fails. While this prevents hammering API server in these error scenarios, it means that some errors in processing volume(s) for a pod could now take up to 2-3 minutes before retry. ([#88141](https://github.com/kubernetes/kubernetes/pull/88141), [@tedyu](https://github.com/tedyu)) [SIG 노드, 스토리지]
+- Fix: azure file mount timeout issue ([#88610](https://github.com/kubernetes/kubernetes/pull/88610), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
 - Fix: corrupted mount point in csi driver ([#88569](https://github.com/kubernetes/kubernetes/pull/88569), [@andyzhangx](https://github.com/andyzhangx)) [SIG 스토리지]
 - Fixed a bug in the TopologyManager. Previously, the TopologyManager would only guarantee alignment if container creation was serialized in some way. Alignment is now guaranteed under all scenarios of container creation. ([#87759](https://github.com/kubernetes/kubernetes/pull/87759), [@klueska](https://github.com/klueska)) [SIG 노드]
-- Fixed block CSI volume cleanup after timeouts. ([#88660](https://github.com/kubernetes/kubernetes/pull/88660), [@jsafrane](https://github.com/jsafrane)) [SIG 노드 and Storage]
+- Fixed block CSI volume cleanup after timeouts. ([#88660](https://github.com/kubernetes/kubernetes/pull/88660), [@jsafrane](https://github.com/jsafrane)) [SIG 노드, 스토리지]
 - Fixes issue where you can't attach more than 15 GCE Persistent Disks to c2, n2, m1, m2 machine types. ([#88602](https://github.com/kubernetes/kubernetes/pull/88602), [@yuga711](https://github.com/yuga711)) [SIG 스토리지]
-- For volumes that allow attaches across multiple nodes, attach and detach operations across different nodes are now executed in parallel. ([#88678](https://github.com/kubernetes/kubernetes/pull/88678), [@verult](https://github.com/verult)) [SIG 앱, Node and Storage]
+- For volumes that allow attaches across multiple nodes, attach and detach operations across different nodes are now executed in parallel. ([#88678](https://github.com/kubernetes/kubernetes/pull/88678), [@verult](https://github.com/verult)) [SIG 앱, 노드, 스토리지]
 - Hide kubectl.kubernetes.io/last-applied-configuration in describe command ([#88758](https://github.com/kubernetes/kubernetes/pull/88758), [@soltysh](https://github.com/soltysh)) [SIG 인증 and CLI]
 - In GKE alpha clusters it will be possible to use the service annotation `cloud.google.com/network-tier: Standard` ([#88487](https://github.com/kubernetes/kubernetes/pull/88487), [@zioproto](https://github.com/zioproto)) [SIG 클라우드 공급자]
 - Kubelets perform fewer unnecessary pod status update operations on the API server. ([#88591](https://github.com/kubernetes/kubernetes/pull/88591), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드 and Scalability]
@@ -745,7 +745,7 @@ filename | sha512 hash
 - Terminating a restartPolicy=Never pod no longer has a chance to report the pod succeeded when it actually failed. ([#88440](https://github.com/kubernetes/kubernetes/pull/88440), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드, 테스트]
 - The EventRecorder from k8s.io/client-go/tools/events will now create events in the default namespace (instead of kube-system) when the related object does not have it set. ([#88815](https://github.com/kubernetes/kubernetes/pull/88815), [@enj](https://github.com/enj)) [SIG API Machinery]
 - The audit event sourceIPs list will now always end with the IP that sent the request directly to the API server. ([#87167](https://github.com/kubernetes/kubernetes/pull/87167), [@tallclair](https://github.com/tallclair)) [SIG API Machinery and Auth]
-- Update to use golang 1.13.8 ([#87648](https://github.com/kubernetes/kubernetes/pull/87648), [@ialidzhikov](https://github.com/ialidzhikov)) [SIG 릴리즈, 테스트]
+- Update to use golang 1.13.8 ([#87648](https://github.com/kubernetes/kubernetes/pull/87648), [@ialidzhikov](https://github.com/ialidzhikov)) [SIG 릴리스, 테스트]
 - Validate kube-proxy flags --ipvs-tcp-timeout, --ipvs-tcpfin-timeout, --ipvs-udp-timeout ([#88657](https://github.com/kubernetes/kubernetes/pull/88657), [@chendotjs](https://github.com/chendotjs)) [SIG 네트워크]
 
 
@@ -830,14 +830,14 @@ filename | sha512 hash
 
 - API additions to apiserver types ([#87179](https://github.com/kubernetes/kubernetes/pull/87179), [@Jefftree](https://github.com/Jefftree)) [SIG API Machinery, Cloud Provider and 클러스터 라이프사이클]
 - Add Scheduling Profiles to kubescheduler.config.k8s.io/v1alpha2 ([#88087](https://github.com/kubernetes/kubernetes/pull/88087), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링, 테스트]
-- Added support for multiple sizes huge pages on a container level ([#84051](https://github.com/kubernetes/kubernetes/pull/84051), [@bart0sh](https://github.com/bart0sh)) [SIG 앱, Node and Storage]
-- AppProtocol is a new field on Service and Endpoints resources, enabled with the ServiceAppProtocol feature gate. ([#88503](https://github.com/kubernetes/kubernetes/pull/88503), [@robscott](https://github.com/robscott)) [SIG 앱 , 네트워크]
+- Added support for multiple sizes huge pages on a container level ([#84051](https://github.com/kubernetes/kubernetes/pull/84051), [@bart0sh](https://github.com/bart0sh)) [SIG 앱, 노드, 스토리지]
+- AppProtocol is a new field on Service and Endpoints resources, enabled with the ServiceAppProtocol feature gate. ([#88503](https://github.com/kubernetes/kubernetes/pull/88503), [@robscott](https://github.com/robscott)) [SIG 앱, 네트워크]
 - Fixed missing validation of uniqueness of list items in lists with `x-kubernetes-list-type: map` or x-kubernetes-list-type: set` in CustomResources. ([#84920](https://github.com/kubernetes/kubernetes/pull/84920), [@sttts](https://github.com/sttts)) [SIG API Machinery]
 - Introduces optional --detect-local flag to kube-proxy.
   Currently the only supported value is "cluster-cidr",
   which is the default if not specified. ([#87748](https://github.com/kubernetes/kubernetes/pull/87748), [@satyasm](https://github.com/satyasm)) [SIG 클러스터 라이프사이클, Network and Scheduling]
 - Kube-scheduler can run more than one scheduling profile. Given a pod, the profile is selected by using its `.spec.SchedulerName`. ([#88285](https://github.com/kubernetes/kubernetes/pull/88285), [@alculquicondor](https://github.com/alculquicondor)) [SIG 앱, Scheduling, 테스트]
-- Moving Windows RunAsUserName feature to GA ([#87790](https://github.com/kubernetes/kubernetes/pull/87790), [@marosset](https://github.com/marosset)) [SIG 앱 and Windows]
+- Moving Windows RunAsUserName feature to GA ([#87790](https://github.com/kubernetes/kubernetes/pull/87790), [@marosset](https://github.com/marosset)) [SIG 앱, 윈도우]
 
 ### Feature
 
@@ -858,7 +858,7 @@ filename | sha512 hash
 
 - Add delays between goroutines for vm instance update ([#88094](https://github.com/kubernetes/kubernetes/pull/88094), [@aramase](https://github.com/aramase)) [SIG 클라우드 공급자]
 - Add init containers log to cluster dump info. ([#88324](https://github.com/kubernetes/kubernetes/pull/88324), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- CPU limits are now respected for Windows containers. If a node is over-provisioned, no weighting is used - only limits are respected. ([#86101](https://github.com/kubernetes/kubernetes/pull/86101), [@PatrickLang](https://github.com/PatrickLang)) [SIG 노드, Testing and Windows]
+- CPU limits are now respected for Windows containers. If a node is over-provisioned, no weighting is used - only limits are respected. ([#86101](https://github.com/kubernetes/kubernetes/pull/86101), [@PatrickLang](https://github.com/PatrickLang)) [SIG 노드, Testing, 윈도우]
 - Cloud provider config CloudProviderBackoffMode has been removed since it won't be used anymore. ([#88463](https://github.com/kubernetes/kubernetes/pull/88463), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
 - Evictions due to pods breaching their ephemeral storage limits are now recorded by the `kubelet_evictions` metric and can be alerted on. ([#87906](https://github.com/kubernetes/kubernetes/pull/87906), [@smarterclayton](https://github.com/smarterclayton)) [SIG 노드]
 - Fix: add remediation in azure disk attach/detach ([#88444](https://github.com/kubernetes/kubernetes/pull/88444), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
@@ -929,7 +929,7 @@ filename | sha512 hash
 
 - Kubelet podresources API now provides the information about active pods only. ([#79409](https://github.com/kubernetes/kubernetes/pull/79409), [@takmatsu](https://github.com/takmatsu)) [SIG 노드]
 - Remove deprecated fields from .leaderElection in kubescheduler.config.k8s.io/v1alpha2 ([#87904](https://github.com/kubernetes/kubernetes/pull/87904), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링]
-- Signatures on generated clientset methods have been modified to accept `context.Context` as a first argument. Signatures of generated Create, Update, and Patch methods have been updated to accept CreateOptions, UpdateOptions and PatchOptions respectively. Clientsets that with the previous interface have been added in new "deprecated" packages to allow incremental migration to the new APIs. The deprecated packages will be removed in the 1.21 release. ([#87299](https://github.com/kubernetes/kubernetes/pull/87299), [@mikedanese](https://github.com/mikedanese)) [SIG API Machinery, Apps, Auth, Autoscaling, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation, Network, Node, Scheduling, Storage, Testing and Windows]
+- Signatures on generated clientset methods have been modified to accept `context.Context` as a first argument. Signatures of generated Create, Update, and Patch methods have been updated to accept CreateOptions, UpdateOptions and PatchOptions respectively. Clientsets that with the previous interface have been added in new "deprecated" packages to allow incremental migration to the new APIs. The deprecated packages will be removed in the 1.21 release. ([#87299](https://github.com/kubernetes/kubernetes/pull/87299), [@mikedanese](https://github.com/mikedanese)) [SIG API Machinery, Apps, Auth, Autoscaling, CLI, Cloud Provider, 클러스터 라이프사이클, Instrumentation, Network, 노드, Scheduling, Storage, Testing, 윈도우]
 - The k8s.io/node-api component is no longer updated. Instead, use the RuntimeClass types located within k8s.io/api, and the generated clients located within k8s.io/client-go ([#87503](https://github.com/kubernetes/kubernetes/pull/87503), [@liggitt](https://github.com/liggitt)) [SIG 노드 and Release]
 
 ### Feature
@@ -949,10 +949,10 @@ filename | sha512 hash
 
 ### Other (Bug, Cleanup or Flake)
 
-- Adds "volume.beta.kubernetes.io/migrated-to" annotation to PV's and PVC's when they are migrated to signal external provisioners to pick up those objects for Provisioning and Deleting. ([#87098](https://github.com/kubernetes/kubernetes/pull/87098), [@davidz627](https://github.com/davidz627)) [SIG 앱 and Storage]
+- Adds "volume.beta.kubernetes.io/migrated-to" annotation to PV's and PVC's when they are migrated to signal external provisioners to pick up those objects for Provisioning and Deleting. ([#87098](https://github.com/kubernetes/kubernetes/pull/87098), [@davidz627](https://github.com/davidz627)) [SIG 앱, 스토리지]
 - Fix a bug in the dual-stack IPVS proxier where stale IPv6 endpoints were not being cleaned up ([#87695](https://github.com/kubernetes/kubernetes/pull/87695), [@andrewsykim](https://github.com/andrewsykim)) [SIG 네트워크]
 - Fix kubectl drain ignore daemonsets and others. ([#87361](https://github.com/kubernetes/kubernetes/pull/87361), [@zhouya0](https://github.com/zhouya0)) [SIG CLI]
-- Fix: add azure disk migration support for CSINode ([#88014](https://github.com/kubernetes/kubernetes/pull/88014), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자 and Storage]
+- Fix: add azure disk migration support for CSINode ([#88014](https://github.com/kubernetes/kubernetes/pull/88014), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자, 스토리지]
 - Fix: add non-retriable errors in azure clients ([#87941](https://github.com/kubernetes/kubernetes/pull/87941), [@andyzhangx](https://github.com/andyzhangx)) [SIG 클라우드 공급자]
 - Fixed NetworkPolicy validation that Except values are accepted when they are outside the CIDR range. ([#86578](https://github.com/kubernetes/kubernetes/pull/86578), [@tnqn](https://github.com/tnqn)) [SIG 네트워크]
 - Improves performance of the node authorizer ([#87696](https://github.com/kubernetes/kubernetes/pull/87696), [@liggitt](https://github.com/liggitt)) [SIG 인증]
@@ -962,12 +962,12 @@ filename | sha512 hash
 - Kubeadm:  'kubeadm alpha kubelet config download' has been removed, please use 'kubeadm upgrade node phase kubelet-config' instead ([#87944](https://github.com/kubernetes/kubernetes/pull/87944), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클]
 - Kubeadm: remove 'kubeadm upgrade node config' command since it was deprecated in v1.15, please use 'kubeadm upgrade node phase kubelet-config' instead ([#87975](https://github.com/kubernetes/kubernetes/pull/87975), [@SataQiu](https://github.com/SataQiu)) [SIG 클러스터 라이프사이클]
 - Kubectl describe <type> and kubectl top pod will return a message saying "No resources found" or "No resources found in <namespace> namespace" if there are no results to display. ([#87527](https://github.com/kubernetes/kubernetes/pull/87527), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
-- Kubelet metrics gathered through metrics-server or prometheus should no longer timeout for Windows nodes running more than 3 pods. ([#87730](https://github.com/kubernetes/kubernetes/pull/87730), [@marosset](https://github.com/marosset)) [SIG 노드, Testing and Windows]
+- Kubelet metrics gathered through metrics-server or prometheus should no longer timeout for Windows nodes running more than 3 pods. ([#87730](https://github.com/kubernetes/kubernetes/pull/87730), [@marosset](https://github.com/marosset)) [SIG 노드, Testing, 윈도우]
 - Kubelet metrics have been changed to buckets.
   For example the exec/{podNamespace}/{podID}/{containerName} is now just exec. ([#87913](https://github.com/kubernetes/kubernetes/pull/87913), [@cheftako](https://github.com/cheftako)) [SIG 노드]
 - Limit number of instances in a single update to GCE target pool to 1000. ([#87881](https://github.com/kubernetes/kubernetes/pull/87881), [@wojtek-t](https://github.com/wojtek-t)) [SIG 클라우드 공급자, Network and Scalability]
 - Make Azure clients only retry on specified HTTP status codes ([#88017](https://github.com/kubernetes/kubernetes/pull/88017), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
-- Pause image contains "Architecture" in non-amd64 images ([#87954](https://github.com/kubernetes/kubernetes/pull/87954), [@BenTheElder](https://github.com/BenTheElder)) [SIG 릴리즈]
+- Pause image contains "Architecture" in non-amd64 images ([#87954](https://github.com/kubernetes/kubernetes/pull/87954), [@BenTheElder](https://github.com/BenTheElder)) [SIG 릴리스]
 - Pods that are considered for preemption and haven't started don't produce an error log. ([#87900](https://github.com/kubernetes/kubernetes/pull/87900), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링]
 - Prevent error message from being displayed when running kubectl plugin list and your path includes an empty string ([#87633](https://github.com/kubernetes/kubernetes/pull/87633), [@brianpursley](https://github.com/brianpursley)) [SIG CLI]
 - `kubectl create clusterrolebinding` creates rbac.authorization.k8s.io/v1 object ([#85889](https://github.com/kubernetes/kubernetes/pull/85889), [@oke-py](https://github.com/oke-py)) [SIG CLI]
@@ -1056,7 +1056,7 @@ filename | sha512 hash
 - disableAvailabilitySetNodes is added to avoid VM list for VMSS clusters. It should only be used when vmType is "vmss" and all the nodes (including masters) are VMSS virtual machines. ([#87685](https://github.com/kubernetes/kubernetes/pull/87685), [@feiskyer](https://github.com/feiskyer)) [SIG 클라우드 공급자]
 - The kubectl --dry-run flag now accepts the values 'client', 'server', and 'none', to support client-side and server-side dry-run strategies. The boolean and unset values for the --dry-run flag are deprecated and a value will be required in a future version. ([#87580](https://github.com/kubernetes/kubernetes/pull/87580), [@julianvmodesto](https://github.com/julianvmodesto)) [SIG CLI]
 - Add support for pre-allocated hugepages for more than one page size ([#82820](https://github.com/kubernetes/kubernetes/pull/82820), [@odinuge](https://github.com/odinuge)) [SIG 앱]
-- Update CNI version to v0.8.5 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus)) [SIG API Machinery, SIG 클러스터 라이프사이클, SIG 네트워크, SIG 릴리즈, and SIG Testing]
+- Update CNI version to v0.8.5 ([#78819](https://github.com/kubernetes/kubernetes/pull/78819), [@justaugustus](https://github.com/justaugustus)) [SIG API Machinery, SIG 클러스터 라이프사이클, SIG 네트워크, SIG 릴리스, and SIG Testing]
 - Skip default spreading scoring plugin for pods that define TopologySpreadConstraints ([#87566](https://github.com/kubernetes/kubernetes/pull/87566), [@skilxn-go](https://github.com/skilxn-go)) [SIG 스케줄링]
 - Added more details to taint toleration errors ([#87250](https://github.com/kubernetes/kubernetes/pull/87250), [@starizard](https://github.com/starizard)) [SIG 앱, and SIG 스케줄링]
 - Scheduler: Add DefaultBinder plugin ([#87430](https://github.com/kubernetes/kubernetes/pull/87430), [@alculquicondor](https://github.com/alculquicondor)) [SIG 스케줄링, and SIG Testing]
@@ -1075,7 +1075,7 @@ filename | sha512 hash
 - For volumes that allow attaches across multiple nodes, attach and detach operations across different nodes are now executed in parallel. ([#87258](https://github.com/kubernetes/kubernetes/pull/87258), [@verult](https://github.com/verult)) [SIG 앱, SIG 노드, and SIG 스토리지]
 - kubeadm: apply further improvements to the tentative support for concurrent etcd member join. Fixes a bug where multiple members can receive the same hostname. Increase the etcd client dial timeout and retry timeout for add/remove/... operations. ([#87505](https://github.com/kubernetes/kubernetes/pull/87505), [@neolit123](https://github.com/neolit123)) [SIG 클러스터 라이프사이클]
 - Reverted a kubectl azure auth module change where oidc claim spn: prefix was omitted resulting a breaking behavior with existing Azure AD OIDC enabled api-server ([#87507](https://github.com/kubernetes/kubernetes/pull/87507), [@weinong](https://github.com/weinong)) [SIG API Machinery, SIG 인증, and SIG 클라우드 공급자]
-- Update cri-tools to v1.17.0 ([#86305](https://github.com/kubernetes/kubernetes/pull/86305), [@saschagrunert](https://github.com/saschagrunert)) [SIG 클러스터 라이프사이클, and SIG 릴리즈]
+- Update cri-tools to v1.17.0 ([#86305](https://github.com/kubernetes/kubernetes/pull/86305), [@saschagrunert](https://github.com/saschagrunert)) [SIG 클러스터 라이프사이클, and SIG 릴리스]
 - kubeadm: remove the deprecated CoreDNS feature-gate. It was set to "true" since v1.11 when the feature went GA. In v1.13 it was marked as deprecated and hidden from the CLI. ([#87400](https://github.com/kubernetes/kubernetes/pull/87400), [@neolit123](https://github.com/neolit123)) [SIG 클러스터 라이프사이클]
 - Shared informers are now more reliable in the face of network disruption. ([#86015](https://github.com/kubernetes/kubernetes/pull/86015), [@squeed](https://github.com/squeed)) [SIG API Machinery]
 - the CSR signing cert/key pairs will be reloaded from disk like the kube-apiserver cert/key pairs ([#86816](https://github.com/kubernetes/kubernetes/pull/86816), [@deads2k](https://github.com/deads2k)) [SIG API Machinery, SIG 앱, and SIG 인증]

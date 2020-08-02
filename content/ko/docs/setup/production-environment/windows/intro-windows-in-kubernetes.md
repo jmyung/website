@@ -42,91 +42,91 @@ API 및 kubectl의 관점에서, 윈도우 컨테이너는 리눅스 기반 컨�
 | 쿠버네티스 버전 | 호스트 OS 버전 (쿠버네티스 노드) | | |
 | --- | --- | --- | --- |
 | | *Windows Server 1709* | *Windows Server 1803* | *Windows Server 1809/Windows Server 2019* |
-| *Kubernetes v1.14* | 미 지원 | 미 지원 | Windows Server containers Builds 17763.* with Docker EE-basic 18.09 에서 지원 |
+| *Kubernetes v1.14* | 미 지원 | 미 지원 | Windows Server containers Builds 17763.* 및 Docker EE-basic 18.09 에서 지원 |
 
 {{< note >}}
-We don't expect all Windows customers to update the operating system for their apps frequently. Upgrading your applications is what dictates and necessitates upgrading or introducing new nodes to the cluster. For the customers that chose to upgrade their operating system for containers running on Kubernetes, we will offer guidance and step-by-step instructions when we add support for a new operating system version. This guidance will include recommended upgrade procedures for upgrading user applications together with cluster nodes. Windows nodes adhere to Kubernetes [version-skew policy](/docs/setup/release/version-skew-policy/) (node to control plane versioning) the same way as Linux nodes do today.
+모든 윈도우 고객이 앱을 위한 운영 체제를 자주 업데이트하는 것은 아니다. 애플리케이션을 업그레이드하려면 클러스터에 새 노드를 업그레이드하거나 도입해야 할 수 있다. 쿠버네티스에서 실행되는 컨테이너에 대해 운영 체제를 업그레이드하기로 선택한 고객을 위해 새로운 운영 체제 버전에 대한 지원을 추가할 때 가이드와 단계별 지침을 제공한다. 이 가이드는 클러스터 노드와 함께 사용자 애플리케이션을 업그레이드 하기 위한 권장 업그레이드 절차가 포함된다. 윈도우 노드는 오늘날 리눅스 노드와 동일한 방식으로 쿠버네티스 [버전-스큐(skew) 정책](/docs/setup/release/version-skew-policy/) (컨트롤 플레인 버저닝 노드)를 준수한다.
 {{< /note >}}
 {{< note >}}
-The Windows Server Host Operating System is subject to the [Windows Server ](https://www.microsoft.com/en-us/cloud-platform/windows-server-pricing) licensing. The Windows Container images are subject to the [Supplemental License Terms for Windows containers](https://docs.microsoft.com/en-us/virtualization/windowscontainers/images-eula).
+윈도우 서버 호스트 운영 체제에는 [윈도우 서버](https://www.microsoft.com/en-us/cloud-platform/windows-server-pricing) 라이센스가 적용된다. 윈도우 컨테이너 이미지는 [윈도우 컨테이너에 대한 보조 라이센스 조항](https://docs.microsoft.com/en-us/virtualization/windowscontainers/images-eula)의 적용을 받는다.
 {{< /note >}}
 {{< note >}}
-Windows containers with process isolation have strict compatibility rules, [where the host OS version must match the container base image OS version](https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility). Once we support Windows containers with Hyper-V isolation in Kubernetes, the limitation and compatibility rules will change.
+프로세스 격리가 포함된 윈도우 컨테이너에는 엄격한 호환성 규칙이 있으며, [여기서 호스트 OS 버전은 컨테이너 베이스 이미지 OS 버전과 일치해야 한다](https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility). 쿠버네티스에서 Hyper-V 격리가 포함된 윈도우 컨테이너를 지원하면, 제한 및 호환성 규칙이 변경될 것이다.
 {{< /note >}}
 
-Key Kubernetes elements work the same way in Windows as they do in Linux. In this section, we talk about some of the key workload enablers and how they map to Windows.
+윈도우에서 주요 쿠버네티스 요소는 리눅스와 동일한 방식으로 작동한다. 이 섹션에서는, 주요 워크로드 이네이블러(enabler) 일부와 이들이 윈도우에 맵핑되는 방법에 대해 설명한다.
 
-* [Pods](/docs/concepts/workloads/pods/pod-overview/)
+* [파드(Pods)](/ko/docs/concepts/workloads/pods/pod-overview/)
 
-    A Pod is the basic building block of Kubernetes–the smallest and simplest unit in the Kubernetes object model that you create or deploy. You may not deploy Windows and Linux containers in the same Pod. All containers in a Pod are scheduled onto a single Node where each Node represents a specific platform and architecture. The following Pod capabilities, properties and events are supported with Windows containers:
+    파드는 쿠버네티스의 기본 빌딩 블록이다 - 쿠버네티스 오브젝트 모델에서 생성하고 배포하는 가장 작고 간단한 단위. 동일한 파드에 윈도우 및 리눅스 컨테이너를 배포할 수 없다. 파드의 모든 컨테이너는 단일 노드로 예약되며 각 노드는 특정 플랫폼 및 아키텍처를 나타낸다. 다음과 같은 파드 기능, 속성 및 이벤트가 윈도우 컨테이너에서 지원된다.
 
-  * Single or multiple containers per Pod with process isolation and volume sharing
-  * Pod status fields
-  * Readiness and Liveness probes
-  * postStart & preStop container lifecycle events
-  * ConfigMap, Secrets: as environment variables or volumes
+  * 프로세스 분리 및 볼륨 공유 기능을 갖춘 파드 당 하나 또는 여러 개의 컨테이너
+  * 파드 상태 필드
+  * 준비성(readiness) 및 활성 프로브(liveness probe)
+  * postStart 및 preStop 컨테이너 라이프사이클 이벤트
+  * 컨피그맵(ConfigMap), 시크릿(Secrets): 환경 변수 또는 볼륨으로
   * EmptyDir
-  * Named pipe host mounts
-  * Resource limits
-* [Controllers](/docs/concepts/workloads/controllers/)
+  * 명명된 파이프 호스트 마운트
+  * 리소스 제한
+* [컨트롤러](/ko/docs/concepts/workloads/controllers/)
 
-    Kubernetes controllers handle the desired state of Pods. The following workload controllers are supported with Windows containers:
+    쿠버네티스 컨트롤러는 파드의 원하는 상태(desired state)를 처리한다. 윈도우 컨테이너에서 지원되는 워크로드 컨트롤러는 다음과 같다.
 
-  * ReplicaSet
-  * ReplicationController
-  * Deployments
-  * StatefulSets
-  * DaemonSet
-  * Job
-  * CronJob
-* [Services](/docs/concepts/services-networking/service/)
+  * 레플리카셋(ReplicaSet)
+  * 레플리케이션컨트롤러(ReplicationController)
+  * 디플로이먼트(Deployment)
+  * 스테이트풀셋(StatefulSet)	
+  * 데몬셋(DaemonSet)
+  * 잡(Job)
+  * 크론잡(CronJob)
+* [서비스(Service)](/docs/concepts/services-networking/service/)
 
-    A Kubernetes Service is an abstraction which defines a logical set of Pods and a policy by which to access them - sometimes called a micro-service. You can use services for cross-operating system connectivity. In Windows, services can utilize the following types, properties and capabilities:
+    쿠버네티스 서비스는 논리적인 파드 집합과 그것을(마이크로 서비스라고도 함) 접근하는 정책을 정의하는 추상화 개념이다. 상호-운영 체제 연결을 위해 서비스를 사용할 수 있다. 윈도우에서 서비스는 다음 유형, 속성 및 기능을 활용할 수 있다.
 
-  * Service Environment variables
-  * NodePort
-  * ClusterIP
-  * LoadBalancer
+  * 서비스 환경 변수
+  * 노드포트 (NodePort)
+  * 클러스터IP (ClusterIP)
+  * 로드밸런서 (LoadBalancer)
   * ExternalName
-  * Headless services
+  * 헤드리스 서비스 (Headless services)
 
-Pods, Controllers and Services are critical elements to managing Windows workloads on Kubernetes. However, on their own they are not enough to enable the proper lifecycle management of Windows workloads in a dynamic cloud native environment. We added support for the following features:
+파드, 컨트롤러 및 서비스는 쿠버네티스에서 윈도우 워크로드를 관리하는데 중요한 요소이다. 그러나 그 자체로는 동적 클라우드 네이티브 환경에서 윈도우 워크로드의 적절한 수명주기 관리를 수행하기에 충분하지 않다. 다음 기능에 대한 지원이 추가되었다.
 
-* Pod and container metrics
-* Horizontal Pod Autoscaler support
+* 파드와 컨테이너 메트릭
+* Horizontal Pod Autoscaler 지원
 * kubectl Exec
-* Resource Quotas
-* Scheduler preemption
+* 리소스쿼터 (Resource Quotas)
+* 스케쥴러 선점
 
-#### Container Runtime
+#### 컨테이너 런타임
 
 ##### Docker EE
 
 {{< feature-state for_k8s_version="v1.14" state="stable" >}}
 
-Docker EE-basic 18.09+ is the recommended container runtime for Windows Server 2019 / 1809 nodes running Kubernetes. This works with the dockershim code included in the kubelet.
+Docker EE-basic 18.09+는 쿠버네티스를 실행하는 Windows Server 2019 / 1809 노드에 권장되는 컨테이너 런타임이다. 이것은 kubelet에 포함된 dockershim 코드와 함께 작동한다.
 
 ##### CRI-ContainerD
 
 {{< feature-state for_k8s_version="v1.18" state="alpha" >}}
 
-ContainerD is an OCI-compliant runtime that works with Kubernetes on Linux. Kubernetes v1.18 adds support for {{< glossary_tooltip term_id="containerd" text="ContainerD" >}} on Windows. Progress for ContainerD on Windows can be tracked at [enhancements#1001](https://github.com/kubernetes/enhancements/issues/1001).
+ContainerD는 리눅스에서 쿠버네티스와 함께 작동하는 OCI-호환 런타임이다. 쿠버네티스 v1.18은 윈도우에서 {{< glossary_tooltip term_id="containerd" text="ContainerD" >}} 에 대한 지원을 추가한다. 윈도우에서 ContainerD의 진행 상황은 [enhancements#1001](https://github.com/kubernetes/enhancements/issues/1001)에서 확인할 수 있다.
 
 {{< caution >}}
 
-ContainerD on Windows in Kubernetes v1.18 has the following known shortcomings:
+쿠버네티스 v1.18의 윈도우 기반 ContainerD에는 다음과 같은 단점이 있다.
 
-* ContainerD does not have an official release with support for Windows; all development in Kubernetes has been performed against active ContainerD development branches. Production deployments should always use official releases that have been fully tested and are supported with security fixes.
-* Group-Managed Service Accounts are not implemented when using ContainerD - see [containerd/cri#1276](https://github.com/containerd/cri/issues/1276).
+* ContainerD에는 윈도우를 지원하는 공식 릴리스가 없다. 쿠버네티스의 모든 개발은 활성화된 ContainerD 개발 브랜치에 대해 수행된다. 프로덕션 배포는 항상 완벽하게 테스트되고 보안 수정된 공식 릴리스를 사용해야 한다.
+* ContainerD를 사용할 때 그룹-관리 서비스 계정이 구현되지 않았다. - [containerd/cri#1276](https://github.com/containerd/cri/issues/1276)를 참조한다.
 
 {{< /caution >}}
 
-#### Persistent Storage
+#### 퍼시스턴트 스토리지 (Persistent Storage)
 
-Kubernetes [volumes](/docs/concepts/storage/volumes/) enable complex applications, with data persistence and Pod volume sharing requirements, to be deployed on Kubernetes. Management of persistent volumes associated with a specific storage back-end or protocol includes actions such as: provisioning/de-provisioning/resizing of volumes, attaching/detaching a volume to/from a Kubernetes node and mounting/dismounting a volume to/from individual containers in a pod that needs to persist data. The code implementing these volume management actions for a specific storage back-end or protocol is shipped in the form of a Kubernetes volume [plugin](/docs/concepts/storage/volumes/#types-of-volumes). The following broad classes of Kubernetes volume plugins are supported on Windows:
+쿠버네티스 [볼륨](/ko/docs/concepts/storage/volumes/)을 사용하면 데이터 지속성(persistence) 및 파드 볼륨 공유 요구 사항이 있는 복잡한 애플리케이션을 쿠버네티스에 배포할 수 있다. 특정 스토리지 백엔드 또는 프로토콜과 관련된 영구 볼륨 관리에는 다음과 같은 작업이 포함된다. 볼륨 프로비저닝/비-프로비저닝/크기 조정, 쿠버네티스 노드에 볼륨 연결/분리, 데이터를 유지해야하는 파드의 개별 컨테이너에 볼륨 마운트/분리. 특정 스토리지 백엔드 또는 프로토콜에 대해 이러한 볼륨 관리 작업을 구현하는 코드는 쿠버네티스 볼륨 [플러그인](/ko/docs/concepts/storage/volumes/#볼륨-유형들)의 형태로 제공된다. 다음과 같은 광범위한 쿠버네티스 볼륨 플러그인 클래스가 윈도우에서 지원된다.
 
-##### In-tree Volume Plugins
-Code associated with in-tree volume plugins ship as part of the core Kubernetes code base. Deployment of in-tree volume plugins do not require installation of additional scripts or deployment of separate containerized plugin components. These plugins can handle: provisioning/de-provisioning and resizing of volumes in the storage backend, attaching/detaching of volumes to/from a Kubernetes node and mounting/dismounting a volume to/from individual containers in a pod. The following in-tree plugins support Windows nodes:
+##### 인-트리(In-tree) 볼륨 플러그인
+인-트리 볼륨 플러그인과 관련된 코드는 핵심 쿠버네티스 코드 베이스의 일부로 제공된다. 인-트리 볼륨 플러그인 배포는 추가 스크립트를 설치하거나 별도의 컨테이너화된 플러그인 컴포넌트를 배포할 필요가 없다. 이러한 플러그인들은 다음을 처리할 수 있다. 볼륨 프로비저닝/비-프로비저닝, 스토리지 백엔드 볼륨 크기 조정, 쿠버네티스 노드에 볼륨 연결/분리, 파드의 개별 컨테이너에 볼륨 마운트/분리. 다음의 인-트리 플러그인은 윈도우 노드를 지원한다.
 
 * [awsElasticBlockStore](/docs/concepts/storage/volumes/#awselasticblockstore)
 * [azureDisk](/docs/concepts/storage/volumes/#azuredisk)
@@ -134,13 +134,13 @@ Code associated with in-tree volume plugins ship as part of the core Kubernetes 
 * [gcePersistentDisk](/docs/concepts/storage/volumes/#gcepersistentdisk)
 * [vsphereVolume](/docs/concepts/storage/volumes/#vspherevolume)
 
-##### FlexVolume Plugins
-Code associated with [FlexVolume](/docs/concepts/storage/volumes/#flexVolume) plugins ship as out-of-tree scripts or binaries that need to be deployed directly on the host. FlexVolume plugins handle attaching/detaching of volumes to/from a Kubernetes node and mounting/dismounting a volume to/from individual containers in a pod. Provisioning/De-provisioning of persistent volumes associated with FlexVolume plugins may be handled through an external provisioner that is typically separate from the FlexVolume plugins. The following FlexVolume [plugins](https://github.com/Microsoft/K8s-Storage-Plugins/tree/master/flexvolume/windows), deployed as powershell scripts on the host, support Windows nodes:
+##### FlexVolume 플러그인
+[FlexVolume](/ko/docs/concepts/storage/volumes/#flexVolume) 플러그인과 관련된 코드는 out-of-tree 스크립트 또는 호스트에 직접 배포해야하는 바이너리로 제공된다. FlexVolume 플러그인은 쿠버네티스 노드에 볼륨 연결/분리 및 파드의 개별 컨테이너에 볼륨 마운트/분리를 처리한다. FlexVolume 플러그인과 관련된 퍼시스턴트 볼륨의 프로비저닝/비-프로비저닝은 일반적으로 FlexVolume 플러그인과는 별도의 외부 프로비저너을 통해 처리될 수 있다. 호스트에서 powershell 스크립트로 배포된 다음의 FlexVolume [플러그인](https://github.com/Microsoft/K8s-Storage-Plugins/tree/master/flexvolume/windows)은 윈도우 노드를 지원한다.
 
 * [SMB](https://github.com/microsoft/K8s-Storage-Plugins/tree/master/flexvolume/windows/plugins/microsoft.com~smb.cmd)
 * [iSCSI](https://github.com/microsoft/K8s-Storage-Plugins/tree/master/flexvolume/windows/plugins/microsoft.com~iscsi.cmd)
 
-##### CSI Plugins
+##### CSI 플러그인
 
 {{< feature-state for_k8s_version="v1.16" state="alpha" >}}
 

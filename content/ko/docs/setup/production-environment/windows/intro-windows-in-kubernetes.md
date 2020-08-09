@@ -144,98 +144,98 @@ ContainerD는 리눅스에서 쿠버네티스와 함께 작동하는 OCI-호환 
 
 {{< feature-state for_k8s_version="v1.16" state="alpha" >}}
 
-Code associated with {{< glossary_tooltip text="CSI" term_id="csi" >}} plugins ship as out-of-tree scripts and binaries that are typically distributed as container images and deployed using standard Kubernetes constructs like DaemonSets and StatefulSets. CSI plugins handle a wide range of volume management actions in Kubernetes: provisioning/de-provisioning/resizing of volumes, attaching/detaching of volumes to/from a Kubernetes node and mounting/dismounting a volume to/from individual containers in a pod, backup/restore of persistent data using snapshots and cloning. CSI plugins typically consist of node plugins (that run on each node as a DaemonSet) and controller plugins.
+{{< glossary_tooltip text="CSI" term_id="csi" >}} 플러그인과 관련된 코드는 일반적으로 컨테이너 이미지로 배포되고 데몬셋(DaemonSets) 및 스테이트풀셋(StatefulSets)과 같은 표준 쿠버네티스 구조를 사용하여 배포되는 아웃-오브-트리(out-of-tree) 스크립트 및 바이너리로 제공된다. CSI 플러그인은 쿠버네티스에서 다양한 볼륨 관리 작업을 처리한다. 볼륨의 프로비저닝/비-프로비저닝, 크기 조정, 쿠버네티스 노드에 볼륨 연결/분리, 파드의 개별 컨테이너에 볼륨 마운트/분리, 스냅샷 및 복제를 사용한 영구 데이터 백업/복원. CSI 플러그인은 일반적으로 노드 플러그인(각 노드에서 데몬셋으로 실행)과 컨트롤러 플러그인으로 구성된다.
 
-CSI node plugins (especially those associated with persistent volumes exposed as either block devices or over a shared file-system) need to perform various privileged operations like scanning of disk devices, mounting of file systems, etc. These operations differ for each host operating system. For Linux worker nodes, containerized CSI node plugins are typically deployed as privileged containers. For Windows worker nodes, privileged operations for containerized CSI node plugins is supported using [csi-proxy](https://github.com/kubernetes-csi/csi-proxy), a community-managed, stand-alone binary that needs to be pre-installed on each Windows node. Please refer to the deployment guide of the CSI plugin you wish to deploy for further details.
+CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일-시스템을 통해 노출되는 퍼시스턴트 볼륨(persistent volumes)과 관련된 플러그인)은 디스크 장치 스캔, 파일 시스템 마운트 등과 같은 다양한 권한 있는(privileged) 작업을 수행해야 한다. 이러한 작업은 각 호스트 운영 체제에 따라 다르다. 리눅스 워커 노드의 경우 컨테이너화된 CSI 노드 플러그인은 일반적으로 권한 있는 컨테이너로 배포된다. 윈도우 워커 노드의 경우 컨테이너화된 CSI 노드 플러그인에 대한 권한 있는 작업은 커뮤니티에서 관리되고, 독립적인(stand-alone) 바이너리인 [csi-proxy](https://github.com/kubernetes-csi/csi-proxy)를 사용하여 지원되며, 각 윈도우 노드에 사전 설치되어야 한다. 자세한 내용은 배포하려는 CSI 플러그인의 배포 가이드를 참조한다.
 
-#### Networking
+#### 네트워킹
 
-Networking for Windows containers is exposed through [CNI plugins](/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/). Windows containers function similarly to virtual machines in regards to networking. Each container has a virtual network adapter (vNIC) which is connected to a Hyper-V virtual switch (vSwitch). The Host Networking Service (HNS) and the Host Compute Service (HCS) work together to create containers and attach container vNICs to networks. HCS is responsible for the management of containers whereas HNS is responsible for the management of networking resources such as:
+윈도우 컨테이너용 네트워킹은 [CNI 플러그인](/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/)을 통해 노출된다. 윈도우 컨테이너는 네트워킹과 관련하여 가상 머신과 유사하게 작동한다. 각 컨테이너에는 Hyper-V 가상 스위치(vSwitch)에 연결된 가상 네트워크 어댑터(vNIC)가 있다. 호스트 네트워킹 서비스(HNS)와 호스트 컴퓨팅 서비스(HCS)는 함께 작동하여 컨테이너를 생성하고 컨테이너 vNIC을 네트워크에 연결한다. HCS는 컨테이너 관리를 담당하는 반면 HNS는 다음과 같은 네트워킹 리소스 관리를 담당한다.
 
-* Virtual networks (including creation of vSwitches)
-* Endpoints / vNICs
-* Namespaces
-* Policies (Packet encapsulations, Load-balancing rules, ACLs, NAT'ing rules, etc.)
+* 가상 네트워크 (vSwitch 생성 포함)
+* 엔드포인트 / vNICs
+* 네임스페이스
+* 정책 (패킷 캡슐화, 로드 밸런싱 규칙, ACL, NAT 규칙 등)
 
-The following service spec types are supported:
+다음 서비스 사양 유형이 지원된다.
 
 * NodePort
 * ClusterIP
 * LoadBalancer
 * ExternalName
 
-Windows supports five different networking drivers/modes: L2bridge, L2tunnel, Overlay, Transparent, and NAT. In a heterogeneous cluster with Windows and Linux worker nodes, you need to select a networking solution that is compatible on both Windows and Linux. The following out-of-tree plugins are supported on Windows, with recommendations on when to use each CNI:
+윈도우는 L2bridge, L2tunnel, Overlay, Transparent 및 NAT의 다섯 가지 네트워킹 드라이버/모드를 지원한다. 윈도우 및 리눅스 워커 노드가 있는 이기종 클러스터에서는, 윈도우와 리눅스 모두에서 호환되는 네트워킹 솔루션을 선택해야 한다. 윈도우에서 다음과 같은 out-of-tree 플러그인이 지원되며, 각 CNI를 사용할 때 대한 권장 사항이 있다.
 
-| Network Driver | Description | Container Packet Modifications | Network Plugins | Network Plugin Characteristics |
+| 네트워크 드라이버 | 내용 | 컨테이너 패킷 변경 | 네트워크 플러그인 | 네트워크 플러그인 특성 |
 | -------------- | ----------- | ------------------------------ | --------------- | ------------------------------ |
-| L2bridge       | Containers are attached to an external vSwitch. Containers are attached to the underlay network, although the physical network doesn't need to learn the container MACs because they are rewritten on ingress/egress. Inter-container traffic is bridged inside the container host. | MAC is rewritten to host MAC, IP remains the same. | [win-bridge](https://github.com/containernetworking/plugins/tree/master/plugins/main/windows/win-bridge), [Azure-CNI](https://github.com/Azure/azure-container-networking/blob/master/docs/cni.md), Flannel host-gateway uses win-bridge | win-bridge uses L2bridge network mode, connects containers to the underlay of hosts, offering best performance. Requires user-defined routes (UDR) for inter-node connectivity. |
-| L2Tunnel | This is a special case of l2bridge, but only used on Azure. All packets are sent to the virtualization host where SDN policy is applied. | MAC rewritten, IP visible on the underlay network | [Azure-CNI](https://github.com/Azure/azure-container-networking/blob/master/docs/cni.md) | Azure-CNI allows integration of containers with Azure vNET, and allows them to leverage the set of capabilities that [Azure Virtual Network provides](https://azure.microsoft.com/en-us/services/virtual-network/). For example, securely connect to Azure services or use Azure NSGs. See [azure-cni for some examples](https://docs.microsoft.com/en-us/azure/aks/concepts-network#azure-cni-advanced-networking) |
-| Overlay (Overlay networking for Windows in Kubernetes is in *alpha* stage) | Containers are given a vNIC connected to an external vSwitch. Each overlay network gets its own IP subnet, defined by a custom IP prefix.The overlay network driver uses VXLAN encapsulation. | Encapsulated with an outer header. | [Win-overlay](https://github.com/containernetworking/plugins/tree/master/plugins/main/windows/win-overlay), Flannel VXLAN (uses win-overlay) | win-overlay should be used when virtual container networks are desired to be isolated from underlay of hosts (e.g. for security reasons). Allows for IPs to be re-used for different overlay networks (which have different VNID tags)  if you are restricted on IPs in your datacenter.  This option requires [KB4489899](https://support.microsoft.com/help/4489899) on Windows Server 2019. |
-| Transparent (special use case for [ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes)) | Requires an external vSwitch. Containers are attached to an external vSwitch which enables intra-pod communication via logical networks (logical switches and routers). | Packet is encapsulated either via [GENEVE](https://datatracker.ietf.org/doc/draft-gross-geneve/) or [STT](https://datatracker.ietf.org/doc/draft-davie-stt/) tunneling to reach pods which are not on the same host.  <br/> Packets are forwarded or dropped via the tunnel metadata information supplied by the ovn network controller. <br/> NAT is done for north-south communication. | [ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes) | [Deploy via ansible](https://github.com/openvswitch/ovn-kubernetes/tree/master/contrib). Distributed ACLs can be applied via Kubernetes policies. IPAM support. Load-balancing can be achieved without kube-proxy. NATing is done without using iptables/netsh. |
-| NAT (*not used in Kubernetes*) | Containers are given a vNIC connected to an internal vSwitch. DNS/DHCP is provided using an internal component called [WinNAT](https://blogs.technet.microsoft.com/virtualization/2016/05/25/windows-nat-winnat-capabilities-and-limitations/) | MAC and IP is rewritten to host MAC/IP. | [nat](https://github.com/Microsoft/windows-container-networking/tree/master/plugins/nat) | Included here for completeness |
+| L2bridge       | 컨테이너는 외부 vSwitch에 연결된다. 컨테이너는 언더레이 네트워크에 연결되지만, 물리적 네트워크는 수신/송신(ingress/egress)시 다시 작성되기 때문에 컨테이너 MAC을 학습할 필요가 없다. 컨테이너 간(Inter-container) 트래픽은 컨테이너 호스트 내부에서 브리지된다. | MAC은 호스트 MAC에 다시 작성되고 IP는 동일하게 유지된다. | [win-bridge](https://github.com/containernetworking/plugins/tree/master/plugins/main/windows/win-bridge), [Azure-CNI](https://github.com/Azure/azure-container-networking/blob/master/docs/cni.md), Flannel host-gateway는 win-bridge를 사용한다. | win-bridge는 L2bridge 네트워크 모드를 사용하고, 컨테이너를 호스트의 언더레이에 연결하여, 최상의 성능을 제공한다. 노드 간 연결을 위해 사용자 정의 경로(UDR)가 필요하다. |
+| L2Tunnel | 이것은 l2bridge의 특수한 경우이지만, Azure에서만 사용된다. 모든 패킷은 SDN 정책이 적용되는 가상화 호스트로 전송된다. | MAC 재작성되고, IP가 언더레이 네트워크에 표시됨 | [Azure-CNI](https://github.com/Azure/azure-container-networking/blob/master/docs/cni.md) | Azure-CNI를 사용하면 컨테이너를 Azure vNET과 통합하고, [Azure 가상 네트워크가 제공하는](https://azure.microsoft.com/en-us/services/virtual-network/) 기능 집합을 활용할 수 있다. 예를 들어 Azure 서비스에 안전하게 연결하거나 Azure NSG를 사용한다. [azure-cni 예시](https://docs.microsoft.com/en-us/azure/aks/concepts-network#azure-cni-advanced-networking)를 참조한다. |
+| 오버레이 (쿠버네티스에서 윈도우 용 오버레이 네트워킹은 *alpha* 단계에 있음) | 컨테이너에는 외부 vSwitch에 연결된 vNIC이 제공된다. 각 오버레이 네트워크는 사용자 지정 IP 접두사로 정의된 자체 IP 서브넷을 가져온다. 오버레이 네트워크 드라이버는 VXLAN 캡슐화를 사용한다. | 외부 헤더로 캡슐화된다. | [Win-overlay](https://github.com/containernetworking/plugins/tree/master/plugins/main/windows/win-overlay), Flannel VXLAN (win-overlay 사용) | win-overlay는 가상 컨테이너 네트워크를 호스트의 언더레이로부터 격리하려는 경우 (예: 보안상의 이유) 사용해야 한다. 데이터 센터의 IP에 제한이 있는 경우 (다른 VNID 태그가 있는) 다른 오버레이 네트워크에 IP를 재사용 할 수 있다. 이 옵션을 사용하려면 Windows Server 2019에서 [KB4489899](https://support.microsoft.com/help/4489899)가 필요하다. |
+| 투명성(Transparent) ([ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes)의 특수한 유스케이스) | 외부 vSwitch가 필요하다. 컨테이너는 논리적 네트워크(논리적 스위치 및 라우터)를 통해 파드 내(intra-pod) 통신을 가능하게 하는 외부 vSwitch에 연결된다. | 패킷은 동일한 호스트에 있지 않은 파드에 도달하기 위해 터널링을 하는 [GENEVE](https://datatracker.ietf.org/doc/draft-gross-geneve/) 또는 [STT](https://datatracker.ietf.org/doc/draft-davie-stt)를 통해 캡슐화된다.  <br/> 패킷은 ovn 네트워크 컨트롤러에서 제공하는 터널 메타데이터 정보를 통해 전달되거나 삭제된다. <br/> NAT는 남-북(north-south) 통신을 위해 수행된다.| [ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes) | [앤서블(ansible)을 통한 배포](https://github.com/openvswitch/ovn-kubernetes/tree/master/contrib). 분산 ACL은 쿠버네티스 정책을 통해 적용할 수 있다. IPAM 지원. kube-proxy없이 로드-밸런싱을 수행할 수 있다. NATing은 iptables/netsh를 사용하지 않고 수행된다. |
+| NAT (*쿠버네티스에서 사용되지 않음*) | 컨테이너에는 내부 vSwitch에 연결된 vNIC이 제공된다. DNS/DHCP는 [WinNAT](https://blogs.technet.microsoft.com/virtualization/2016/05/25/windows-nat-winnat-capabilities-and-limitations/)라는 내부 컴포넌트를 사용하여 제공된다. | MAC 및 IP는 호스트 MAC/IP에 다시 작성된다. | [nat](https://github.com/Microsoft/windows-container-networking/tree/master/plugins/nat) | 완전성을 위해 여기에 포함 |
 
-As outlined above, the [Flannel](https://github.com/coreos/flannel) CNI [meta plugin](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel) is also supported on [Windows](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel#windows-support-experimental) via the [VXLAN network backend](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan) (**alpha support** ; delegates to win-overlay) and [host-gateway network backend](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#host-gw) (stable support; delegates to win-bridge). This plugin supports delegating to one of the reference CNI plugins (win-overlay, win-bridge), to work in conjunction with Flannel daemon on Windows (Flanneld) for automatic node subnet lease assignment and HNS network creation. This plugin reads in its own configuration file (cni.conf), and aggregates it with the environment variables from the FlannelD generated subnet.env file. It then delegates to one of the reference CNI plugins for network plumbing, and sends the correct configuration containing the node-assigned subnet to the IPAM plugin (e.g. host-local).
+위에서 설명한대로, [플란넬(Flannel)](https://github.com/coreos/flannel) CNI [메타 플러그인](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel)은 [VXLAN 네트워크 백엔드](https://github.com)를 통해 [윈도우](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel#windows-support-experimental)에서도 지원된다. /coreos/flannel/blob/master/Documentation/backends.md#vxlan) (**alpha 지원** win-overlay에 위임) 및 [host-gateway 네트워크 백엔드](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#host-gw) (stable 지원, win-bridge에 위임). 이 플러그인은 자동 노드 서브넷 임대 할당 및 HNS 네트워크 생성을 위해 윈도우(Flanneld)에서 플란넬 데몬과 함께 작동하도록 참조 CNI 플러그인 (win-overlay, win-bridge) 중 하나에 대한 위임을 지원한다. 이 플러그인은 자체 구성 파일(cni.conf)을 읽고, 이를 FlannelD가 생성한 subnet.env 파일의 환경 변수와 함께 집계한다. 그런 다음 네트워크 연결을 위한 참조 CNI 플러그인 중 하나에 위임하고, 노드 할당 서브넷을 포함하는 올바른 구성을 IPAM 플러그인(예: host-local)으로 보낸다.
 
-For the node, pod, and service objects, the following network flows are supported for TCP/UDP traffic:
+노드, 파드 및 서비스 오브젝트의 경우 TCP/UDP 트래픽에 대해 다음 네트워크 흐름이 지원된다.
 
 * Pod -> Pod (IP)
 * Pod -> Pod (Name)
 * Pod -> Service (Cluster IP)
-* Pod -> Service (PQDN, but only if there are no ".")
+* Pod -> Service (PQDN, 그러나 "." 가 없는 경우에만)
 * Pod -> Service (FQDN)
 * Pod -> External (IP)
 * Pod -> External (DNS)
 * Node -> Pod
 * Pod -> Node
 
-The following IPAM options are supported on Windows:
+윈도우에서는 다음 IPAM 옵션이 지원된다.
 
 * [Host-local](https://github.com/containernetworking/plugins/tree/master/plugins/ipam/host-local)
-* HNS IPAM (Inbox platform IPAM, this is a fallback when no IPAM is set)
-* [Azure-vnet-ipam](https://github.com/Azure/azure-container-networking/blob/master/docs/ipam.md) (for azure-cni only)
+* HNS IPAM (Inbox platform IPAM, IPAM이 설정되지 않은 경우 대체함)
+* [Azure-vnet-ipam](https://github.com/Azure/azure-container-networking/blob/master/docs/ipam.md) (azure-cni 전용)
 
-### Limitations
+### 한계
 
-#### Control Plane
+#### 컨트롤 플레인
 
-Windows is only supported as a worker node in the Kubernetes architecture and component matrix. This means that a Kubernetes cluster must always include Linux master nodes, zero or more Linux worker nodes, and zero or more Windows worker nodes.
+윈도우는 쿠버네티스 아키텍처 및 컴포넌트 매트릭스에서 워커 노드로만 지원된다. 즉, 쿠버네티스 클러스터에는 항상 리눅스 마스터 노드, 0개 이상의 쿠버네티스 워커 노드, 0개 이상의 윈도우 워커 노드가 포함되어야 한다.
 
-#### Compute
+#### 컴퓨트
 
-##### Resource management and process isolation
+##### 리소스 관리 및 프로세스 격리
 
- Linux cgroups are used as a pod boundary for resource controls in Linux. Containers are created within that boundary for network, process and file system isolation. The cgroups APIs can be used to gather cpu/io/memory stats. In contrast, Windows uses a Job object per container with a system namespace filter to contain all processes in a container and provide logical isolation from the host. There is no way to run a Windows container without the namespace filtering in place. This means that system privileges cannot be asserted in the context of the host, and thus privileged containers are not available on Windows. Containers cannot assume an identity from the host because the Security Account Manager (SAM) is separate.
+ 리눅스 cgroup은 리눅스 리소스 제어를 위한 파드 경계로서 사용된다. 컨테이너는 네트워크, 프로세스 및 파일 시스템 격리를 위해 해당 경계 내에 생성된다. cgroups API는 cpu/io/메모리 통계를 수집하는 데 사용할 수 있다. 반대로 윈도우는 시스템 네임스페이스 필터가 있는 컨테이너 마다 잡(Job) 오브젝트를 사용하여 컨테이너의 모든 프로세스를 포함하고 호스트와의 논리적 격리를 제공한다. 네임스페이스 필터링없이 윈도우 컨테이너를 실행할 수 있는 방법은 없다. 즉, 시스템 권한(privilege)은 호스트 컨텍스트에서 사용될 수 없으므로 윈도우에서 권한있는(privileged) 컨테이너를 사용할 수 없다. 보안 계정 매니저(SAM)가 분리되어 있기 때문에 컨테이너는 호스트의 ID를 가정할 수 없다.
 
-##### Operating System Restrictions
+##### 운영 체제 제한
 
-Windows has strict compatibility rules, where the host OS version must match the container base image OS version. Only Windows containers with a container operating system of Windows Server 2019 are supported. Hyper-V isolation of containers, enabling some backward compatibility of Windows container image versions, is planned for a future release.
+윈도우에는 호스트 OS 버전이 컨테이너 베이스 이미지 OS 버전과 일치해야하는 엄격한 호환성 규칙이 있다. Windows Server 2019의 컨테이너 운영 체제가 있는 윈도우 컨테이너만 지원된다. 윈도우 컨테이너 이미지 버전의 일부 이전 버전과의 호환성을 가능하게하는 컨테이너의 Hyper-V 격리는 향후 릴리스에서 계획된다.
 
-##### Feature Restrictions
+##### 기능 제한
 
-* TerminationGracePeriod: not implemented
-* Single file mapping: to be implemented with CRI-ContainerD
-* Termination message: to be implemented with CRI-ContainerD
-* Privileged Containers: not currently supported in Windows containers
-* HugePages: not currently supported in Windows containers
-* The existing node problem detector is Linux-only and requires privileged containers. In general, we don't expect this to be used on Windows because privileged containers are not supported
-* Not all features of shared namespaces are supported (see API section for more details)
+* TerminationGracePeriod : 구현되지 않음
+* 단일 파일 매핑 : CRI-ContainerD로 구현 예정
+* 종료(Termination) 메시지 : CRI-ContainerD로 구현 예정
+* 권한있는(Privileged) 컨테이너 : 현재 Windows 컨테이너에서 지원되지 않음
+* HugePages : 현재 Windows 컨테이너에서 지원되지 않음
+* 기존 노드 문제 감지기(detector)는 리눅스 전용이며 권한있는 컨테이너가 필요하다. 일반적으로 권한있는 컨테이너가 지원되지 않기 때문에 윈도우에서 이 기능이 사용될 것으로 예상하지 않는다.
+* 공유 네임스페이스의 모든 기능이 지원되는 것은 아니다. (자세한 내용은 API 섹션 참조).
 
-##### Memory Reservations and Handling
+##### 메모리 예약 및 핸들링
 
-Windows does not have an out-of-memory process killer as Linux does. Windows always treats all user-mode memory allocations as virtual, and pagefiles are mandatory. The net effect is that Windows won't reach out of memory conditions the same way Linux does, and processes page to disk instead of being subject to out of memory (OOM) termination. If memory is over-provisioned and all physical memory is exhausted, then paging can slow down performance.
+윈도우에는 리눅스처럼 메모리 부족(out-of-memory) 프로세스 킬러가 없다. 윈도우는 항상 모든 사용자 모드 메모리 할당을 가상으로 처리하며 페이지 파일은 필수이다. 결과적으로 윈도우는 리눅스와 같은 방식으로 메모리 부족 상태에 도달하지 않고, 메모리 부족(OOM) 종료를 받는 대신 페이지를 디스크로 처리한다. 메모리가 과도하게 프로비저닝되고 모든 물리적 메모리가 고갈되면 페이징으로 인해 성능이 저하될 수 있다.
 
-Keeping memory usage within reasonable bounds is possible with a two-step process. First, use the kubelet parameters `--kubelet-reserve` and/or `--system-reserve` to account for memory usage on the node (outside of containers). This reduces [NodeAllocatable](/docs/tasks/administer-cluster/reserve-compute-resources/#node-allocatable)). As you deploy workloads, use resource limits (must set only limits or limits must equal requests) on containers. This also subtracts from NodeAllocatable and prevents the scheduler from adding more pods once a node is full.
+2단계 프로세스를 통해 적절한 범위 내에서 메모리 사용량을 유지할 수 있다. 먼저 kubelet 파라미터 `--kubelet-reserve` 그리고/또는 `--system-reserve`를 사용하여 노드(컨테이너 외부)의 메모리 사용량을 고려한다. 이렇게하면 [NodeAllocatable](/docs/tasks/administer-cluster/reserve-compute-resources/#node-allocatable))이 줄어든다. 워크로드를 배포할 때 컨테이너에 리소스 제한(limit)을 사용한다(제한만 설정하거나 제한이 요청(requests)과 같아야 함). 또한 NodeAllocatable에서 빼고 노드가 가득 차면 스케줄러가 더 많은 파드를 추가하지 못하도록 한다.
 
-A best practice to avoid over-provisioning is to configure the kubelet with a system reserved memory of at least 2GB to account for Windows, Docker, and Kubernetes processes.
+오버 프로비저닝을 방지하는 모범 사례는 윈도우, 도커 및 쿠버네티스 프로세스를 고려하여 최소 2GB의 시스템 예약 메모리로 kubelet을 구성하는 것이다.
 
-The behavior of the flags behave differently as described below:
+플래그의 동작은 아래에 설명된 바와 같이 다르게 동작한다.
 
-* `--kubelet-reserve`, `--system-reserve` , and `--eviction-hard` flags update Node Allocatable
-* Eviction by using `--enforce-node-allocable` is not implemented
-* Eviction by using `--eviction-hard` and `--eviction-soft` are not implemented
-* MemoryPressure Condition is not implemented
-* There are no OOM eviction actions taken by the kubelet
-* Kubelet running on the windows node does not have memory restrictions. `--kubelet-reserve` and `--system-reserve` do not set limits on kubelet or processes running on the host. This means kubelet or a process on the host could cause memory resource starvation outside the node-allocatable and scheduler
+* `--kubelet-reserve`, `--system-reserve`, `--eviction-hard` 플래그는 노드 할당가능(Node Allocatable)을 업데이트
+* `--enforce-node-allocable`을 사용한 축출(Eviction)은 구현되지 않음.
+* `--eviction-hard` 과 `--eviction-soft`를 사용한 축출은 구현되지 않음.
+* MemoryPressure 조건은 구현되지 않음.
+* kubelet에 의한 OOM 축출 조치는 없음.
+* 윈도우 노드에서 실행되는 Kubelet에는 메모리 제한이 없다. `--kubelet-reserve` 와 `--system-reserve`는 호스트에서 실행되는 kubelet 또는 프로세스에 제한을 설정하지 않는다. 이는 호스트의 kubelet 또는 프로세스가 노드 할당 가능(node-allocatable) 및 스케줄러 외부에서 메모리 리소스 부족을 유발할 수 있음을 의미한다.
 
 #### Storage
 

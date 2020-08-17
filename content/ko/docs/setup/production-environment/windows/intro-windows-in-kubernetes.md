@@ -237,53 +237,53 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일-시스�
 * kubelet에 의한 OOM 축출 조치는 없음.
 * 윈도우 노드에서 실행되는 Kubelet에는 메모리 제한이 없다. `--kubelet-reserve` 와 `--system-reserve`는 호스트에서 실행되는 kubelet 또는 프로세스에 제한을 설정하지 않는다. 이는 호스트의 kubelet 또는 프로세스가 노드 할당 가능(node-allocatable) 및 스케줄러 외부에서 메모리 리소스 부족을 유발할 수 있음을 의미한다.
 
-#### Storage
+#### 스토리지
 
-Windows has a layered filesystem driver to mount container layers and create a copy filesystem based on NTFS. All file paths in the container are resolved only within the context of that container.
+윈도우에는 컨테이너 레이어를 마운트하고 NTFS를 기반으로하는 복사 파일시스템을 만드는 레이어화된(layered) 파일시스템 드라이버가 있다. 컨테이너의 모든 파일 경로는 해당 컨테이너의 컨텍스트 내에서만 확인된다.
 
-* Volume mounts can only target a directory in the container, and not an individual file
-* Volume mounts cannot project files or directories back to the host filesystem
-* Read-only filesystems are not supported because write access is always required for the Windows registry and SAM database. However, read-only volumes are supported
-* Volume user-masks and permissions are not available. Because the SAM is not shared between the host & container, there's no mapping between them. All permissions are resolved within the context of the container
+* 볼륨 마운트는 개별 파일이 아닌 컨테이너의 디렉토리만 대상으로 할 수 있다.
+* 볼륨 마운트는 파일 또는 디렉토리를 호스트 파일시스템으로 다시 투영할 수 없다.
+* 윈도우 레지스트리 및 SAM 데이터베이스에는 쓰기 액세스가 항상 필요하기 때문에 읽기 전용(Read-only) 파일시스템은 지원되지 않는다. 그러나 읽기 전용 볼륨은 지원된다.
+* 볼륨 사용자 마스크(user-mask) 및 퍼미션을 사용할 수 없다. SAM은 호스트와 컨테이너간에 공유되지 않기 때문에 이들간에 매핑이 없다. 모든 퍼미션은 컨테이너의 컨텍스트 내에서 적용된다.
 
-As a result, the following storage functionality is not supported on Windows nodes
+결론적으로 다음 스토리지 기능은 윈도우 노드에서 지원되지 않는다.
 
-* Volume subpath mounts. Only the entire volume can be mounted in a Windows container.
-* Subpath volume mounting for Secrets
-* Host mount projection
-* DefaultMode (due to UID/GID dependency)
-* Read-only root filesystem. Mapped volumes still support readOnly
-* Block device mapping
-* Memory as the storage medium
-* File system features like uui/guid, per-user Linux filesystem permissions
-* NFS based storage/volume support
-* Expanding the mounted volume (resizefs)
+* 볼륨 하위 경로 마운트. 전체 볼륨만 윈도우 컨테이너에 마운트할 수 있다.
+* 시크릿(secret)에 대한 하위 경로 볼륨 마운트
+* 호스트 마운트 프로젝션
+* DefaultMode (UID/GID 디펜던시에 기인함)
+* 읽기 전용(Read-only) 루트 파일 시스템. 매핑된 볼륨은 여전히 ​​읽기 전용을 지원한다.
+* 블록 디바이스 매핑
+* 저장 매체로서의 메모리
+* uui/guid, 사용자 별 리눅스 파일시스템 퍼미션과 같은 파일시스템 기능
+* NFS 기반 스토리지/볼륨 지원
+* 마운트된 볼륨 확장 (resizefs)
 
-#### Networking
+#### 네트워킹
 
-Windows Container Networking differs in some important ways from Linux networking. The [Microsoft documentation for Windows Container Networking](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture) contains additional details and background.
+윈도우 컨테이너 네트워킹은 리눅스 네트워킹과 몇 가지 중요한 부분에서 다르다. [윈도우 컨테이너 네트워킹에 대한 Microsoft 설명서](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture)에는 추가 세부 정보와 배경이 포함되어 있다.
 
-The Windows host networking service and virtual switch implement namespacing and can create virtual NICs as needed for a pod or container. However, many configurations such as DNS, routes, and metrics are stored in the Windows registry database rather than /etc/... files as they are on Linux. The Windows registry for the container is separate from that of the host, so concepts like mapping /etc/resolv.conf from the host into a container don't have the same effect they would on Linux. These must be configured using Windows APIs run in the context of that container. Therefore CNI implementations need to call the HNS instead of relying on file mappings to pass network details into the pod or container.
+윈도우 호스트 네트워킹 서비스 및 가상 스위치는 네임스페이스를 구현하고 파드 또는 컨테이너에 필요한 가상 NIC를 만들 수 있다. 그러나 DNS, 라우트 및 메트릭과 같은 많은 구성은 리눅스에서와 같이 /etc/... 파일이 아닌 윈도우 레지스트리 데이터베이스에 저장된다. 컨테이너의 윈도우 레지스트리는 호스트 레지스트리와 별개이므로, 호스트에서 컨테이너로 /etc/resolv.conf를 매핑하는 것과 같은 개념은 리눅스에서와 동일한 효과를 갖지 않는다. 이러한 것들은 해당 컨테이너의 컨텍스트에서 실행되는 Windows API를 사용하여 구성해야 한다. 따라서 CNI 구현에서는 파일 매핑에 의존하는 대신 HNS를 호출하여 네트워크 세부 정보를 파드 또는 컨테이너로 전달해야 한다.
 
-The following networking functionality is not supported on Windows nodes
+다음 네트워킹 기능은 윈도우 노드에서 지원되지 않는다.
 
-* Host networking mode is not available for Windows pods
-* Local NodePort access from the node itself fails (works for other nodes or external clients)
-* Accessing service VIPs from nodes will be available with a future release of Windows Server
-* Overlay networking support in kube-proxy is an alpha release. In addition, it requires [KB4482887](https://support.microsoft.com/en-us/help/4482887/windows-10-update-kb4482887) to be installed on Windows Server 2019
-* Local Traffic Policy and DSR mode
-* Windows containers connected to l2bridge, l2tunnel, or overlay networks do not support communicating over the IPv6 stack. There is outstanding Windows platform work required to enable these network drivers to consume IPv6 addresses and subsequent Kubernetes work in kubelet, kube-proxy, and CNI plugins.
-* Outbound communication using the ICMP protocol via the win-overlay, win-bridge, and Azure-CNI plugin. Specifically, the Windows data plane ([VFP](https://www.microsoft.com/en-us/research/project/azure-virtual-filtering-platform/)) doesn't support ICMP packet transpositions. This means:
-  * ICMP packets directed to destinations within the same network (e.g. pod to pod communication via ping) work as expected and without any limitations
-  * TCP/UDP packets work as expected and without any limitations
-  * ICMP packets directed to pass through a remote network (e.g. pod to external internet communication via ping) cannot be transposed and thus will not be routed back to their source
-  * Since TCP/UDP packets can still be transposed, one can substitute `ping <destination>` with `curl <destination>` to be able to debug connectivity to the outside world.
+* 윈도우 파드에서는 호스트 네트워킹 모드를 사용할 수 없다.
+* 노드 자체에서 로컬 NodePort 액세스가 실패한다. (다른 노드 또는 외부 클라이언트에서 작동함)
+* 노드에서 서비스 VIP에 액세스하는 것은 향후 Windows Server 릴리스에서 사용할 수 있다.
+* kube-proxy의 오버레이 네트워킹 지원은 알파 릴리스이다. 또한 Windows Server 2019에 [KB4482887](https://support.microsoft.com/en-us/help/4482887/windows-10-update-kb4482887)을 설치해야 한다.
+* 로컬 트래픽 정책 및 DSR 모드
+* l2bridge, l2tunnel 또는 오버레이 네트워크에 연결된 윈도우 컨테이너는 IPv6 스택을 통한 통신을 지원하지 않는다. 이러한 네트워크 드라이버가 IPv6 주소를 사용하고 kubelet, kube-proxy 및 CNI 플러그인에서 후속 쿠버네티스 작업을 사용할 수 있도록 하는데 필요한 뛰어난 윈도우 플랫폼 작업이 있다.
+* win-overlay, win-bridge 및 Azure-CNI 플러그인을 통해 ICMP 프로토콜을 사용하는 아웃바운드 통신. 특히, 윈도우 데이터 플레인 ([VFP](https://www.microsoft.com/en-us/research/project/azure-virtual-filtering-platform/))은 ICMP 패킷 전치를 지원하지 않는다. 이것은 다음을 의미한다.
+  * 동일한 네트워크 (예: ping을 통한 파드 간 통신) 내의 대상으로 전달되는 ICMP 패킷은 예상대로 제한없이 작동한다.
+  * TCP/UDP 패킷은 예상대로 제한없이 작동한다.
+  * 원격 네트워크를 통과하도록 지정된 ICMP 패킷 (예: ping을 통해 파드에서 외부 인터넷 통신으로)은 전송될 수 없으므로 소스로 다시 라우팅되지 않는다.
+  * TCP/UDP 패킷은 여전히 전송될 수 있기 때문에 `ping <destination>`을 `curl <destination>`으로 대체하여 외부와의 연결을 디버깅할 수 있다.
 
-These features were added in Kubernetes v1.15:
+다음 기능은 쿠버네티스 v1.15에 추가되었다.
 
 * `kubectl port-forward`
 
-##### CNI Plugins
+##### CNI 플러그인
 
 * Windows reference network plugins win-bridge and win-overlay do not currently implement [CNI spec](https://github.com/containernetworking/cni/blob/master/SPEC.md) v0.4.0 due to missing "CHECK" implementation.
 * The Flannel VXLAN CNI has the following limitations on Windows:

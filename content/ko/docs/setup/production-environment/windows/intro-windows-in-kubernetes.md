@@ -285,11 +285,11 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일-시스�
 
 ##### CNI 플러그인
 
-* Windows reference network plugins win-bridge and win-overlay do not currently implement [CNI spec](https://github.com/containernetworking/cni/blob/master/SPEC.md) v0.4.0 due to missing "CHECK" implementation.
-* The Flannel VXLAN CNI has the following limitations on Windows:
+* 윈도우 참조 네트워크 플러그인 win-bridge 및 win-overlay는 현재 "CHECK" 구현 누락으로 인해 [CNI 사양](https://github.com/containernetworking/cni/blob/master/SPEC.md) v0.4.0을 구현하지 않는다.
+* Flannel VXLAN CNI에는 윈도우에서 다음과 같은 제한 사항이 있다.
 
-1. Node-pod connectivity isn't possible by design. It's only possible for local pods with Flannel [PR 1096](https://github.com/coreos/flannel/pull/1096)
-2. We are restricted to using VNI 4096 and UDP port 4789. The VNI limitation is being worked on and will be overcome in a future release (open-source flannel changes). See the official [Flannel VXLAN](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan) backend docs for more details on these parameters.
+1. 노드-파드 연결은 설계상 불가능히다. Flannel [PR 1096](https://github.com/coreos/flannel/pull/1096)이 있는 로컬 파드에서만 가능하다.
+2. VNI 4096 및 UDP 4789 포트 사용이 제한된다. VNI 제한은 작업 진행중이며 향후 릴리스 (오픈소스 flannel 변경)에서 해결될 것이다. 이러한 파라미터에 대한 자세한 내용은 공식 [Flannel VXLAN](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan) 백엔드 문서를 참조한다.
 
 ##### DNS {#dns-limitations}
 

@@ -33,26 +33,35 @@ weight: 65
 
 ### 지원되는 기능
 
-#### 컴퓨트
+#### 윈도우 OS 버전 지원
 
-API 및 kubectl의 관점에서, 윈도우 컨테이너는 리눅스 기반 컨테이너와 거의 같은 방식으로 작동한다. 그러나 제한 섹션에 요약된 주요 기능에는 몇 가지 눈에 띄는 차이점이 있다.
+쿠버네티스의 윈도우 운영 체제 지원은 다음 표를 참조한다. 단일 이기종 쿠버네티스 클러스터에는 윈도우 및 리눅스 워커 노드가 모두 있을 수 있다. 윈도우 컨테이너는 윈도우 노드에서, 리눅스 컨테이너는 리눅스 노드에서 스케쥴 되어야 한다.
 
-운영 체제 버전부터 살펴본다. 쿠버네티스의 윈도우 운영 체제 지원에 대해서는 다음 표를 참조한다. 단일 이기종 쿠버네티스 클러스터는 윈도우 및 리눅스 워커 노드를 모두 가질 수 있다. 윈도우 컨테이너는 윈도우 노드에서 스케줄되고 리눅스 컨테이너는 리눅스 노드에서 스케줄되어야 한다.
-
-| 쿠버네티스 버전 | 호스트 OS 버전 (쿠버네티스 노드) | | |
+| 쿠버네티스 버전 | 윈도우 서버 LTSC 릴리스 | 윈도우 서버 SAC 릴리스 |
 | --- | --- | --- | --- |
-| | *Windows Server 1709* | *Windows Server 1803* | *Windows Server 1809/Windows Server 2019* |
-| *Kubernetes v1.14* | 미 지원 | 미 지원 | Windows Server containers Builds 17763.* 및 Docker EE-basic 18.09 에서 지원 |
+| *Kubernetes v1.14* | Windows Server 2019 | Windows Server ver 1809 |
+| *Kubernetes v1.15* | Windows Server 2019 | Windows Server ver 1809 |
+| *Kubernetes v1.16* | Windows Server 2019 | Windows Server ver 1809 |
+| *Kubernetes v1.17* | Windows Server 2019 | Windows Server ver 1809 |
+| *Kubernetes v1.18* | Windows Server 2019 | Windows Server ver 1809, Windows Server ver 1903, Windows Server ver 1909 |
+| *Kubernetes v1.19* | Windows Server 2019 | Windows Server ver 1909, Windows Server ver 2004 |
 
 {{< note >}}
-모든 윈도우 고객이 앱을 위한 운영 체제를 자주 업데이트하는 것은 아니다. 애플리케이션을 업그레이드하려면 클러스터에 새 노드를 업그레이드하거나 도입해야 할 수 있다. 쿠버네티스에서 실행되는 컨테이너에 대해 운영 체제를 업그레이드하기로 선택한 고객을 위해 새로운 운영 체제 버전에 대한 지원을 추가할 때 가이드와 단계별 지침을 제공한다. 이 가이드는 클러스터 노드와 함께 사용자 애플리케이션을 업그레이드 하기 위한 권장 업그레이드 절차가 포함된다. 윈도우 노드는 오늘날 리눅스 노드와 동일한 방식으로 쿠버네티스 [버전-스큐(skew) 정책](/docs/setup/release/version-skew-policy/) (컨트롤 플레인 버저닝 노드)를 준수한다.
+지원 모델을 포함한 다양한 윈도우 서버 서비스 채널에 대한 정보는 [윈도우 서버 서비스 채널](https://docs.microsoft.com/en-us/windows-server/get-started-19/servicing-channels)에서 확인할 수 있다.
 {{< /note >}}
 {{< note >}}
-윈도우 서버 호스트 운영 체제에는 [윈도우 서버](https://www.microsoft.com/en-us/cloud-platform/windows-server-pricing) 라이센스가 적용된다. 윈도우 컨테이너 이미지는 [윈도우 컨테이너에 대한 보조 라이센스 조항](https://docs.microsoft.com/en-us/virtualization/windowscontainers/images-eula)의 적용을 받는다.
+모든 윈도우 고객이 앱의 운영 체제를 자주 업데이트하는 것은 아니다. 애플리케이션 업그레이드는 클러스터에 새 노드를 업그레이드하거나 도입하는 것을 명령하고 필요하게 만든다. 쿠버네티스에서 실행되는 컨테이너의 운영 체제를 업그레이드하기로 선택한 고객을 위해 새 운영 체제 버전에 대한 지원을 추가 할 때 지침과 단계별 지침을 제공한다. 이 지침에는 클러스터 노드와 함께 사용자 애플리케이션을 업그레이드하기 위한 권장 업그레이드 절차가 포함된다. 윈도우 노드는 현재 리눅스 노드와 동일한 방식으로 쿠버네티스 [버전-스큐(skew) 정책](/docs/setup/release/version-skew-policy/) (노드 대 컨트롤 플레인 버전 관리)을 준수한다.
+{{< /note >}}
+{{< note >}}
+윈도우 서버 호스트 운영 체제에는 [윈도우 서버](https://www.microsoft.com/en-us/cloud-platform/windows-server-pricing) 라이선스가 적용된다. 윈도우 컨테이너 이미지에는 [윈도우 컨테이너에 대한 추가 사용 조건](https://docs.microsoft.com/en-us/virtualization/windowscontainers/images-eula)이 적용된다.
 {{< /note >}}
 {{< note >}}
 프로세스 격리가 포함된 윈도우 컨테이너에는 엄격한 호환성 규칙이 있으며, [여기서 호스트 OS 버전은 컨테이너 베이스 이미지 OS 버전과 일치해야 한다](https://docs.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility). 쿠버네티스에서 Hyper-V 격리가 포함된 윈도우 컨테이너를 지원하면, 제한 및 호환성 규칙이 변경될 것이다.
 {{< /note >}}
+
+#### 컴퓨트
+
+API 및 kubectl의 관점에서, 윈도우 컨테이너는 리눅스 기반 컨테이너와 거의 같은 방식으로 작동한다. 그러나 [제한 섹션](#limitations)에 요약된 주요 기능에는 몇 가지 눈에 띄는 차이점이 있다.
 
 윈도우에서 주요 쿠버네티스 요소는 리눅스와 동일한 방식으로 작동한다. 이 섹션에서는, 주요 워크로드 이네이블러(enabler) 일부와 이들이 윈도우에 맵핑되는 방법에 대해 설명한다.
 
@@ -96,7 +105,7 @@ API 및 kubectl의 관점에서, 윈도우 컨테이너는 리눅스 기반 컨�
 * Horizontal Pod Autoscaler 지원
 * kubectl Exec
 * 리소스쿼터 (Resource Quotas)
-* 스케쥴러 선점
+* 스케쥴러 선점 (preemption)
 
 #### 컨테이너 런타임
 
@@ -108,18 +117,17 @@ Docker EE-basic 18.09+는 쿠버네티스를 실행하는 Windows Server 2019 / 
 
 ##### CRI-ContainerD
 
-{{< feature-state for_k8s_version="v1.18" state="alpha" >}}
-
-ContainerD는 리눅스에서 쿠버네티스와 함께 작동하는 OCI-호환 런타임이다. 쿠버네티스 v1.18은 윈도우에서 {{< glossary_tooltip term_id="containerd" text="ContainerD" >}} 에 대한 지원을 추가한다. 윈도우에서 ContainerD의 진행 상황은 [enhancements#1001](https://github.com/kubernetes/enhancements/issues/1001)에서 확인할 수 있다.
+{{< feature-state for_k8s_version="v1.19" state="beta" >}}
 
 {{< caution >}}
-
-쿠버네티스 v1.18의 윈도우 기반 ContainerD에는 다음과 같은 단점이 있다.
-
-* ContainerD에는 윈도우를 지원하는 공식 릴리스가 없다. 쿠버네티스의 모든 개발은 활성화된 ContainerD 개발 브랜치에 대해 수행된다. 프로덕션 배포는 항상 완벽하게 테스트되고 보안 수정된 공식 릴리스를 사용해야 한다.
-* ContainerD를 사용할 때 그룹-관리 서비스 계정이 구현되지 않았다. - [containerd/cri#1276](https://github.com/containerd/cri/issues/1276)를 참조한다.
-
+커널 패치가 필요한 윈도우 네트워크 공유에 액세스하기 위해 ContainerD와 함께 GMSA를 사용할 때 [알려진 제한](/docs/tasks/configure-pod-container/configure-gmsa/#gmsa-limitations)이 있다. [Microsoft 윈도우 컨테이너 이슈 트래커](https://github.com/microsoft/Windows-Containers/issues/44)에서 업데이트를 확인한다.
 {{< /caution >}}
+
+{{< glossary_tooltip term_id="containerd" text="ContainerD" >}} 1.4.0-beta.2+는 윈도우 쿠버네티스 노드의 컨테이너 런타임으로도 사용할 수 있다.
+
+쿠버네티스 v1.18은 윈도우에서 ContainerD 지원을 추가한다. 윈도우에서 ContainerD의 진행 상황은 [enhancements#1001](https://github.com/kubernetes/enhancements/issues/1001)에서 확인할 수 있다.
+
+[윈도우에 ContainerD 설치](/docs/setup/production-environment/container-runtimes/#install-containerd) 방법을 확인한다.
 
 #### 퍼시스턴트 스토리지 (Persistent Storage)
 

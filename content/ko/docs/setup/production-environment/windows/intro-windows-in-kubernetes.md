@@ -181,7 +181,7 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일 시스�
 | L2Tunnel | 이것은 l2bridge의 특별한 케이스이지만 Azure에서만 사용된다. 모든 패킷은 SDN 정책이 적용되는 가상화 호스트로 전송된다. | MAC 재작성, 언더레이 네트워크 상에서 IP 보여짐 | [Azure-CNI](https://github.com/Azure/azure-container-networking/blob/master/docs/cni.md) | Azure-CNI를 사용하면 컨테이너를 Azure vNET과 통합할 수 있으며, [Azure Virtual Network에서 제공하는](https://azure.microsoft.com/en-us/services/virtual-network/) 기능 집합을 활용할 수 있다. 예를 들어 Azure 서비스에 안전하게 연결하거나 Azure NSG를 사용한다. [azure-cni 예제](https://docs.microsoft.com/en-us/azure/aks/concepts-network#azure-cni-advanced-networking)를 참고한다. |
 | 오버레이 (쿠버네티스에서 윈도우 용 오버레이 네트워킹은 *알파* 단계에 있음) | 컨테이너에는 외부 vSwitch에 연결된 vNIC가 제공된다. 각 오버레이 네트워크는 사용자 지정 IP 접두사로 정의된 자체 IP 서브넷을 가져온다. 오버레이 네트워크 드라이버는 VXLAN 캡슐화를 사용한다. | 외부 헤더로 캡슐화된다. | [Win-overlay](https://github.com/containernetworking/plugins/tree/master/plugins/main/windows/win-overlay), Flannel VXLAN (win-overlay 사용) | win-overlay는 가상 컨테이너 네트워크를 호스트의 언더레이에서 격리하려는 경우 (예: 보안상의 이유로) 사용해야 한다. 데이터 센터의 IP에 제한이있는 경우, (다른 VNID 태그가 있는) 다른 오버레이 네트워크에 IP를 재사용 할 수 있다. 이 옵션을 사용하려면 Windows Server 2019에서 [KB4489899](https://support.microsoft.com/help/4489899)가 필요하다. |
 | Transparent ([ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes)의 특수한 유스케이스) | 외부 vSwitch가 필요하다. 컨테이너는 논리적 네트워크 (논리적 스위치 및 라우터)를 통해 파드 내 통신을 가능하게하는 외부 vSwitch에 연결된다. | 패킷은 [GENEVE](https://datatracker.ietf.org/doc/draft-gross-geneve/) 또는 [STT](https://datatracker.ietf.org/doc/draft-davie-stt)를 통해 캡슐화되는데, 동일한 호스트에 있지 않은 파드에 도달하기 위한 터널링을 한다. <br/> 패킷은 ovn 네트워크 컨트롤러에서 제공하는 터널 메타데이터 정보를 통해 전달되거나 삭제된다. <br/> NAT는 남북 통신을 위해 수행된다. | [ovn-kubernetes](https://github.com/openvswitch/ovn-kubernetes) | [ansible을 통해 배포](https://github.com/openvswitch/ovn-kubernetes/tree/master/contrib). 분산 ACL은 쿠버네티스 정책을 통해 적용할 수 있다. IPAM 지원. kube-proxy없이 로드 밸런싱을 수행할 수 있다. NATing은 iptables/netsh를 사용하지 않고 수행된다. |
-| NAT (*쿠버네티스에서 사용되지 않음*) | 컨테이너에는 내부 vSwitch에 연결된 vNIC가 제공됩니다. DNS/DHCP는 [WinNAT](https://blogs.technet.microsoft.com/virtualization/2016/05/25/windows-nat-winnat-capabilities-and-limitations/)라는 내부 컴포넌트를 사용하여 제공된다. | MAC 및 IP는 호스트 MAC/IP에 다시 작성된다. | [nat](https://github.com/Microsoft/windows-container-networking/tree/master/plugins/nat) | 완전성을 위해 여기에 포함됨 |
+| NAT (*쿠버네티스에서 사용되지 않음*) | 컨테이너에는 내부 vSwitch에 연결된 vNIC가 제공된다. DNS/DHCP는 [WinNAT](https://blogs.technet.microsoft.com/virtualization/2016/05/25/windows-nat-winnat-capabilities-and-limitations/)라는 내부 컴포넌트를 사용하여 제공된다. | MAC 및 IP는 호스트 MAC/IP에 다시 작성된다. | [nat](https://github.com/Microsoft/windows-container-networking/tree/master/plugins/nat) | 완전성을 위해 여기에 포함됨 |
 
 위에서 설명한대로 [플라넬(Flannel)](https://github.com/coreos/flannel) CNI [메타 플러그인](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel)은 [VXLAN 네트워크 백엔드](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan)(**alpha 지원**, win-overlay에 위임) 및 [host-gateway network backend](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#host-gw) (안정적인 지원, win-bridge에 위임)를 통해 [윈도우](https://github.com/containernetworking/plugins/tree/master/plugins/meta/flannel#windows-support-experimental)에서도 지원된다. 이 플러그인은 자동 노드 서브넷 임대 할당과 HNS 네트워크 생성을 위해 윈도우 (Flanneld)에서 Flannel 데몬과 함께 작동하도록 참조 CNI 플러그인 (win-overlay, win-bridge) 중 하나에 대한 위임을 지원한다. 이 플러그인은 자체 구성 파일 (cni.conf)을 읽고, 이를 FlannelD 생성하는 subnet.env 파일의 환경 변수와 함께 집계한다. 이후 네트워크 연결을 위한 참조 CNI 플러그인 중 하나에 위임하고 노드 할당 서브넷을 포함하는 올바른 구성을 IPAM 플러그인 (예: 호스트-로컬)으로 보낸다.
 
@@ -260,7 +260,7 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일 시스�
 
 2단계 프로세스를 통해 적절한 범위 내에서 메모리 사용량을 유지할 수 있다. 먼저, kubelet 파라미터 `--kubelet-reserve` 그리고/또는 `--system-reserve`를 사용하여 노드(컨테이너 외부)의 메모리 사용량을 고려한다. 이렇게 하면 [노드 할당(NodeAllocatable)](/docs/tasks/administer-cluster/reserve-compute-resources/#node-allocatable)이 줄어든다. 워크로드를 배포할 때 컨테이너에 리소스 제한을 사용한다. (limits만 설정하거나 limits이 requests과 같아야 함). 또한 NodeAllocatable에서 빼고 노드가 가득 차면 스케줄러가 더 많은 파드를 추가하지 못하도록 한다. 
 
-오버 프로비저닝을 방지하는 모범 사례는 윈도우, Docker 및 Kubernetes 프로세스를 고려하여 최소 2GB의 시스템 예약 메모리로 kubelet을 구성하는 것이다. 
+오버 프로비저닝을 방지하는 모범 사례는 윈도우, Docker 및 쿠버네티스 프로세스를 고려하여 최소 2GB의 시스템 예약 메모리로 kubelet을 구성하는 것이다. 
 
 플래그의 동작은 아래에 설명된대로 다르게 동작한다.
 
@@ -273,14 +273,14 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일 시스�
 
 #### 스토리지
 
-윈도우에는 컨테이너 계층을 마운트하고 NTFS를 기반으로하는 복사 파일시스템을 만드는 레이어드(layered) 파일시스템 드라이버가 있다. 컨테이너의 모든 파일 경로는 해당 컨테이너의 컨텍스트 내에서만 확인됩니다.
+윈도우에는 컨테이너 계층을 마운트하고 NTFS를 기반으로하는 복사 파일시스템을 만드는 레이어드(layered) 파일시스템 드라이버가 있다. 컨테이너의 모든 파일 경로는 해당 컨테이너의 컨텍스트 내에서만 확인된다.
 
 * 볼륨 마운트는 개별 파일이 아닌 컨테이너의 디렉토리만 대상으로 할 수 있다.
 * 볼륨 마운트는 파일이나 디렉토리를 호스트 파일 시스템으로 다시 투영할 수 없다.
 * 읽기 전용 파일시스템은 윈도우 레지스트리 및 SAM 데이터베이스에 항상 쓰기 액세스가 필요하기 때문에 지원되지 않는다. 그러나 읽기 전용 볼륨은 지원된다.
-* 볼륨 사용자 마스크 및 권한은 사용할 수 없습니다. SAM은 호스트와 컨테이너간에 공유되지 않기 때문에 이들간에 매핑이 없다. 모든 권한은 컨테이너 컨텍스트 내에서 해결된다.
+* 볼륨 사용자 마스크 및 권한은 사용할 수 없다. SAM은 호스트와 컨테이너간에 공유되지 않기 때문에 이들간에 매핑이 없다. 모든 권한은 컨테이너 컨텍스트 내에서 해결된다.
 
-결과적으로, 다음 스토리지 기능은 윈도우 노드에서 지원되지 않습니다.
+결과적으로, 다음 스토리지 기능은 윈도우 노드에서 지원되지 않는다.
 
 * 볼륨 하위 경로(subpath) 마운트. 전체 볼륨 만 윈도우 컨테이너에 마운트할 수 있다.
 * 시크릿에 대한 하위 경로 볼륨 마운트
@@ -295,79 +295,80 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일 시스�
 
 #### 네트워킹
 
-Windows Container Networking differs in some important ways from Linux networking. The [Microsoft documentation for Windows Container Networking](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture) contains additional details and background.
+윈도우 컨테이너 네트워킹은 리눅스 네트워킹과 몇 가지 중요한 면에서 다르다. [윈도우 컨테이너 네트워킹에 대한 Microsoft 문서](https://docs.microsoft.com/en-us/virtualization/windowscontainers/container-networking/architecture)에는 추가 세부 정보와 배경이 포함되어 있다.
 
-The Windows host networking service and virtual switch implement namespacing and can create virtual NICs as needed for a pod or container. However, many configurations such as DNS, routes, and metrics are stored in the Windows registry database rather than /etc/... files as they are on Linux. The Windows registry for the container is separate from that of the host, so concepts like mapping /etc/resolv.conf from the host into a container don't have the same effect they would on Linux. These must be configured using Windows APIs run in the context of that container. Therefore CNI implementations need to call the HNS instead of relying on file mappings to pass network details into the pod or container.
+윈도우 호스트 네트워킹 서비스와 가상 스위치는 네임스페이스를 구현하고 파드 또는 컨테이너에 필요한 가상 NIC을 만들 수 있다. 그러나 DNS, 라우트, 메트릭과 같은 많은 구성은 Linux에서와 같이 /etc/... 파일이 아닌 윈도우 레지스트리 데이터베이스에 저장된다. 컨테이너의 윈도우 레지스트리는 호스트 레지스트리와 별개이므로 호스트에서 컨테이너로 /etc/resolv.conf를 매핑하는 것과 같은 개념은 Linux에서와 동일한 효과를 갖지 않는다. 해당 컨테이너의 컨텍스트에서 실행되는 윈도우 API를 사용하여 구성해야 한다. 따라서 CNI 구현에서는 파일 매핑에 의존하는 대신 HNS를 호출하여 네트워크 세부 정보를 파드 또는 컨테이너로 전달해야 한다.
 
-The following networking functionality is not supported on Windows nodes
+다음 네트워킹 기능은 윈도우 노드에서 지원되지 않는다.
 
-* Host networking mode is not available for Windows pods
-* Local NodePort access from the node itself fails (works for other nodes or external clients)
-* Accessing service VIPs from nodes will be available with a future release of Windows Server
-* Overlay networking support in kube-proxy is an alpha release. In addition, it requires [KB4482887](https://support.microsoft.com/en-us/help/4482887/windows-10-update-kb4482887) to be installed on Windows Server 2019
-* Local Traffic Policy and DSR mode
-* Windows containers connected to l2bridge, l2tunnel, or overlay networks do not support communicating over the IPv6 stack. There is outstanding Windows platform work required to enable these network drivers to consume IPv6 addresses and subsequent Kubernetes work in kubelet, kube-proxy, and CNI plugins.
-* Outbound communication using the ICMP protocol via the win-overlay, win-bridge, and Azure-CNI plugin. Specifically, the Windows data plane ([VFP](https://www.microsoft.com/en-us/research/project/azure-virtual-filtering-platform/)) doesn't support ICMP packet transpositions. This means:
-  * ICMP packets directed to destinations within the same network (e.g. pod to pod communication via ping) work as expected and without any limitations
-  * TCP/UDP packets work as expected and without any limitations
-  * ICMP packets directed to pass through a remote network (e.g. pod to external internet communication via ping) cannot be transposed and thus will not be routed back to their source
-  * Since TCP/UDP packets can still be transposed, one can substitute `ping <destination>` with `curl <destination>` to be able to debug connectivity to the outside world.
+* 윈도우 파드에서는 호스트 네트워킹 모드를 사용할 수 없다.
+* 노드 자체에서 로컬 NodePort 액세스는 실패한다. (다른 노드 또는 외부 클라이언트에서 작동)
+* 노드에서 서비스 VIP에 액세스하는 것은 향후 Windows Server 릴리스에서 사용할 수 있다.
+* kube-proxy의 오버레이 네트워킹 지원은 알파 릴리스이다. 또한 Windows Server 2019에 [KB4482887](https://support.microsoft.com/en-us/help/4482887/윈도우-10-update-kb4482887)을 설치해야 한다.
+* 로컬 트래픽 정책 및 DSR 모드
+* l2bridge, l2tunnel 또는 오버레이 네트워크에 연결된 윈도우 컨테이너는 IPv6 스택을 통한 통신을 지원하지 않는다. 이러한 네트워크 드라이버가 IPv6 주소를 사용하고 kubelet, kube-proxy 및 CNI 플러그인에서 후속 쿠버네티스 작업을 사용할 수 있도록 하는데 필요한 뛰어난 윈도우 플랫폼 작업이 있다.
+* win-overlay, win-bridge, Azure-CNI 플러그인을 통해 ICMP 프로토콜을 사용하는 아웃바운드 통신. 특히, 윈도우 데이터 플레인 ([VFP](https://www.microsoft.com/en-us/research/project/azure-virtual-filtering-platform/))은 ICMP 패킷 치환을 지원하지 않다. 이것은 다음을 의미한다.
+  * 동일한 네트워크 (예: 핑을 통한 파드 간 통신) 내의 목적지로 전달되는 ICMP 패킷은 예상대로 제한없이 작동한다.
+  * TCP/UDP 패킷은 예상대로 제한없이 작동한다.
+  * 원격 네트워크를 통과하도록 지정된 ICMP 패킷 (예: ping을 통한 파드에서 외부 인터넷으로의 통신)은 치환될 수 없으므로 소스로 다시 라우팅되지 않는다.
+  * TCP/UDP 패킷은 여전히 ​​치환될 수 있기 때문에 `ping <destination>`을 `curl <destination>`으로 대체하여 외부와의 연결을 디버깅할 수 있다.
 
-These features were added in Kubernetes v1.15:
+해당 기능은 쿠버네티스 v1.15에 추가되었다.
 
 * `kubectl port-forward`
 
-##### CNI Plugins
+##### CNI 플러그인
 
-* Windows reference network plugins win-bridge and win-overlay do not currently implement [CNI spec](https://github.com/containernetworking/cni/blob/master/SPEC.md) v0.4.0 due to missing "CHECK" implementation.
-* The Flannel VXLAN CNI has the following limitations on Windows:
+* 윈도우 참조 네트워크 플러그인 win-bridge와 win-overlay는 현재 "CHECK" 구현 누락으로 인해 [CNI 사양](https://github.com/containernetworking/cni/blob/master/SPEC.md) v0.4.0을 구현하지 않는다.
+* Flannel VXLAN CNI는 윈도우에서 다음과 같은 제한이 있다.
 
-1. Node-pod connectivity isn't possible by design. It's only possible for local pods with Flannel v0.12.0 (or higher).
-2. We are restricted to using VNI 4096 and UDP port 4789. The VNI limitation is being worked on and will be overcome in a future release (open-source flannel changes). See the official [Flannel VXLAN](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan) backend docs for more details on these parameters.
+1. 노드-파드 연결은 설계상 불가능하다. Flannel v0.12.0(또는 그 이상)이 있는 로컬 파드에서만 가능하다.
+2. VNI 4096와 UDP 4789 포트 사용은 제한된다. VNI 제한(limitation)은 작업중이며 향후 릴리스 (오픈 소스 flannel 변경)에서 구현될 것이다. 이러한 파라미터에 대한 자세한 내용은 공식 [Flannel VXLAN](https://github.com/coreos/flannel/blob/master/Documentation/backends.md#vxlan) 백엔드 문서를 참고한다.
 
 ##### DNS {#dns-limitations}
 
-* ClusterFirstWithHostNet is not supported for DNS. Windows treats all names with a '.' as a FQDN and skips PQDN resolution
-* On Linux, you have a DNS suffix list, which is used when trying to resolve PQDNs. On Windows, we only have 1 DNS suffix, which is the DNS suffix associated with that pod's namespace (mydns.svc.cluster.local for example). Windows can resolve FQDNs and services or names resolvable with just that suffix. For example, a pod spawned in the default namespace, will have the DNS suffix **default.svc.cluster.local**. On a Windows pod, you can resolve both **kubernetes.default.svc.cluster.local** and **kubernetes**, but not the in-betweens, like **kubernetes.default** or **kubernetes.default.svc**.
-* On Windows, there are multiple DNS resolvers that can be used. As these come with slightly different behaviors, using the `Resolve-DNSName` utility for name query resolutions is recommended.
+* ClusterFirstWithHostNet은 DNS에서 지원되지 않는다. 윈도우는 모든 이름을 FQDN으로서 '.'로 처리하고 PQDN 확인을 건너뛴다.
+* Linux에서는 PQDN을 확인하려고 할 때 사용되는 DNS 접미사 목록이 있다. 윈도우에서는 해당 파드의 네임스페이스 (예: mydns.svc.cluster.local)와 연결된 DNS 접미사인 DNS 접미사 1개만 있다. 윈도우는 FQDN과 서비스 또는 해당 접미사만으로 확인할 수 있는 이름을 확인할 수 있다. 예를 들어 디폴트 네임스페이스에서 생성된 파드에는 DNS 접미사 **default.svc.cluster.local**이 있다. Windows 파드에서는 **kubernetes.default.svc.cluster.local** 및 **kubernetes**를 모두 확인할 수 있지만 **kubernetes.default** 또는 **kubernetes.default.svc**와 같은 중간 항목은 확인할 수 없다.
+* 윈도우에서는 사용할 수 있는 여러 가지의 DNS 리졸버(resolver)가 있다. 이들은 약간 다른 동작을 제공하므로, 이름 쿼리 확인을 위해 `Resolve-DNSName` 유틸리티를 사용하는 것이 좋다.
 
 ##### IPv6
-Kubernetes on Windows does not support single-stack "IPv6-only" networking. However,dual-stack IPv4/IPv6 networking for pods and nodes with single-family services is supported. See [IPv4/IPv6 dual-stack networking](#ipv4ipv6-dual-stack) for more details.
+윈도우의 쿠버네티스는 단일 스택 "IPv6 전용" 네트워킹을 지원하지 않는다. 그러나 단일 제품군 서비스를 사용하는 파드와 노드에 대한 이중 스택 IPv4/IPv6 네트워킹이 지원된다. 자세한 내용은 [IPv4/IPv6 이중 스택 네트워킹](#ipv4ipv6-dual-stack)을 참고한다.
 
 
-##### Session affinity
-Setting the maximum session sticky time for Windows services using `service.spec.sessionAffinityConfig.clientIP.timeoutSeconds` is not supported.
+##### 세션 어피니티(affinity)
+`service.spec.sessionAffinityConfig.clientIP.timeoutSeconds`를 사용하는 윈도우 서비스의 최대 세션 고정(sticky) 시간 설정은 지원되지 않는다.
 
-##### Security
+##### 보안
 
-Secrets are written in clear text on the node's volume (as compared to tmpfs/in-memory on linux). This means customers have to do two things
+시크릿(Secret)은 노드의 볼륨에 일반 텍스트로 작성된다. (리눅스의 tmpfs/in-memory와 비교) 이는 고객이 두 가지 작업을 수행해야함을 의미한다.
 
-1. Use file ACLs to secure the secrets file location
-2. Use volume-level encryption using [BitLocker](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-how-to-deploy-on-windows-server)
+1. 파일 ACL을 사용하여 시크릿 파일 위치를 보호한다.
+2. [BitLocker](https://docs.microsoft.com/en-us/windows/security/information-protection/bitlocker/bitlocker-how-to-deploy-on-windows-server)를 사용하여 볼륨-레벨 암호화 사용
 
-[RunAsUser ](/docs/concepts/policy/pod-security-policy/#users-and-groups)is not currently supported on Windows. The workaround is to create local accounts before packaging the container. The RunAsUsername capability may be added in a future release.
+[RunAsUser](/ko/docs/concepts/policy/pod-security-policy/#사용자-및-그룹)는 현재 윈도우에서 지원되지 않는다. 해결 방법(workaround)은 컨테이너를 패키징하기 전에 로컬 계정을 만드는 것이다. RunAsUsername 기능은 향후 릴리스에 추가될 수 있다.
 
-Linux specific pod security context privileges such as SELinux, AppArmor, Seccomp, Capabilities (POSIX Capabilities), and others are not supported.
+SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파드 시큐리티 컨텍스트 권한은 지원하지 않는다.
 
-In addition, as mentioned already, privileged containers are not supported on Windows.
+또한 이미 언급했듯이 권한있는(privileged) 컨테이너는 윈도우에서 지원되지 않습니다.
 
 #### API
 
-There are no differences in how most of the Kubernetes APIs work for Windows. The subtleties around what's different come down to differences in the OS and container runtime. In certain situations, some properties on workload APIs such as Pod or Container were designed with an assumption that they are implemented on Linux, failing to run on Windows.
+대부분의 Kubernetes API가 윈도우에서 작동하는 방식에는 차이가 없다. 중요한 차이점은 OS와 컨테이너 런타임의 차이로 귀결됩니다. 특정 상황에서 파드 또는 컨테이너와 같은 워크로드 API의 일부 속성은 리눅스에서 구현되고 윈도우에서 실행되지 않는다는 가정하에 설계되었다.
 
-At a high level, these OS concepts are different:
+높은 수준에서 이러한 OS 개념은 다르다.
 
-* Identity - Linux uses userID (UID) and groupID (GID) which are represented as integer types. User and group names are not canonical - they are just an alias in `/etc/groups` or `/etc/passwd` back to UID+GID. Windows uses a larger binary security identifier (SID) which is stored in the Windows Security Access Manager (SAM) database. This database is not shared between the host and containers, or between containers.
-* File permissions - Windows uses an access control list based on SIDs, rather than a bitmask of permissions and UID+GID
-* File paths - convention on Windows is to use `\` instead of `/`. The Go IO libraries typically accept both and just make it work, but when you're setting a path or command line that's interpreted inside a container, `\` may be needed.
-* Signals - Windows interactive apps handle termination differently, and can implement one or more of these:
-  * A UI thread handles well-defined messages including WM_CLOSE
-  * Console apps handle ctrl-c or ctrl-break using a Control Handler
-  * Services register a Service Control Handler function that can accept SERVICE_CONTROL_STOP control codes
+* ID - 리눅스는 정수형으로 표시되는 userID (UID) 및 groupID (GID)를 사용한다. 사용자와 그룹 이름은 정식 이름이 아니다. UID+GID에 대한 `/etc/groups` 또는 `/etc/passwd`의 별칭 일 뿐이다. 윈도우는 윈도우 보안 계정 매니져(Security Account Manager, SAM) 데이터베이스에 저장된 더 큰 이진 보안 식별자 (SID)를 사용한다. 이 데이터베이스는 호스트와 컨테이너간에 또는 컨테이너들 간에 공유되지 않는다.
+* 파일 퍼미션 - 윈도우는 권한 및 UUID+GID의 비트 마스크(bitmask) 대신 SID를 기반으로하는 액세스 제어 목록을 사용한다.
 
-Exit Codes follow the same convention where 0 is success, nonzero is failure. The specific error codes may differ across Windows and Linux. However, exit codes passed from the Kubernetes components (kubelet, kube-proxy) are unchanged.
+* 파일 경로 - 윈도우의 규칙은 `/` 대신 `\`를 사용하는 것이다. Go IO 라이브러리는 일반적으로 두 가지를 모두 허용하고 작동하도록 하지만, 컨테이너 내부에서 해석되는 경로 또는 명령 줄을 설정할 때 `\`가 필요할 수 있다.
+* 신호(Signals) - 윈도우 대화형(interactive) 앱은 종료를 다르게 처리하며, 다음 중 하나 이상을 구현할 수 있다.
+  * UI 스레드는 WM_CLOSE를 포함하여 잘 정의된(well-defined) 메시지를 처리한다.
+  * 콘솔 앱은 컨트롤 핸들러(Control Handler)를 사용하여 ctrl-c 또는 ctrl-break를 처리한다.
+  * 서비스는 SERVICE_CONTROL_STOP 제어 코드를 수용할 수있는 Service Control Handler 함수를 등록한다.
 
-##### V1.Container
+종료 코드는 0이 성공하고 0이 아닌 경우 실패하는 동일한 규칙을 따른다. 특정 오류 코드는 윈도우와 Linux에서 다를 수 있습니다. 그러나 쿠버네티스 컴포넌트 (kubelet, kube-proxy)에서 전달된 종료 코드는 변경되지 않는다.
+
+##### V1.컨테이너
 
 * V1.Container.ResourceRequirements.limits.cpu and V1.Container.ResourceRequirements.limits.memory - Windows doesn't use hard limits for CPU allocations. Instead, a share system is used. The existing fields based on millicores are scaled into relative shares that are followed by the Windows scheduler. [see: kuberuntime/helpers_windows.go](https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/kuberuntime/helpers_windows.go), [see: resource controls in Microsoft docs](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/resource-controls)
   * Huge pages are not implemented in the Windows container runtime, and are not available. They require [asserting a user privilege](https://docs.microsoft.com/en-us/windows/desktop/Memory/large-page-support) that's not configurable for containers.

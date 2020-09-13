@@ -359,7 +359,6 @@ SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파
 
 * ID - 리눅스는 정수형으로 표시되는 userID (UID) 및 groupID (GID)를 사용한다. 사용자와 그룹 이름은 정식 이름이 아니다. UID+GID에 대한 `/etc/groups` 또는 `/etc/passwd`의 별칭 일 뿐이다. 윈도우는 윈도우 보안 계정 매니져(Security Account Manager, SAM) 데이터베이스에 저장된 더 큰 이진 보안 식별자 (SID)를 사용한다. 이 데이터베이스는 호스트와 컨테이너간에 또는 컨테이너들 간에 공유되지 않는다.
 * 파일 퍼미션 - 윈도우는 권한 및 UUID+GID의 비트 마스크(bitmask) 대신 SID를 기반으로하는 액세스 제어 목록을 사용한다.
-
 * 파일 경로 - 윈도우의 규칙은 `/` 대신 `\`를 사용하는 것이다. Go IO 라이브러리는 일반적으로 두 가지를 모두 허용하고 작동하도록 하지만, 컨테이너 내부에서 해석되는 경로 또는 명령 줄을 설정할 때 `\`가 필요할 수 있다.
 * 신호(Signals) - 윈도우 대화형(interactive) 앱은 종료를 다르게 처리하며, 다음 중 하나 이상을 구현할 수 있다.
   * UI 스레드는 WM_CLOSE를 포함하여 잘 정의된(well-defined) 메시지를 처리한다.
@@ -368,113 +367,113 @@ SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파
 
 종료 코드는 0이 성공하고 0이 아닌 경우 실패하는 동일한 규칙을 따른다. 특정 오류 코드는 윈도우와 Linux에서 다를 수 있습니다. 그러나 쿠버네티스 컴포넌트 (kubelet, kube-proxy)에서 전달된 종료 코드는 변경되지 않는다.
 
-##### V1.컨테이너
+##### V1.Container
 
-* V1.Container.ResourceRequirements.limits.cpu and V1.Container.ResourceRequirements.limits.memory - Windows doesn't use hard limits for CPU allocations. Instead, a share system is used. The existing fields based on millicores are scaled into relative shares that are followed by the Windows scheduler. [see: kuberuntime/helpers_windows.go](https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/kuberuntime/helpers_windows.go), [see: resource controls in Microsoft docs](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/resource-controls)
-  * Huge pages are not implemented in the Windows container runtime, and are not available. They require [asserting a user privilege](https://docs.microsoft.com/en-us/windows/desktop/Memory/large-page-support) that's not configurable for containers.
-* V1.Container.ResourceRequirements.requests.cpu and V1.Container.ResourceRequirements.requests.memory - Requests are subtracted from node available resources, so they can be used to avoid overprovisioning a node. However, they cannot be used to guarantee resources in an overprovisioned node. They should be applied to all containers as a best practice if the operator wants to avoid overprovisioning entirely.
-* V1.Container.SecurityContext.allowPrivilegeEscalation - not possible on Windows, none of the capabilities are hooked up
-* V1.Container.SecurityContext.Capabilities - POSIX capabilities are not implemented on Windows
-* V1.Container.SecurityContext.privileged - Windows doesn't support privileged containers
-* V1.Container.SecurityContext.procMount - Windows doesn't have a /proc filesystem
-* V1.Container.SecurityContext.readOnlyRootFilesystem - not possible on Windows, write access is required for registry & system processes to run inside the container
-* V1.Container.SecurityContext.runAsGroup - not possible on Windows, no GID support
-* V1.Container.SecurityContext.runAsNonRoot - Windows does not have a root user. The closest equivalent is ContainerAdministrator which is an identity that doesn't exist on the node.
-* V1.Container.SecurityContext.runAsUser - not possible on Windows, no UID support as int.
-* V1.Container.SecurityContext.seLinuxOptions - not possible on Windows, no SELinux
-* V1.Container.terminationMessagePath - this has some limitations in that Windows doesn't support mapping single files. The default value is /dev/termination-log, which does work because it does not exist on Windows by default.
+* V1.Container.ResourceRequirements.limits.cpu 및 V1.Container.ResourceRequirements.limits.memory - 윈도우는 CPU 할당에 하드 리밋(limit)을 사용하지 않는다. 대신 공유 시스템이 사용된다. 밀리코어를 기반으로하는 기존 필드는 윈도우 스케줄러가 뒤 따르는 상대적인 공유로 스케일된다. [참고: kuberuntime/helpers_windows.go](https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/kuberuntime/helpers_windows.go), [참고: Microsoft docs에서 리소스 제어](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/resource-controls)
+  * 대형 페이지는 윈도우 컨테이너 런타임에서 구현되지 않으며, 사용할 수 없다. 컨테이너에 대해 구성할 수 없는 [사용자 권한(privilege) 어설트](https://docs.microsoft.com/en-us/windows/desktop/Memory/large-page-support)이 필요하다.
+* V1.Container.ResourceRequirements.requests.cpu 및 V1.Container.ResourceRequirements.requests.memory - 노드 사용 가능한 리소스에서 요청(requests)을 빼서, 노드 오버 프로비저닝을 방지하는데 사용할 수 있다. 그러나 오버 프로비저닝된 노드에서 리소스를 보장하는 데는 사용할 수 없다. 운영자가 오버 프로비저닝을 완전히 피하려는 경우 모범 사례로 모든 컨테이너에 적용해야 한다.
+* V1.Container.SecurityContext.allowPrivilegeEscalation - 윈도우에서는 불가능하며, 어떤 기능도 연결되지 않는다.
+* V1.Container.SecurityContext.Capabilities - POSIX 기능은 윈도우에서 구현되지 않는다.
+* V1.Container.SecurityContext.privileged - 윈도우는 권한 있는(privileged) 컨테이너를 지원하지 않는다.
+* V1.Container.SecurityContext.procMount - 윈도우에는 /proc 파일시스템이 없다.
+* V1.Container.SecurityContext.readOnlyRootFilesystem - 윈도우에서는 불가능하며, 레지스트리 및 시스템 프로세스가 컨테이너 내부에서 실행 되려면 쓰기 권한이 필요하다.
+* V1.Container.SecurityContext.runAsGroup - 윈도우에서는 불가능, GID 지원 없음
+* V1.Container.SecurityContext.runAsNonRoot - 윈도우에 root 사용자가 없다. 가장 가까운 항목은 노드에 존재하지 않는 ID인 ContainerAdministrator입니다.
+* V1.Container.SecurityContext.runAsUser - 윈도우에서는 불가능, int로 UID 지원 없음.
+* V1.Container.SecurityContext.seLinuxOptions - 윈도우에서는 불가능, SELinux 없음
+* V1.Container.terminationMessagePath - 윈도우가 단일 파일 매핑을 지원하지 않는다는 점에서 몇 가지 제한이 있다. 기본 값은 /dev/termination-log이며 기본적으로 윈도우에 존재하지 않기 때문에 작동한다.
 
 ##### V1.Pod
 
-* V1.Pod.hostIPC, v1.pod.hostpid - host namespace sharing is not possible on Windows
-* V1.Pod.hostNetwork - There is no Windows OS support to share the host network
-* V1.Pod.dnsPolicy - ClusterFirstWithHostNet - is not supported because Host Networking is not supported on Windows.
-* V1.Pod.podSecurityContext - see V1.PodSecurityContext below
-* V1.Pod.shareProcessNamespace - this is a beta feature, and depends on Linux namespaces which are not implemented on Windows. Windows cannot share process namespaces or the container's root filesystem. Only the network can be shared.
-* V1.Pod.terminationGracePeriodSeconds - this is not fully implemented in Docker on Windows, see: [reference](https://github.com/moby/moby/issues/25982). The behavior today is that the ENTRYPOINT process is sent CTRL_SHUTDOWN_EVENT, then Windows waits 5 seconds by default, and finally shuts down all processes using the normal Windows shutdown behavior. The 5 second default is actually in the Windows registry [inside the container](https://github.com/moby/moby/issues/25982#issuecomment-426441183), so it can be overridden when the container is built.
-* V1.Pod.volumeDevices - this is a beta feature, and is not implemented on Windows. Windows cannot attach raw block devices to pods.
-* V1.Pod.volumes - EmptyDir, Secret, ConfigMap, HostPath - all work and have tests in TestGrid
-  * V1.emptyDirVolumeSource - the Node default medium is disk on Windows. Memory is not supported, as Windows does not have a built-in RAM disk.
-* V1.VolumeMount.mountPropagation - mount propagation is not supported on Windows.
+* V1.Pod.hostIPC, v1.pod.hostpid - 윈도우에서 호스트 네임 스페이스 공유가 불가능하다.
+* V1.Pod.hostNetwork - 호스트 네트워크를 공유하기 위한 윈도우 OS 지원이 없다.
+* V1.Pod.dnsPolicy - ClusterFirstWithHostNet - 윈도우에서 호스트 네트워킹이 지원되지 않기 때문에 지원되지 않는다.
+* V1.Pod.podSecurityContext - 아래 V1.PodSecurityContext 참조
+* V1.Pod.shareProcessNamespace - 이것은 베타 기능이며 윈도우에서 구현되지 않은 리눅스 네임스페이스에 따라 다르다. 윈도우는 프로세스 네임스페이스 또는 컨테이너의 루트 파일시스템을 공유할 수 없다. 네트워크만 공유할 수 있다.
+* V1.Pod.terminationGracePeriodSeconds - 이것은 윈도우의 도커에서 완전히 구현되지 않았다. 다음을 참조한다. [참조](https://github.com/moby/moby/issues/25982). 현재 동작은 ENTRYPOINT 프로세스가 CTRL_SHUTDOWN_EVENT로 전송된 다음 윈도우가 기본적으로 5초를 기다린 후, 마지막으로 정상적인 윈도우 종료 동작을 사용하여 모든 프로세스를 종료하는 것이다. 5초 기본값은 실제로 [컨테이너 내부](https://github.com/moby/moby/issues/25982#issuecomment-426441183) 윈도우 레지스트리에 있으므로 컨테이너를 빌드할 때 재정의 할 수 있다.
+* V1.Pod.volumeDevices - 이것은 베타 기능이며 윈도우에서 구현되지 않는다. 윈도우는 원시 블록 장치(raw block device)를 파드에 연결할 수 없다.
+* V1.Pod.volumes - EmptyDir, 시크릿, 컨피그맵(ConfigMap), HostPath - 모두 작동하며 TestGrid에 테스트가 있다.
+  * V1.emptyDirVolumeSource - 노드 기본 매체는 윈도우의 디스크이다. 윈도우에는 내장 RAM 디스크가 없기 때문에 메모리는 지원되지 않는다.
+* V1.VolumeMount.mountPropagation - 마운트 전파(propagation)는 윈도우에서 지원되지 않는다.
 
 ##### V1.PodSecurityContext
 
-None of the PodSecurityContext fields work on Windows. They're listed here for reference.
+PodSecurityContext 필드는 윈도우에서 작동하지 않는다. 참조를 위해 여기에 나열되어 있다.
 
-* V1.PodSecurityContext.SELinuxOptions - SELinux is not available on Windows
-* V1.PodSecurityContext.RunAsUser - provides a UID, not available on Windows
-* V1.PodSecurityContext.RunAsGroup - provides a GID, not available on Windows
-* V1.PodSecurityContext.RunAsNonRoot - Windows does not have a root user. The closest equivalent is ContainerAdministrator which is an identity that doesn't exist on the node.
-* V1.PodSecurityContext.SupplementalGroups - provides GID, not available on Windows
-* V1.PodSecurityContext.Sysctls - these are part of the Linux sysctl interface. There's no equivalent on Windows.
+* V1.PodSecurityContext.SELinuxOptions - SELinux는 윈도우에서 사용할 수 없다.
+* V1.PodSecurityContext.RunAsUser - 윈도우에서는 사용할 수 없는 UID를 제공한다.
+* V1.PodSecurityContext.RunAsGroup - 윈도우에서는 사용할 수없는 GID를 제공한다.
+* V1.PodSecurityContext.RunAsNonRoot - 윈도우에 루트 사용자가 없습니다. 가장 가까운 항목은 노드에 존재하지 않는 아이덴티티(identity)인 ContainerAdministrator이다.
+* V1.PodSecurityContext.SupplementalGroups - 윈도우에서는 사용할 수 없는 GID 제공
+* V1.PodSecurityContext.Sysctls - 이것들은 Linux sysctl 인터페이스의 일부이다. 윈도우에는 이에 상응하는 것이 없다.
 
-## Getting Help and Troubleshooting {#troubleshooting}
+## 도움 받기 및 트러블슈팅 {#troubleshooting}
 
-Your main source of help for troubleshooting your Kubernetes cluster should start with this [section](/docs/tasks/debug-application-cluster/troubleshooting/). Some additional, Windows-specific troubleshooting help is included in this section. Logs are an important element of troubleshooting issues in Kubernetes. Make sure to include them any time you seek troubleshooting assistance from other contributors. Follow the instructions in the SIG-Windows [contributing guide on gathering logs](https://github.com/kubernetes/community/blob/master/sig-windows/CONTRIBUTING.md#gathering-logs).
+쿠버네티스 클러스터 트러블슈팅을 위한 기본 도움말은 이 [섹션](/docs/tasks/debug-application-cluster/troubleshooting/)에서 시작해야 한다. 이 섹션에는 몇 가지 추가 윈도우 관련 트러블슈팅 도움말이 포함되어 있다. 로그는 쿠버네티스에서 트러블슈팅하는데 중요한 요소이다. 다른 컨트리뷰터로부터 트러블슈팅 지원을 구할 때마다 이를 포함해야 한다. SIG-Windows [로그 수집에 대한 컨트리뷰트 가이드](https://github.com/kubernetes/community/blob/master/sig-windows/CONTRIBUTING.md#gathering-logs)의 지침을 따른다.
 
-1. How do I know start.ps1 completed successfully?
+1. start.ps1이 성공적으로 완료되었는지 어떻게 알 수 있는가?
 
-    You should see kubelet, kube-proxy, and (if you chose Flannel as your networking solution) flanneld host-agent processes running on your node, with running logs being displayed in separate PowerShell windows. In addition to this, your Windows node should be listed as "Ready" in your Kubernetes cluster.
+    kubelet, kube-proxy 및 (Flannel을 네트워킹 솔루션으로 선택한 경우) 노드에서 실행중인 flanneld 호스트 에이전트 프로세스를 확인할 수 있어야 하는데, 별도의 PowerShell 윈도우에서 실행중인 로그가 표시된다. 또한 윈도우 노드는 쿠버네티스 클러스터에서 "Ready"로 조회되어야 한다.
 
-1. Can I configure the Kubernetes node processes to run in the background as services?
+1. 백그라운드에서 서비스로 실행되도록 쿠버네티스 노드 프로세스를 구성할 수 있습니까?
 
-    Kubelet and kube-proxy are already configured to run as native Windows Services, offering resiliency by re-starting the services automatically in the event of failure (for example a process crash). You have two options for configuring these node components as services.
+    Kubelet 및 kube-proxy는 이미 기본 윈도우 서비스로 실행되도록 구성되어 있으며 실패(예: 프로세스 충돌)시 서비스를 자동으로 다시 시작하여 복원력(resiliency)을 제공한다. 이러한 노드 컴포넌트를 서비스로 구성하기 위한 두 가지 옵션이 있다.
 
-    1. As native Windows Services
+    1. 네이티브 윈도우 서비스
 
-        Kubelet & kube-proxy can be run as native Windows Services using `sc.exe`.
+        Kubelet와 kube-proxy는 `sc.exe`를 사용하여 네이티브 윈도우 서비스로 실행될 수 있다.
 
         ```powershell
-        # Create the services for kubelet and kube-proxy in two separate commands
-        sc.exe create <component_name> binPath= "<path_to_binary> --service <other_args>"
+        # 두 개의 개별 명령으로 kubelet 및 kube-proxy에 대한 서비스 생성
+        sc.exe create <컴포넌트_명> binPath= "<바이너리_경로> --service <다른_인자>"
 
-        # Please note that if the arguments contain spaces, they must be escaped.
-        sc.exe create kubelet binPath= "C:\kubelet.exe --service --hostname-override 'minion' <other_args>"
+        # 인자에 공백이 포함 된 경우 이스케이프 되어야 한다.
+        sc.exe create kubelet binPath= "C:\kubelet.exe --service --hostname-override 'minion' <다른_인자>"
 
-        # Start the services
+        # 서비스 시작
         Start-Service kubelet
         Start-Service kube-proxy
 
-        # Stop the service
+        # 서비스 중지
         Stop-Service kubelet (-Force)
         Stop-Service kube-proxy (-Force)
 
-        # Query the service status
+        # 서비스 상태 질의
         Get-Service kubelet
         Get-Service kube-proxy
         ```
 
-    1. Using nssm.exe
+    1. nssm.exe 사용
 
-        You can also always use alternative service managers like [nssm.exe](https://nssm.cc/) to run these processes (flanneld, kubelet & kube-proxy) in the background for you. You can use this [sample script](https://github.com/Microsoft/SDN/tree/master/Kubernetes/flannel/register-svc.ps1), leveraging nssm.exe to register kubelet, kube-proxy, and flanneld.exe to run as Windows services in the background.
+        또한 언제든지 [nssm.exe](https://nssm.cc/)와 같은 대체 서비스 관리자를 사용하여 백그라운드에서 이러한 프로세스 (flanneld, kubelet, kube-proxy)를 실행할 수 있다. 이 [샘플 스크립트](https://github.com/Microsoft/SDN/tree/master/Kubernetes/flannel/register-svc.ps1)를 사용하여 nssm.exe를 활용하여 kubelet, kube-proxy, flanneld.exe 등록할 수 있고, 백그라운드에서 윈도우 서비스로 실행한다.
 
         ```powershell
-        register-svc.ps1 -NetworkMode <Network mode> -ManagementIP <Windows Node IP> -ClusterCIDR <Cluster subnet> -KubeDnsServiceIP <Kube-dns Service IP> -LogDir <Directory to place logs>
+        register-svc.ps1 -NetworkMode <네트워크 모드> -ManagementIP <윈도우 노드 IP> -ClusterCIDR <클러스터 서브넷> -KubeDnsServiceIP <Kube-dns 서비스 IP> -LogDir <로그 위치 디렉토리>
 
-        # NetworkMode      = The network mode l2bridge (flannel host-gw, also the default value) or overlay (flannel vxlan) chosen as a network solution
-        # ManagementIP     = The IP address assigned to the Windows node. You can use ipconfig to find this
-        # ClusterCIDR      = The cluster subnet range. (Default value 10.244.0.0/16)
-        # KubeDnsServiceIP = The Kubernetes DNS service IP (Default value 10.96.0.10)
-        # LogDir           = The directory where kubelet and kube-proxy logs are redirected into their respective output files (Default value C:\k)
+        # NetworkMode      = 네트워크 솔루션으로 선택한 네트워크 모드 l2bridge (flannel host-gw, 기본값이기도 함) 또는 오버레이 (flannel vxlan)
+        # ManagementIP     = 윈도우 노드에 할당된 IP 주소. ipconfig를 사용하여 찾을 수 있다.
+        # ClusterCIDR      = 클러스터 서브넷 범위. (기본값 10.244.0.0/16)
+        # KubeDnsServiceIP = 쿠버네티스 DNS 서비스 IP (기본값 10.96.0.10)
+        # LogDir           = kubelet 및 kube-proxy 로그가 각각의 출력 파일로 리디렉션되는 디렉토리 (기본값 C:\k)
         ```
 
-        If the above referenced script is not suitable, you can manually configure nssm.exe using the following examples.
+        위에 언급된 스크립트가 적합하지 않은 경우, 다음 예제를 사용하여 nssm.exe를 수동으로 구성할 수 있다.
         ```powershell
-        # Register flanneld.exe
+        # flanneld.exe 등록
         nssm install flanneld C:\flannel\flanneld.exe
         nssm set flanneld AppParameters --kubeconfig-file=c:\k\config --iface=<ManagementIP> --ip-masq=1 --kube-subnet-mgr=1
         nssm set flanneld AppEnvironmentExtra NODE_NAME=<hostname>
         nssm set flanneld AppDirectory C:\flannel
         nssm start flanneld
 
-        # Register kubelet.exe
-        # Microsoft releases the pause infrastructure container at mcr.microsoft.com/k8s/core/pause:1.2.0
+        # kubelet.exe 등록
+        # Microsoft는 mcr.microsoft.com/k8s/core/pause:1.2.0에서 퍼즈(pause) 인프라 컨테이너를 릴리스했다.
         nssm install kubelet C:\k\kubelet.exe
         nssm set kubelet AppParameters --hostname-override=<hostname> --v=6 --pod-infra-container-image=mcr.microsoft.com/k8s/core/pause:1.2.0 --resolv-conf="" --allow-privileged=true --enable-debugging-handlers --cluster-dns=<DNS-service-IP> --cluster-domain=cluster.local --kubeconfig=c:\k\config --hairpin-mode=promiscuous-bridge --image-pull-progress-deadline=20m --cgroups-per-qos=false  --log-dir=<log directory> --logtostderr=false --enforce-node-allocatable="" --network-plugin=cni --cni-bin-dir=c:\k\cni --cni-conf-dir=c:\k\cni\config
         nssm set kubelet AppDirectory C:\k
         nssm start kubelet
 
-        # Register kube-proxy.exe (l2bridge / host-gw)
+        # kube-proxy.exe 등록 (l2bridge / host-gw)
         nssm install kube-proxy C:\k\kube-proxy.exe
         nssm set kube-proxy AppDirectory c:\k
         nssm set kube-proxy AppParameters --v=4 --proxy-mode=kernelspace --hostname-override=<hostname>--kubeconfig=c:\k\config --enable-dsr=false --log-dir=<log directory> --logtostderr=false
@@ -482,7 +481,7 @@ Your main source of help for troubleshooting your Kubernetes cluster should star
         nssm set kube-proxy DependOnService kubelet
         nssm start kube-proxy
 
-        # Register kube-proxy.exe (overlay / vxlan)
+        # kube-proxy.exe 등록 (overlay / vxlan)
         nssm install kube-proxy C:\k\kube-proxy.exe
         nssm set kube-proxy AppDirectory c:\k
         nssm set kube-proxy AppParameters --v=4 --proxy-mode=kernelspace --feature-gates="WinOverlay=true" --hostname-override=<hostname> --kubeconfig=c:\k\config --network-name=vxlan0 --source-vip=<source-vip> --enable-dsr=false --log-dir=<log directory> --logtostderr=false
@@ -491,68 +490,68 @@ Your main source of help for troubleshooting your Kubernetes cluster should star
         ```
 
 
-        For initial troubleshooting, you can use the following flags in [nssm.exe](https://nssm.cc/) to redirect stdout and stderr to a output file:
+        초기 트러블슈팅을 위해 [nssm.exe](https://nssm.cc/)에서 다음 플래그를 사용하여 stdout 및 stderr을 출력 파일로 리다이렉션 할 수 있다.
 
         ```powershell
         nssm set <Service Name> AppStdout C:\k\mysvc.log
         nssm set <Service Name> AppStderr C:\k\mysvc.log
         ```
 
-        For additional details, see official [nssm usage](https://nssm.cc/usage) docs.
+        자세한 내용은 공식 [nssm 사용](https://nssm.cc/usage) 문서를 참조한다.
 
-1. My Windows Pods do not have network connectivity
+1. 내 윈도우 파드에 네트워크 연결이 없다.
 
-    If you are using virtual machines, ensure that MAC spoofing is enabled on all the VM network adapter(s).
+    가상 머신을 사용하는 경우, 모든 VM 네트워크 어댑터에서 MAC 스푸핑이 활성화되어 있는지 확인한다.
 
-1. My Windows Pods cannot ping external resources
+1. 내 윈도우 파드가 외부 리소스를 ping 할 수 없다.
 
-    Windows Pods do not have outbound rules programmed for the ICMP protocol today. However, TCP/UDP is supported. When trying to demonstrate connectivity to resources outside of the cluster, please substitute `ping <IP>` with corresponding `curl <IP>` commands.
+    윈도우 파드에는 현재 ICMP 프로토콜 용으로 프로그래밍된 아웃바운드 규칙이 없다. 그러나 TCP/UDP는 지원된다. 클러스터 외부 리소스에 대한 연결을 시연하려는 경우, `ping <IP>`를 해당 `curl <IP>`명령으로 대체한다.
 
-    If you are still facing problems, most likely your network configuration in [cni.conf](https://github.com/Microsoft/SDN/blob/master/Kubernetes/flannel/l2bridge/cni/config/cni.conf) deserves some extra attention. You can always edit this static file. The configuration update will apply to any newly created Kubernetes resources.
+    여전히 문제가 발생하는 경우, [cni.conf](https://github.com/Microsoft/SDN/blob/master/Kubernetes/flannel/l2bridge/cni/config/cni.conf)의 네트워크 구성에 특별히 추가 확인이 필요하다. 언제든지 이 정적 파일을 편집할 수 있다. 구성 업데이트는 새로 생성된 모든 쿠버네티스 리소스에 적용된다.
 
-    One of the Kubernetes networking requirements (see [Kubernetes model](/docs/concepts/cluster-administration/networking/)) is for cluster communication to occur without NAT internally. To honor this requirement, there is an [ExceptionList](https://github.com/Microsoft/SDN/blob/master/Kubernetes/flannel/l2bridge/cni/config/cni.conf#L20) for all the communication where we do not want outbound NAT to occur. However, this also means that you need to exclude the external IP you are trying to query from the ExceptionList. Only then will the traffic originating from your Windows pods be SNAT'ed correctly to receive a response from the outside world. In this regard, your ExceptionList in `cni.conf` should look as follows:
+    쿠버네티스 네트워킹 요구사항 중 하나 ([쿠버네티스 모델](/ko/docs/concepts/cluster-administration/networking/))는 클러스터 통신이 내부적으로 NAT없이 발생하는 것이다. 이 요구 사항을 준수하기 위해 아웃바운드 NAT가 발생하지 않도록하는 모든 통신에 대한 [ExceptionList](https://github.com/Microsoft/SDN/blob/master/Kubernetes/flannel/l2bridge/cni/config/cni.conf#L20)가 있다. 그러나 이것은 또한 쿼리하려는 외부 IP를 ExceptionList에서 제외해야 함을 의미한다. 그래야만 윈도우 파드에서 발생하는 트래픽이 제대로 SNAT되어 외부에서 응답을 받는다. 이와 관련하여 `cni.conf`의 ExceptionList는 다음과 같아야 한다.
 
     ```conf
     "ExceptionList": [
-                    "10.244.0.0/16",  # Cluster subnet
-                    "10.96.0.0/12",   # Service subnet
-                    "10.127.130.0/24" # Management (host) subnet
+                    "10.244.0.0/16",  # 클러스터 서브넷
+                    "10.96.0.0/12",   # 서비스 서브넷
+                    "10.127.130.0/24" # 관리 (호스트) 서브넷
                 ]
     ```
 
-1. My Windows node cannot access NodePort service
+1. 내 윈도우 노드가 NodePort 서비스에 액세스 할 수 없다.
 
-    Local NodePort access from the node itself fails. This is a known limitation. NodePort access works from other nodes or external clients.
+    노드 자체에서는 로컬 NodePort 액세스가 실패한다. 이것은 알려진 제약사항이다. NodePort 액세스는 다른 노드 또는 외부 클라이언트에서는 가능하다.
 
-1. vNICs and HNS endpoints of containers are being deleted
+1. 컨테이너의 vNIC 및 HNS 엔드포인트가 삭제됨
 
-    This issue can be caused when the `hostname-override` parameter is not passed to [kube-proxy](/docs/reference/command-line-tools-reference/kube-proxy/). To resolve it, users need to pass the hostname to kube-proxy as follows:
+    이 문제는 `hostname-override` 파라미터가 [kube-proxy](/docs/reference/command-line-tools-reference/kube-proxy/)에 전달되지 않은 경우 발생할 수 있다. 이를 해결하려면 사용자는 다음과 같이 hostname을 kube-proxy에 전달해야 한다.
 
     ```powershell
     C:\k\kube-proxy.exe --hostname-override=$(hostname)
     ```
 
-1. With flannel my nodes are having issues after rejoining a cluster
+1. 플라넬(flannel)을 사용하면 클러스터에 다시 조인(join)한 후 노드에 이슈가 발생한다.
 
-    Whenever a previously deleted node is being re-joined to the cluster, flannelD tries to assign a new pod subnet to the node. Users should remove the old pod subnet configuration files in the following paths:
+    이전에 삭제된 노드가 클러스터에 다시 조인될 때마다, flannelD는 새 파드 서브넷을 노드에 할당하려고 한다. 사용자는 다음 경로에서 이전 파드 서브넷 구성 파일을 제거해야 한다.
 
     ```powershell
     Remove-Item C:\k\SourceVip.json
     Remove-Item C:\k\SourceVipRequest.json
     ```
 
-1. After launching `start.ps1`, flanneld is stuck in "Waiting for the Network to be created"
+1. `start.ps1`을 시작한 후, flanneld가 "Waiting for the Network to be created"에서 멈춘다.
 
-    There are numerous reports of this [issue which are being investigated](https://github.com/coreos/flannel/issues/1066); most likely it is a timing issue for when the management IP of the flannel network is set. A workaround is to simply relaunch start.ps1 or relaunch it manually as follows:
+    이 [조사중인 이슈](https://github.com/coreos/flannel/issues/1066)에 대한 수많은 보고가 있다. 플라넬 네트워크의 관리 IP가 설정될 때 타이밍 이슈일 가능성이 높다. 해결 방법은 간단히 start.ps1을 다시 시작하거나 다음과 같이 수동으로 다시 시작하는 것이다.
 
     ```powershell
     PS C:> [Environment]::SetEnvironmentVariable("NODE_NAME", "<Windows_Worker_Hostname>")
     PS C:> C:\flannel\flanneld.exe --kubeconfig-file=c:\k\config --iface=<Windows_Worker_Node_IP> --ip-masq=1 --kube-subnet-mgr=1
     ```
 
-1. My Windows Pods cannot launch because of missing `/run/flannel/subnet.env`
+1. `/run/flannel/subnet.env` 누락으로 인해 윈도우 파드를 시작할 수 없다.
 
-    This indicates that Flannel didn't launch correctly. You can either try to restart flanneld.exe or you can copy the files over manually from `/run/flannel/subnet.env` on the Kubernetes master to` C:\run\flannel\subnet.env` on the Windows worker node and modify the `FLANNEL_SUBNET` row to a different number. For example, if node subnet 10.244.4.1/24 is desired:
+    이것은 플라넬이 제대로 실행되지 않았음을 나타낸다. flanneld.exe를 다시 시작하거나 쿠버네티스 마스터의 `/run/flannel/subnet.env`에서 윈도우 워커 노드의 `C:\run\flannel\subnet.env`로 파일을 수동으로 복사할 수 있고, `FLANNEL_SUBNET` 행을 다른 숫자로 수정한다. 예를 들어 노드 서브넷 10.244.4.1/24가 필요한 경우
 
     ```env
     FLANNEL_NETWORK=10.244.0.0/16
@@ -561,58 +560,58 @@ Your main source of help for troubleshooting your Kubernetes cluster should star
     FLANNEL_IPMASQ=true
     ```
 
-1. My Windows node cannot access my services using the service IP
+1. 내 윈도우 노드가 서비스 IP를 사용하여 내 서비스에 액세스할 수 없다.
 
-    This is a known limitation of the current networking stack on Windows. Windows Pods are able to access the service IP however.
+    이는 윈도우에서 현재 네트워킹 스택의 알려진 제약 사항이다. 그러나 윈도우 파드는 서비스 IP에 액세스 할 수 있다.
 
-1. No network adapter is found when starting kubelet
+1. kubelet을 시작할 때 네트워크 어댑터를 찾을 수 없다.
 
-    The Windows networking stack needs a virtual adapter for Kubernetes networking to work. If the following commands return no results (in an admin shell), virtual network creation — a necessary prerequisite for Kubelet to work — has failed:
+    윈도우 네트워킹 스택에는 쿠버네티스 네트워킹이 작동하기 위한 가상 어댑터가 필요하다. 다음 명령이 (어드민 쉘에서) 결과를 반환하지 않으면 Kubelet이 작동하는데 필요한 필수 구성 요소인 가상 네트워크 생성이 실패한 것이다.
 
     ```powershell
     Get-HnsNetwork | ? Name -ieq "cbr0"
     Get-NetAdapter | ? Name -Like "vEthernet (Ethernet*"
     ```
 
-    Often it is worthwhile to modify the [InterfaceName](https://github.com/microsoft/SDN/blob/master/Kubernetes/flannel/start.ps1#L6) parameter of the start.ps1 script, in cases where the host's network adapter isn't "Ethernet". Otherwise, consult the output of the `start-kubelet.ps1` script to see if there are errors during virtual network creation.
+    호스트 네트워크 어댑터가 "Ethernet"이 아닌 경우, 종종 start.ps1 스크립트의 [InterfaceName](https://github.com/microsoft/SDN/blob/master/Kubernetes/flannel/start.ps1#L6) 파라미터를 수정하는 것이 좋다. 그렇지 않으면 `start-kubelet.ps1` 스크립트의 출력을 참조하여 가상 네트워크 생성 중에 오류가 있는지 확인한다.
 
-1. My Pods are stuck at "Container Creating" or restarting over and over
+1. 내 파드가 "Container Creating"에서 멈췄거나 계속해서 다시 시작(restarting)된다.
 
-    Check that your pause image is compatible with your OS version. The [instructions](https://docs.microsoft.com/en-us/virtualization/windowscontainers/kubernetes/deploying-resources) assume that both the OS and the containers are version 1803. If you have a later version of Windows, such as an Insider build, you need to adjust the images accordingly. Please refer to the Microsoft's [Docker repository](https://hub.docker.com/u/microsoft/) for images. Regardless, both the pause image Dockerfile and the sample service expect the image to be tagged as :latest.
+    pause 이미지가 OS 버전과 호환되는지 확인한다. [지침](https://docs.microsoft.com/en-us/virtualization/windowscontainers/kubernetes/deploying-resources)에서는 OS와 컨테이너가 모두 버전 1803이라고 가정한다. 이후 버전의 윈도우가 있는 경우, Insider 빌드와 같이 그에 따라 이미지를 조정해야 한다. 이미지는 Microsoft의 [Docker 저장소](https://hub.docker.com/u/microsoft/)를 참조한다. 그럼에도 불구하고, pause 이미지 Dockerfile과 샘플 서비스는 이미지가 :latest로 태그될 것으로 예상한다.
 
-    Starting with Kubernetes v1.14, Microsoft releases the pause infrastructure container at `mcr.microsoft.com/k8s/core/pause:1.2.0`.
+    쿠버네티스 v1.14부터 Microsoft는 `mcr.microsoft.com/k8s/core/pause:1.2.0`에서 pause 인프라 컨테이너를 릴리스한다.
 
-1. DNS resolution is not properly working
+1. DNS 확인(resolution)이 제대로 작동하지 않는다.
 
-    Check the DNS limitations for Windows in this [section](#dns-limitations).
+    이 [섹션](#dns-limitations)에서 윈도우에 대한 DNS 제한을 확인한다.
+    
+1. `kubectl port-forward`가 "포트 포워딩을 수행할 수 없음: wincat을 찾을 수 없음"으로 실패
 
-1. `kubectl port-forward` fails with "unable to do port forwarding: wincat not found"
+    이는 쿠버네티스 1.15 및 pause 인프라 컨테이너 `mcr.microsoft.com/k8s/core/pause:1.2.0`에서 구현되었다. 해당 버전 또는 최신 버전을 사용해야 한다.
+    자체 pause 인프라 컨테이너를 빌드하려면 [wincat](https://github.com/kubernetes-sigs/sig-windows-tools/tree/master/cmd/wincat)을 포함해야 한다.
 
-    This was implemented in Kubernetes 1.15, and the pause infrastructure container `mcr.microsoft.com/k8s/core/pause:1.2.0`. Be sure to use these versions or newer ones.
-    If you would like to build your own pause infrastructure container, be sure to include [wincat](https://github.com/kubernetes-sigs/sig-windows-tools/tree/master/cmd/wincat)
+1. 내 윈도우 서버 노드가 프록시 뒤에 있기 때문에 내 쿠버네티스 설치가 실패한다.
 
-1. My Kubernetes installation is failing because my Windows Server node is behind a proxy
-
-    If you are behind a proxy, the following PowerShell environment variables must be defined:
+    프록시 뒤에있는 경우 다음 PowerShell 환경 변수를 정의해야 한다.
 
     ```PowerShell
     [Environment]::SetEnvironmentVariable("HTTP_PROXY", "http://proxy.example.com:80/", [EnvironmentVariableTarget]::Machine)
     [Environment]::SetEnvironmentVariable("HTTPS_PROXY", "http://proxy.example.com:443/", [EnvironmentVariableTarget]::Machine)
     ```
 
-1. What is a `pause` container?
+1. `pause` 컨테이너 란 무엇인가?
 
-    In a Kubernetes Pod, an infrastructure or "pause" container is first created to host the container endpoint. Containers that belong to the same pod, including infrastructure and worker containers, share a common network namespace and endpoint (same IP and port space). Pause containers are needed to accommodate worker containers crashing or restarting without losing any of the networking configuration.
+    쿠버네티스 파드에서는 컨테이너 엔드포인트를 호스팅하기 위해 먼저 인프라 또는 "pause" 컨테이너가 생성된다. 인프라 및 워커 컨테이너를 포함하여 동일한 파드에 속하는 컨테이너는 공통 네트워크 네임스페이스 및 엔드포인트 (동일한 IP 및 포트 공간)를 공유한다. 네트워크 구성을 잃지 않고 워커 컨테이너가 충돌하거나 다시 시작되도록 하려면 pause 컨테이너가 필요하다.
 
-    The "pause" (infrastructure) image is hosted on Microsoft Container Registry (MCR). You can access it using `docker pull mcr.microsoft.com/k8s/core/pause:1.2.0`. For more details, see the [DOCKERFILE](https://github.com/kubernetes-sigs/sig-windows-tools/tree/master/cmd/wincat).
+    "pause" (인프라) 이미지는 Microsoft Container Registry (MCR)에서 호스팅된다. `docker pull mcr.microsoft.com/k8s/core/pause:1.2.0`을 사용하여 액세스할 수 있다. 자세한 내용은 [DOCKERFILE](https://github.com/kubernetes-sigs/sig-windows-tools/tree/master/cmd/wincat)을 참조한다.
 
-### Further investigation
+### 추가 조사
 
-If these steps don't resolve your problem, you can get help running Windows containers on Windows nodes in Kubernetes through:
+이러한 단계로 문제가 해결되지 않으면, 다음을 통해 쿠버네티스의 윈도우 노드에서 윈도우 컨테이너를 실행하는데 도움을 받을 수 있다.
 
-* StackOverflow [Windows Server Container](https://stackoverflow.com/questions/tagged/windows-server-container) topic
-* Kubernetes Official Forum [discuss.kubernetes.io](https://discuss.kubernetes.io/)
-* Kubernetes Slack [#SIG-Windows Channel](https://kubernetes.slack.com/messages/sig-windows)
+* 스택오버플로우 [윈도우 서버 컨테이너](https://stackoverflow.com/questions/tagged/windows-server-container) 주제
+* 쿠버네티스 공식 포럼 [discuss.kubernetes.io](https://discuss.kubernetes.io/)
+* 쿠버네티스 슬랙 [#SIG-Windows Channel](https://kubernetes.slack.com/messages/sig-windows)
 
 ## Reporting Issues and Feature Requests
 

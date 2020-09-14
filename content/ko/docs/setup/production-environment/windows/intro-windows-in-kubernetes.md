@@ -349,11 +349,11 @@ CSI 노드 플러그인 (특히 블록 디바이스 또는 공유 파일 시스�
 
 SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파드 시큐리티 컨텍스트 권한은 지원하지 않는다.
 
-또한 이미 언급했듯이 권한있는(privileged) 컨테이너는 윈도우에서 지원되지 않습니다.
+또한 이미 언급했듯이 권한있는(privileged) 컨테이너는 윈도우에서 지원되지 않는다.
 
 #### API
 
-대부분의 Kubernetes API가 윈도우에서 작동하는 방식에는 차이가 없다. 중요한 차이점은 OS와 컨테이너 런타임의 차이로 귀결됩니다. 특정 상황에서 파드 또는 컨테이너와 같은 워크로드 API의 일부 속성은 리눅스에서 구현되고 윈도우에서 실행되지 않는다는 가정하에 설계되었다.
+대부분의 Kubernetes API가 윈도우에서 작동하는 방식에는 차이가 없다. 중요한 차이점은 OS와 컨테이너 런타임의 차이로 귀결된다. 특정 상황에서 파드 또는 컨테이너와 같은 워크로드 API의 일부 속성은 리눅스에서 구현되고 윈도우에서 실행되지 않는다는 가정하에 설계되었다.
 
 높은 수준에서 이러한 OS 개념은 다르다.
 
@@ -365,7 +365,7 @@ SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파
   * 콘솔 앱은 컨트롤 핸들러(Control Handler)를 사용하여 ctrl-c 또는 ctrl-break를 처리한다.
   * 서비스는 SERVICE_CONTROL_STOP 제어 코드를 수용할 수있는 Service Control Handler 함수를 등록한다.
 
-종료 코드는 0이 성공하고 0이 아닌 경우 실패하는 동일한 규칙을 따른다. 특정 오류 코드는 윈도우와 Linux에서 다를 수 있습니다. 그러나 쿠버네티스 컴포넌트 (kubelet, kube-proxy)에서 전달된 종료 코드는 변경되지 않는다.
+종료 코드는 0이 성공하고 0이 아닌 경우 실패하는 동일한 규칙을 따른다. 특정 오류 코드는 윈도우와 Linux에서 다를 수 있다. 그러나 쿠버네티스 컴포넌트 (kubelet, kube-proxy)에서 전달된 종료 코드는 변경되지 않는다.
 
 ##### V1.Container
 
@@ -378,7 +378,7 @@ SELinux, AppArmor, Seccomp, 기능 (POSIX 기능)과 같은 리눅스 특정 파
 * V1.Container.SecurityContext.procMount - 윈도우에는 /proc 파일시스템이 없다.
 * V1.Container.SecurityContext.readOnlyRootFilesystem - 윈도우에서는 불가능하며, 레지스트리 및 시스템 프로세스가 컨테이너 내부에서 실행 되려면 쓰기 권한이 필요하다.
 * V1.Container.SecurityContext.runAsGroup - 윈도우에서는 불가능, GID 지원 없음
-* V1.Container.SecurityContext.runAsNonRoot - 윈도우에 root 사용자가 없다. 가장 가까운 항목은 노드에 존재하지 않는 ID인 ContainerAdministrator입니다.
+* V1.Container.SecurityContext.runAsNonRoot - 윈도우에 root 사용자가 없다. 가장 가까운 항목은 노드에 존재하지 않는 아이덴티티(identity)인 ContainerAdministrator이다.
 * V1.Container.SecurityContext.runAsUser - 윈도우에서는 불가능, int로 UID 지원 없음.
 * V1.Container.SecurityContext.seLinuxOptions - 윈도우에서는 불가능, SELinux 없음
 * V1.Container.terminationMessagePath - 윈도우가 단일 파일 매핑을 지원하지 않는다는 점에서 몇 가지 제한이 있다. 기본 값은 /dev/termination-log이며 기본적으로 윈도우에 존재하지 않기 때문에 작동한다.
@@ -403,7 +403,7 @@ PodSecurityContext 필드는 윈도우에서 작동하지 않는다. 참조를 �
 * V1.PodSecurityContext.SELinuxOptions - SELinux는 윈도우에서 사용할 수 없다.
 * V1.PodSecurityContext.RunAsUser - 윈도우에서는 사용할 수 없는 UID를 제공한다.
 * V1.PodSecurityContext.RunAsGroup - 윈도우에서는 사용할 수없는 GID를 제공한다.
-* V1.PodSecurityContext.RunAsNonRoot - 윈도우에 루트 사용자가 없습니다. 가장 가까운 항목은 노드에 존재하지 않는 아이덴티티(identity)인 ContainerAdministrator이다.
+* V1.PodSecurityContext.RunAsNonRoot - 윈도우에 루트 사용자가 없다. 가장 가까운 항목은 노드에 존재하지 않는 아이덴티티(identity)인 ContainerAdministrator이다.
 * V1.PodSecurityContext.SupplementalGroups - 윈도우에서는 사용할 수 없는 GID 제공
 * V1.PodSecurityContext.Sysctls - 이것들은 Linux sysctl 인터페이스의 일부이다. 윈도우에는 이에 상응하는 것이 없다.
 
@@ -613,35 +613,35 @@ PodSecurityContext 필드는 윈도우에서 작동하지 않는다. 참조를 �
 * 쿠버네티스 공식 포럼 [discuss.kubernetes.io](https://discuss.kubernetes.io/)
 * 쿠버네티스 슬랙 [#SIG-Windows Channel](https://kubernetes.slack.com/messages/sig-windows)
 
-## Reporting Issues and Feature Requests
+## 이슈 리포팅 및 기능 요청
 
-If you have what looks like a bug, or you would like to make a feature request, please use the [GitHub issue tracking system](https://github.com/kubernetes/kubernetes/issues). You can open issues on [GitHub](https://github.com/kubernetes/kubernetes/issues/new/choose) and assign them to SIG-Windows. You should first search the list of issues in case it was reported previously and comment with your experience on the issue and add additional logs. SIG-Windows Slack is also a great avenue to get some initial support and troubleshooting ideas prior to creating a ticket.
+버그처럼 보이는 부분이 있거나 기능 요청을 하고 싶다면, [GitHub 이슈 트래킹 시스템](https://github.com/kubernetes/kubernetes/issues)을 활용한다. [GitHub](https://github.com/kubernetes/kubernetes/issues/new/choose)에서 이슈를 열고 SIG-Windows에 할당할 수 있다. 먼저 이전에 보고된 이슈 목록을 검색하고 이슈에 대한 경험을 언급하고 추가 로그를 첨부해야 한다. SIG-Windows Slack은 티켓을 만들기 전에 초기 지원 및 트러블슈팅 아이디어를 얻을 수 있는 좋은 방법이기도 하다.
 
-If filing a bug, please include detailed information about how to reproduce the problem, such as:
+버그를 제출하는 경우, 다음과 같이 문제를 재현하는 방법에 대한 자세한 정보를 포함한다.
 
-* Kubernetes version: kubectl version
-* Environment details: Cloud provider, OS distro, networking choice and configuration, and Docker version
-* Detailed steps to reproduce the problem
-* [Relevant logs](https://github.com/kubernetes/community/blob/master/sig-windows/CONTRIBUTING.md#gathering-logs)
-* Tag the issue sig/windows by commenting on the issue with `/sig windows` to bring it to a SIG-Windows member's attention
+* 쿠버네티스 버전: kubectl version
+* 환경 세부사항: 클라우드 공급자, OS 배포판, 네트워킹 선택 및 구성, 도커 버전
+* 문제를 재현하기 위한 세부 단계
+* [관련 로그](https://github.com/kubernetes/community/blob/master/sig-windows/CONTRIBUTING.md#gathering-logs)
+* SIG-Windows 회원의 주의를 끌 수 있도록 `/sig windows`로 문제에 대해 어노테이션을 달아 문제 sig/windows에 태그를 지정한다.
 
 
 
 ## {{% heading "whatsnext" %}}
 
 
-We have a lot of features in our roadmap. An abbreviated high level list is included below, but we encourage you to view our [roadmap project](https://github.com/orgs/kubernetes/projects/8) and help us make Windows support better by [contributing](https://github.com/kubernetes/community/blob/master/sig-windows/).
+로드맵에는 많은 기능이 있다. 요약된 상위 수준 목록이 아래에 포함되어 있지만, [로드맵 프로젝트](https://github.com/orgs/kubernetes/projects/8)를 보고 [컨트리뷰션]((https://github.com/kubernetes/community/blob/master/sig-windows/)하여 윈도우 지원을 개선하는데 도움이 주는 것이 좋다.
 
-### Hyper-V isolation
+### Hyper-V 격리(isolation)
 
-Hyper-V isolation is requried to enable the following use cases for Windows containers in Kubernetes:
+쿠버네티스에서 윈도우 컨테이너에 대해 다음 유스케이스를 사용하려면 Hyper-V 격리가 필요하다.
 
-* Hypervisor-based isolation between pods for additional security
-* Backwards compatibility allowing a node to run a newer Windows Server version without requiring containers to be rebuilt
-* Specific CPU/NUMA settings for a pod
-* Memory isolation and reservations
+* 추가 보안을 위해 파드 간 하이퍼바이저 기반 격리
+* 하위 호환성을 통해 컨테이너를 다시 빌드할 필요없이 노드에서 최신 윈도우 서버 버전을 실행할 수 있다.
+* 파드에 대한 특정 CPU/NUMA 설정
+* 메모리 격리 및 예약
 
-The existing Hyper-V isolation support, an experimental feature as of v1.10, will be deprecated in the future in favor of the CRI-ContainerD and RuntimeClass features mentioned above. To use the current features and create a Hyper-V isolated container, the kubelet should be started with feature gates `HyperVContainer=true` and the Pod should include the annotation `experimental.windows.kubernetes.io/isolation-type=hyperv`. In the experiemental release, this feature is limited to 1 container per Pod.
+v1.10의 실험적(experimental) 기능인 기존 Hyper-V 격리 지원은 위에서 언급한 CRI-ContainerD와 RuntimeClass 기능을 위해 향후 사용 중단(deprecated)된다. 현재 기능을 사용하고 Hyper-V 격리된 컨테이너를 만드려면 kubelet을 기능 게이트(feature gates) `HyperVContainer=true`로 시작해야 하고 파드에 `experimental.windows.kubernetes.io/isolation-type=hyperv` 어노테이션을 포함해야 한다. 실험 릴리스에서 이 기능은 파드 당 컨테이너 1개로 제한된다.
 
 ```yaml
 apiVersion: apps/v1
@@ -667,17 +667,17 @@ spec:
         - containerPort: 80
 ```
 
-### Deployment with kubeadm and cluster API
+### kubeadm 및 클러스터 API를 사용한 배포
 
-Kubeadm is becoming the de facto standard for users to deploy a Kubernetes
-cluster. Windows node support in kubeadm is currently a work-in-progress but a
-guide is available [here](/docs/tasks/administer-cluster/kubeadm/adding-windows-nodes/).
-We are also making investments in cluster API to ensure Windows nodes are
-properly provisioned.
+Kubeadm은 사용자가 쿠버네티스 클러스터를 배포하기 위한 사실상의 표준이 
+되고 있다. kubeadm의 윈도우 노드 지원은 현재 작업 중이지만 
+[여기](/docs/tasks/administer-cluster/kubeadm/adding-windows-nodes/)에서 가이드를 사용할 수 있다.
+또한 윈도우 노드가 적절하게 프로비저닝 되도록 클러스터 API에 
+투자하고 있다.
 
-### A few other key features
-* Beta support for Group Managed Service Accounts
-* More CNIs
-* More Storage Plugins
+### 몇 가지 기타 주요 기능
+* 그룹 관리 서비스 어카운트(Service Accounts)에 대한 베타 지원
+* 더 많은 CNI
+* 더 많은 스토리지 플러그인
 
 
